@@ -1,3 +1,13 @@
+## I2C Example
+
+Example that uses the I2C.h libraries and I2C_Transaction Struct to transmit and
+receive data from I2C enabled peripherals.
+
+
+Make sure to make clean your workspace before running debugger!
+
+-------------------------------------------------------------------------
+
 ## Example Summary
 
 Example that uses the UART driver to echo back to the console. It also

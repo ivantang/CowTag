@@ -73,6 +73,8 @@ PIN_Config ledPinTable[] = {
     PIN_TERMINATE
 };
 
+/*boolean to show if transfer is done*/
+bool	transferDone = false;
 /*
  *  ======== echoFxn ========
  *  Task for this function is created statically. See the project's .cfg file.
@@ -107,50 +109,111 @@ Void echoFxn(UArg arg0, UArg arg1)
     }
 }
 
+static void transferCallback(I2C_Handle handle, I2C_Transaction *transac, bool result)
+{
+    // Set length bytes
+    if (result) {
+        transferDone = true;
+        System_printf("Transaction complete\n");
+    } else {
+        // Transaction failed, act accordingly...
+        System_printf("Transaction failed\n");
+    }
+    System_flush();
+}
+
 Void taskGetI2C(UArg arg0, UArg arg1){
 	unsigned int	i;
 	uint16_t		acceleration;
     uint8_t         txBuffer[8];
     uint8_t         rxBuffer[2];
-    I2C_Handle      i2c;
-    I2C_Params      i2cParams;
     I2C_Transaction i2cTransaction;
 
-    /* Create I2C for usage */
-    I2C_Params_init(&i2cParams);
-    i2cParams.bitRate = I2C_400kHz;
-    i2c = I2C_open(Board_I2C, &i2cParams);
-    if (i2c == NULL) {
-        System_abort("Error Initializing I2C\n");
-    }
-    else {
-        System_printf("I2C Initialized!\n");
-    }
+    //locals
+    I2C_Handle handle;
+    I2C_Params params;
+
+    // Configure I2C parameters.
+    I2C_Params_init(&params);
+    params.transferMode = I2C_MODE_CALLBACK;
+    params.transferCallbackFxn = transferCallback;
 
     /*prepare data to send*/
-    txBuffer[0] = LIS3DH_TEMP;	//enable all axes, normal mode
-    txBuffer[1] = 0x88;			//high res & BDU enabled
+    txBuffer[0] = LIS3DH_TEMP;	//all axes, normal mode 0x07
+    txBuffer[1] = 0x88;			//high res
     txBuffer[2] = 0x10;			//DRDY on INT1
     txBuffer[3] = 0x80;			//enable adcs
 
-
-    /*Fetch LIS3DH accelerometer data*/
+    /*initialize master I2C transaction structure*/
 
     i2cTransaction.writeBuf = txBuffer;
-    i2cTransaction.writeCount = 4;
+    i2cTransaction.writeCount = 16;
     i2cTransaction.readBuf = rxBuffer;
-    i2cTransaction.readCount = 5;
-    i2cTransaction.slaveAddress = Board_LIS3DH_ADDR;
+    i2cTransaction.readCount = 0;
+    i2cTransaction.slaveAddress = Board_LIS3DH_ADDR; //0x18
 
+    /* Create I2C for usage */
+    //I2C_Params_init(&i2cParams);
+    params.bitRate = I2C_400kHz;
+    handle = I2C_open(Board_I2C, &params);
+    if (handle == NULL) {
+        System_abort("Error Initializing I2C for Transmitting\n");
+    }
+    else {
+        System_printf("I2C Initialized for Transmitting!\n");
+    }
+
+    //do i2c transfer in callback mode (doesn't stall system)
+    I2C_transfer(handle, &i2cTransaction);
+
+    while(!transferDone){
+    	//loop until transfer is complete
+    	System_printf("Waiting for transferDone\n");
+    	System_flush();
+    	Task_sleep(1000000 / Clock_tickPeriod);
+    }
+
+    /*Deinitialized I2C */
+    I2C_close(handle);
+    System_printf("I2C closed. transfer finished\n");
+
+    System_flush();
+
+    /*receiving now*/
+
+    /*configure I2C parameters*/
+    I2C_Params_init(&params);
+
+    /*initialize master I2C transaction structure*/
+    i2cTransaction.writeBuf = txBuffer;
+    i2cTransaction.writeCount = 0;
+    i2cTransaction.readBuf = rxBuffer;
+    i2cTransaction.readCount = 16;
+    i2cTransaction.slaveAddress = Board_LIS3DH_ADDR; //0x18
+
+    /*open i2c*/
+    handle = I2C_open(Board_I2C, &params);
+    if (handle == NULL) {
+        System_abort("Error Initializing I2C for Receiving\n");
+    }
+    else {
+        System_printf("I2C Initialized for Receiving!\n");
+    }
     /*take a few samples and print into console*/
-    for(i = 0; i< 5; i++){
-    	if (I2C_transfer(i2c, &i2cTransaction)){
-    		acceleration = rxBuffer;
-    		System_printf("Acceleration sample %u: %d (g)\n", i, acceleration);
+    for(i = 1; i< 100; i++){
+    	if (I2C_transfer(handle, &i2cTransaction)){
+    		acceleration = (uint16_t)(rxBuffer[i] << 8 | rxBuffer[i-1]);
+    		//acceleration |= acceleration << 8;
+    		if(i%3 == 1)
+    			System_printf("x%u: %d (g)      ", i, acceleration);
+    		if(i%3 == 2)
+    			System_printf("y%u: %d (g)      ", i, acceleration);
+    		if(i%3 == 0)
+    			System_printf("z%u: %d (g)\n", i, acceleration);
     	}
     	else{
     		System_printf("I2C Bus fault");
-    		System_printf("      (rx buffer: %d)\n",acceleration );
+    		//System_printf("      (rx buffer: %d)\n",acceleration );
     	}
 
     	System_flush();
@@ -158,11 +221,12 @@ Void taskGetI2C(UArg arg0, UArg arg1){
     }
 
     /*Deinitialized I2C */
-    I2C_close(i2c);
-    System_printf("I2C closed \n");
+    I2C_close(handle);
+    System_printf("I2C closed receiving finished\n");
 
     System_flush();
 }
+
 
 /*
  *  ======== main ========

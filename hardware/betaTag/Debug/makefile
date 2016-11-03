@@ -121,32 +121,32 @@ endif
 
 # Add inputs and outputs from these tool invocations to the build variables 
 EXE_OUTPUTS += \
-uartecho_CC1310_LAUNCHXL_TI.out \
+betaTag.out \
 
 EXE_OUTPUTS__QUOTED += \
-"uartecho_CC1310_LAUNCHXL_TI.out" \
+"betaTag.out" \
 
 BIN_OUTPUTS += \
-uartecho_CC1310_LAUNCHXL_TI.hex \
+betaTag.hex \
 
 BIN_OUTPUTS__QUOTED += \
-"uartecho_CC1310_LAUNCHXL_TI.hex" \
+"betaTag.hex" \
 
 
 # All Target
-all: uartecho_CC1310_LAUNCHXL_TI.out
+all: betaTag.out
 
 # Tool invocations
-uartecho_CC1310_LAUNCHXL_TI.out: $(OBJS) $(CMD_SRCS) $(GEN_CMDS)
+betaTag.out: $(OBJS) $(CMD_SRCS) $(GEN_CMDS)
 	@echo 'Building target: $@'
 	@echo 'Invoking: ARM Linker'
-	"/home/ivan/ti/ccsv6/tools/compiler/arm_15.12.3.LTS/bin/armcl" -mv7M3 --code_state=16 --float_support=vfplib -me -g --define=ccs --display_error_number --diag_warning=225 --diag_warning=255 --diag_wrap=off --gen_func_subsections=on --abi=eabi -z -m"uartecho_CC1310_LAUNCHXL_TI.map" --heap_size=0 --stack_size=256 -i"/home/ivan/ti/ccsv6/tools/compiler/arm_15.12.3.LTS/lib" -i"/home/ivan/ti/ccsv6/tools/compiler/arm_15.12.3.LTS/include" --reread_libs --warn_sections --display_error_number --diag_wrap=off --xml_link_info="uartecho_CC1310_LAUNCHXL_TI_linkInfo.xml" --rom_model -o "uartecho_CC1310_LAUNCHXL_TI.out" $(ORDERED_OBJS)
+	"/home/ivan/ti/ccsv6/tools/compiler/arm_15.12.3.LTS/bin/armcl" -mv7M3 --code_state=16 --float_support=vfplib -me -g --define=ccs --display_error_number --diag_warning=225 --diag_warning=255 --diag_wrap=off --gen_func_subsections=on --abi=eabi -z -m"betaTag.map" --heap_size=0 --stack_size=256 -i"/home/ivan/ti/ccsv6/tools/compiler/arm_15.12.3.LTS/lib" -i"/home/ivan/ti/ccsv6/tools/compiler/arm_15.12.3.LTS/include" --reread_libs --warn_sections --display_error_number --diag_wrap=off --xml_link_info="betaTag_linkInfo.xml" --rom_model -o "betaTag.out" $(ORDERED_OBJS)
 	@echo 'Finished building target: $@'
 	@echo ' '
 
-uartecho_CC1310_LAUNCHXL_TI.hex: $(EXE_OUTPUTS)
+betaTag.hex: $(EXE_OUTPUTS)
 	@echo 'Invoking: ARM Hex Utility'
-	"/home/ivan/ti/ccsv6/tools/compiler/arm_15.12.3.LTS/bin/armhex" --memwidth=8 --romwidth=8 --intel -o "uartecho_CC1310_LAUNCHXL_TI.hex" $(EXE_OUTPUTS__QUOTED)
+	"/home/ivan/ti/ccsv6/tools/compiler/arm_15.12.3.LTS/bin/armhex" --memwidth=8 --romwidth=8 --intel -o "betaTag.hex" $(EXE_OUTPUTS__QUOTED)
 	@echo 'Finished building: $@'
 	@echo ' '
 

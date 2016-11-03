@@ -11,7 +11,7 @@ var makeAssembly = false;
 var Executable = xdc.module('xdc.bld.Executable');
 
 var exeOpts = new Executable.Attrs({
-        cfgScript: '/home/ivan/workspace_v6_2/uartecho_CC1310_LAUNCHXL_TI/uartecho.cfg',
+        cfgScript: '/home/ivan/workspace_v6_2/betaTag/uartecho.cfg',
         profile: 'release',
         cfgHome: 'configPkg',
 });
@@ -41,7 +41,7 @@ else {
 
 var thisObj = {
     cfg:        '../uartecho.cfg',
-    outputPath: '/home/ivan/workspace_v6_2/uartecho_CC1310_LAUNCHXL_TI/Debug/configPkg',
+    outputPath: '/home/ivan/workspace_v6_2/betaTag/Debug/configPkg',
     exeName:    'uartecho' + suffix,
     exeIntName: 'uartecho' + suffix.replace('.', '_'),
     targ:       targ,

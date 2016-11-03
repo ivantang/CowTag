@@ -125,6 +125,8 @@ static void transferCallback(I2C_Handle handle, I2C_Transaction *transac, bool r
     System_flush();
 }
 
+//currently not using this function
+//TODO: get this working
 static void writeI2CRegister(uint8_t destination[], uint8_t value[]){
 	unsigned int 	i;
 	//uint8_t			txBuffer[sizeof(destination) + sizeof(value)];
@@ -204,7 +206,7 @@ static void writeI2CRegister(uint8_t destination[], uint8_t value[]){
 	return;
 }
 
-Void taskGetI2C(UArg arg0, UArg arg1){
+Void initLIS3DH(UArg arg0, UArg arg1){
 	unsigned int	i;
 	uint16_t		acceleration;
 
@@ -215,7 +217,7 @@ Void taskGetI2C(UArg arg0, UArg arg1){
     //enable auto increment
     uint8_t			LIS3DH_Init_Dest_Reg[5] = {LIS3DH_REG_CTRL1, LIS3DH_REG_CTRL4, LIS3DH_REG_CTRL3, LIS3DH_REG_TEMPCFG, LIS3DH_REG_OUT_X_L};
     uint8_t			LIS3DH_Init_Values[5] =  {0x07, 0x88, 0x10, 0x80, 0x80};
-    uint8_t         txBuffer[sizeof(LIS3DH_Init_Dest_Reg) + sizeof(LIS3DH_Init_Values)];
+    uint8_t         txBuffer[sizeof(LIS3DH_Init_Dest_Reg)+sizeof(LIS3DH_Init_Values) + 2];
     uint8_t         rxBuffer[2];
 
     I2C_Transaction i2cTransaction;
@@ -233,21 +235,24 @@ Void taskGetI2C(UArg arg0, UArg arg1){
     params.transferCallbackFxn = transferCallback;
 
     /*prepare data to send*/
-    txBuffer[0] = LIS3DH_REG_CTRL1;
-    txBuffer[1] = 0x07; 	//all axes, normal mode (0x07)
-    txBuffer[2] = LIS3DH_REG_CTRL4;
-    txBuffer[3] = 0x88;		 	//high res and BDU enabled
-    txBuffer[4] = LIS3DH_REG_CTRL3;
-    txBuffer[5] = 0x10;			//DRDY on INT1
-    txBuffer[6] = LIS3DH_REG_TEMPCFG;
-    txBuffer[7] = 0x80;			//enable adcs
-    txBuffer[8] = LIS3DH_REG_OUT_X_L;
-    txBuffer[9] = 0x80;			//for auto increment
-
+//    txBuffer[0] = LIS3DH_REG_CTRL1;
+//    txBuffer[1] = 0x07; 	//all axes, normal mode (0x07)
+//    txBuffer[2] = LIS3DH_REG_CTRL4;
+//    txBuffer[3] = 0x88;		 	//high res and BDU enabled
+//    txBuffer[4] = LIS3DH_REG_CTRL3;
+//    txBuffer[5] = 0x10;			//DRDY on INT1
+//    txBuffer[6] = LIS3DH_REG_TEMPCFG;
+//    txBuffer[7] = 0x80;			//enable adcs
+//    txBuffer[8] = LIS3DH_REG_OUT_X_L;
+//    txBuffer[9] = 0x80;			//for auto increment
+    for(i = 0; i < sizeof(LIS3DH_Init_Dest_Reg) + 1; i++){
+        	txBuffer[2 * i + 0] = LIS3DH_Init_Dest_Reg[i];
+    		txBuffer[2 * i + 1] = LIS3DH_Init_Values[i];
+    }
     		/*initialize master I2C transaction structure*/
 
     i2cTransaction.writeBuf = txBuffer;
-    i2cTransaction.writeCount = 64;
+    i2cTransaction.writeCount = (sizeof(LIS3DH_Init_Dest_Reg)+sizeof(LIS3DH_Init_Values) + 2)*2;
     i2cTransaction.readBuf = rxBuffer;
     i2cTransaction.readCount = 0;
     i2cTransaction.slaveAddress = Board_LIS3DH_ADDR; //0x18
@@ -354,7 +359,7 @@ int main(void)
     Task_Params_init(&taskParams);
     taskParams.stackSize = TASKSTACKSIZE;
     taskParams.stack = &task0Stack;
-    Task_construct(&task0Struct, (Task_FuncPtr)taskGetI2C, &taskParams, NULL);
+    Task_construct(&task0Struct, (Task_FuncPtr)initLIS3DH, &taskParams, NULL);
 
     /* Open LED pins */
     ledPinHandle = PIN_open(&ledPinState, ledPinTable);

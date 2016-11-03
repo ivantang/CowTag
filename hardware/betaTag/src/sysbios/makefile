@@ -16,7 +16,7 @@ BIOS_INC  = -I"/home/ivan/ti/tirtos_cc13xx_cc26xx_2_21_00_06/products/bios_6_46_
 
 TARGET_INC = -I"/home/ivan/ti/tirtos_cc13xx_cc26xx_2_21_00_06/products/bios_6_46_01_37/packages/"
 
-INCS = $(BIOS_INC) $(TARGET_INC)  --include_path="/home/ivan/workspace_v6_2/uartecho_CC1310_LAUNCHXL_TI" --include_path="/home/ivan/ti/tirtos_cc13xx_cc26xx_2_21_00_06/products/cc13xxware_2_04_03_17272" --include_path="/home/ivan/ti/ccsv6/tools/compiler/arm_15.12.3.LTS/include"  -I/home/ivan/ti/tirtos_cc13xx_cc26xx_2_21_00_06/products/bios_6_46_01_37/packages/ 
+INCS = $(BIOS_INC) $(TARGET_INC)  --include_path="/home/ivan/workspace_v6_2/betaTag" --include_path="/home/ivan/ti/tirtos_cc13xx_cc26xx_2_21_00_06/products/cc13xxware_2_04_03_17272" --include_path="/home/ivan/ti/ccsv6/tools/compiler/arm_15.12.3.LTS/include"  -I/home/ivan/ti/tirtos_cc13xx_cc26xx_2_21_00_06/products/bios_6_46_01_37/packages/ 
 
 CC = /home/ivan/ti/ccsv6/tools/compiler/arm_15.12.3.LTS/bin/armcl -c $(CCOPTS) -I /home/ivan/ti/ccsv6/tools/compiler/arm_15.12.3.LTS/include
 ASM = /home/ivan/ti/ccsv6/tools/compiler/arm_15.12.3.LTS/bin/armcl -c $(CCOPTS) -I /home/ivan/ti/ccsv6/tools/compiler/arm_15.12.3.LTS/include

@@ -7,5 +7,5 @@
 #       or equal to the generated config header
 #
 linker.cmd: package/cfg/uartecho_pem3.xdl
-	$(SED) 's"^\"\(package/cfg/uartecho_pem3cfg.cmd\)\"$""\"/home/ivan/workspace_v6_2/uartecho_CC1310_LAUNCHXL_TI/Debug/configPkg/\1\""' package/cfg/uartecho_pem3.xdl > $@
+	$(SED) 's"^\"\(package/cfg/uartecho_pem3cfg.cmd\)\"$""\"/home/ivan/workspace_v6_2/betaTag/Debug/configPkg/\1\""' package/cfg/uartecho_pem3.xdl > $@
 	-$(SETDATE) -r:max package/cfg/uartecho_pem3.h compiler.opt compiler.opt.defs

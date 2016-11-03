@@ -1,0 +1,6 @@
+# Compiled source #
+###################
+*.project
+*.cproject
+*.ccsproject
+*.xdchelp

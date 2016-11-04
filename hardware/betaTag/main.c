@@ -11,8 +11,10 @@
 
 /* BIOS Header files */
 #include <ti/sysbios/BIOS.h>
-//#include <ti/sysbios/knl/Clock.h> //i2c
+#include <ti/sysbios/knl/Clock.h> //i2c
 #include <ti/sysbios/knl/Task.h>
+#include <ti/drivers/Power.h> //rf
+#include <ti/drivers/power/PowerCC26XX.h> //rf //(TODO: do we need to change to power cc13xx?)
 
 /* TI-RTOS Header files */
 #include <ti/drivers/PIN.h>
@@ -20,9 +22,12 @@
 /*standard libraries*/
 #include <stdint.h>
 
-/*custom drivers*/
+/*custom headers*/
 #include "Board.h"
 #include "i2c.h"
+#include "radioProtocol.h"
+#include "betaTask.h"
+#include "betaRadio.h"
 
 /*******************************************/
 /**constants*/
@@ -56,8 +61,16 @@ int main(void)
     PIN_Handle ledPinHandle;
     Task_Params taskParams;
 
-    Board_initGeneral();
-    Board_initI2C();
+
+	System_printf("Initializing tasks...\n");
+	System_flush();
+
+    Board_initGeneral(); // init board
+    Board_initI2C(); // init i2C
+
+    /* Initialize rf sensor node tasks */
+    BetaRadio_init();
+    BetaTask_init();
 
     /* Construct BIOS objects */
     Task_Params_init(&taskParams);
@@ -74,8 +87,9 @@ int main(void)
     PIN_setOutputValue(ledPinHandle, Board_LED1, 1);
 
 
-    System_printf("Starting I2C Test\nSystem provider is set to "
-                  "SysMin. Halt the target to view any SysMin contents in "
+    System_printf("Starting BIOS:\n"
+    			  "System provider is set to SysMin. \n"
+    			  "Halt the target to view any SysMin contents in "
                   "ROV.\n");
     /* SysMin will only print to the console when you call flush or exit */
     System_flush();

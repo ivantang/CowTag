@@ -30,9 +30,9 @@
 
 # Code Composer Studio
 # http://processors.wiki.ti.com/index.php/Source_control_with_CCS
-Debug/
-Release/
+./Debug/
+./Release/
 .xdchelp
-.config/
-.launches/
+./.config/
+./.launches/
 

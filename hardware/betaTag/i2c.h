@@ -19,7 +19,8 @@ static void transferCallback(I2C_Handle handle, I2C_Transaction *transac, bool r
 
 static void writeI2CRegister(uint8_t destination[], uint8_t value[]);
 
-Void initLIS3DH(UArg arg0, UArg arg1);
+Void initLIS3DH();
+Void initMIKROE1362();
 
 
 #endif /* I2C_H_ */

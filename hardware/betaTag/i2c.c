@@ -165,7 +165,7 @@ static void writeI2CRegister(uint8_t destination[], uint8_t value[]){
 	return;
 }
 
-Void initLIS3DH(UArg arg0, UArg arg1){
+Void initLIS3DH(){
 	unsigned int	i;
 	uint16_t		acceleration;
 
@@ -298,6 +298,19 @@ Void initLIS3DH(UArg arg0, UArg arg1){
 
     System_flush();
     receiveStart = false;
+}
+
+Void initMIKROE1362(){
+	unsigned int	i;
+	uint16_t		temperature;
+
+
+	uint8_t			MIKROE1362_Init_Dest_Reg[5] = {LIS3DH_REG_CTRL1, LIS3DH_REG_CTRL4, LIS3DH_REG_CTRL3, LIS3DH_REG_TEMPCFG, LIS3DH_REG_OUT_X_L};
+	uint8_t			MIKROE1362_Init_Values[5] =  {0x07, 0x88, 0x10, 0x80, 0x80};
+	uint8_t         txBuffer[sizeof(MIKROE1362_Init_Dest_Reg)+sizeof(MIKROE1362_Init_Values) + 2];
+	uint8_t         rxBuffer[2];
+
+	I2C_Transaction i2cTransaction;
 }
 
 

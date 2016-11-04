@@ -125,6 +125,9 @@ extern "C" {
 //#define     Board_OPT3001_ADDR      (0x45)
 //#define     Board_BMP280_ADDR       (0x77)
 
+/*MIKROE1362 IR TEMP ADDRESSED*/
+#define		Board_MIKROE1362_ADDR	 0x5A
+
 /* Interface #1 */
 //#define     Board_MPU9250_ADDR      (0x68)
 //#define     Board_MPU9250_MAG_ADDR  (0x0C)

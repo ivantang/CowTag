@@ -185,31 +185,20 @@ Void initLIS3DH(){
     I2C_Handle handle;
     I2C_Params params;
 
-
-    //writeI2CRegister(LIS3DH_Init_Dest_Reg, LIS3DH_Init_Values);
+    //writeI2CRegister(LIS3DH_Init_Dest_Reg, LIS3DH_Init_Values);		//currently not using this function
 
     // Configure I2C parameters.
     I2C_Params_init(&params);
     params.transferMode = I2C_MODE_CALLBACK;
     params.transferCallbackFxn = transferCallback;
 
-    /*prepare data to send*/
-//    txBuffer[0] = LIS3DH_REG_CTRL1;
-//    txBuffer[1] = 0x07; 	//all axes, normal mode (0x07)
-//    txBuffer[2] = LIS3DH_REG_CTRL4;
-//    txBuffer[3] = 0x88;		 	//high res and BDU enabled
-//    txBuffer[4] = LIS3DH_REG_CTRL3;
-//    txBuffer[5] = 0x10;			//DRDY on INT1
-//    txBuffer[6] = LIS3DH_REG_TEMPCFG;
-//    txBuffer[7] = 0x80;			//enable adcs
-//    txBuffer[8] = LIS3DH_REG_OUT_X_L;
-//    txBuffer[9] = 0x80;			//for auto increment
+    //making txbuffer array
     for(i = 0; i < sizeof(LIS3DH_Init_Dest_Reg) + 1; i++){
         	txBuffer[2 * i + 0] = LIS3DH_Init_Dest_Reg[i];
     		txBuffer[2 * i + 1] = LIS3DH_Init_Values[i];
     }
-    		/*initialize master I2C transaction structure*/
 
+    /*initialize master I2C transaction structure*/
     i2cTransaction.writeBuf = txBuffer;
     i2cTransaction.writeCount = (sizeof(LIS3DH_Init_Dest_Reg)+sizeof(LIS3DH_Init_Values) + 2)*2;
     i2cTransaction.readBuf = rxBuffer;
@@ -217,7 +206,6 @@ Void initLIS3DH(){
     i2cTransaction.slaveAddress = Board_LIS3DH_ADDR; //0x18
 
     /* Create I2C for usage */
-    //I2C_Params_init(&i2cParams);
     params.bitRate = I2C_400kHz;
     handle = I2C_open(Board_I2C, &params);
     if (handle == NULL) {
@@ -240,7 +228,6 @@ Void initLIS3DH(){
     /*Deinitialized I2C */
     I2C_close(handle);
     System_printf("I2C closed. transfer finished\n");
-
     System_flush();
 
     /*
@@ -249,7 +236,8 @@ Void initLIS3DH(){
 		System_flush();
 		Task_sleep(1000000 / Clock_tickPeriod);
     } */
-    /*receiving now*/
+
+    /*RECEIVING NOW*/
 
     /*configure I2C parameters*/
     I2C_Params_init(&params);
@@ -287,7 +275,7 @@ Void initLIS3DH(){
     		}
     	}
     	else{
-    		System_printf("I2C Bus fault");
+    		System_abort("I2C Bus fault");
     		//System_printf("      (rx buffer: %d)\n",acceleration );
     	}
     }
@@ -302,15 +290,106 @@ Void initLIS3DH(){
 
 Void initMIKROE1362(){
 	unsigned int	i;
+	bool			verbose = false;
 	uint16_t		temperature;
-
-
-	uint8_t			MIKROE1362_Init_Dest_Reg[5] = {LIS3DH_REG_CTRL1, LIS3DH_REG_CTRL4, LIS3DH_REG_CTRL3, LIS3DH_REG_TEMPCFG, LIS3DH_REG_OUT_X_L};
-	uint8_t			MIKROE1362_Init_Values[5] =  {0x07, 0x88, 0x10, 0x80, 0x80};
-	uint8_t         txBuffer[sizeof(MIKROE1362_Init_Dest_Reg)+sizeof(MIKROE1362_Init_Values) + 2];
-	uint8_t         rxBuffer[2];
+	float			celcius;
+	//uint8_t			MIKROE1362_Init_Dest_Reg[5] = {( Board_MIKROE1362_ADDR )};
+	//uint8_t			MIKROE1362_Init_Values[5] =  { MIKROE1362_AMB_TEMP };
+	//uint8_t         txBuffer[sizeof(MIKROE1362_Init_Dest_Reg)+sizeof(MIKROE1362_Init_Values) + 2];
+	uint8_t			txBuffer[32];
+	uint8_t         rxBuffer[32];
 
 	I2C_Transaction i2cTransaction;
+	I2C_Transaction	i2cTransaction2;
+
+	//locals
+	I2C_Handle handle;
+	I2C_Params params;
+
+	//configure i2c params
+    I2C_Params_init(&params);
+    //params.transferMode = I2C_MODE_CALLBACK;
+    //params.transferCallbackFxn = transferCallback;
+
+	/*prepare data to send*/
+    txBuffer[0] = MLX90614_TOBJ1; //object temperature
+
+    /*initialize master I2C transaction structure*/
+    i2cTransaction.writeBuf = txBuffer;
+    i2cTransaction.writeCount = 4;
+    i2cTransaction.readBuf = rxBuffer;
+    i2cTransaction.readCount = 0;
+    i2cTransaction.slaveAddress = Board_MIKROE1362_ADDR;
+
+    /* Create I2C for usage */
+    params.bitRate = I2C_400kHz;
+    handle = I2C_open(Board_I2C, &params);
+    if (handle == NULL) {
+        System_abort("Error Initializing MIKROE1362 for Transmitting\n");
+    }
+    else {
+        System_printf("MIKROE1362 Initialized for Transmitting!\n");
+    }
+
+    //do i2c transfer in blocking mode (stall system)
+    I2C_transfer(handle, &i2cTransaction);
+
+
+    /*Deinitialized I2C */
+    I2C_close(handle);
+    System_printf("Transfer finished\n");
+    System_flush();
+
+
+
+    /*RECEIVING NOW*/
+    I2C_Params_init(&params);
+
+    i2cTransaction2.writeBuf = txBuffer;
+    i2cTransaction2.writeCount = 0;
+    i2cTransaction2.readBuf = rxBuffer;
+    i2cTransaction2.readCount = 12;
+    i2cTransaction2.slaveAddress = Board_MIKROE1362_ADDR;
+
+    handle = I2C_open(Board_I2C, &params);
+    if (handle == NULL) {
+        System_abort("Error Initializing I2C for Receiving\n");
+    }
+    else {
+        System_printf("I2C Initialized for Receiving!\n");
+    }
+	System_flush();
+
+    /*take a few samples and print into console*/
+    for(i = 1; i< 17; i++){
+    	if (I2C_transfer(handle, &i2cTransaction2)){
+    		temperature = rxBuffer[i];
+    		temperature |= (rxBuffer[i] << 8);
+    		celcius = temperature;
+    		celcius *= .02;
+    		celcius -= 273.15;
+    		celcius = 1 ;
+   	    	System_printf("temperature%u:", i);
+   	    	System_printf("%5.2f ",celcius);
+	    	System_flush();
+   	    	Task_sleep(100000 / Clock_tickPeriod);
+   	    	if( i % 4 == 0 ){
+   	    		System_printf("\n");
+
+   	    	}
+    	}
+    	else{
+    		System_printf("I2C Bus fault\n");
+    		break;
+    	}
+    }
+
+    /*Deinitialized I2C */
+    I2C_close(handle);
+    System_printf("\nI2C closed receiving finished\n");
+
+    System_flush();
+    receiveStart = false;
 }
 
 

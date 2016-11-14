@@ -96,12 +96,9 @@
 
 Void echoFxn(UArg arg0, UArg arg1);
 
-static void transferCallback(I2C_Handle handle, I2C_Transaction *transac, bool result);
-
-static void writeI2CRegister(uint8_t board_address, uint8_t destination[], uint8_t value[]);
-
 Void initLIS3DH();
 Void initMIKROE1362();
 Void initMAX30100();
+void initSensors();
 
 #endif /* I2C_H_ */

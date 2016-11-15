@@ -35,5 +35,7 @@ Release/
 .xdchelp
 .config/
 .launches/
-**/src/makefile.libs
 **/src/sysbios/*
+*.aem3
+hardware/betaTag/src/sysbios/makefile
+hardware/betaTag/src/makefile.libs

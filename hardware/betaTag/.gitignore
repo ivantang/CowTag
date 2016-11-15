@@ -3,6 +3,7 @@
 *.ko
 *.obj
 *.elf
+src/sysbios/*.obj
 
 # Precompiled Headers
 *.gch

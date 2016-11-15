@@ -37,3 +37,6 @@ src/
 .config/
 .launches/
 *.aem3
+hardware/betaTag/src/makefile.libs
+hardware/betaTag/src/sysbios/makefile
+hardware/betaTag/src/sysbios/rom_sysbios.aem3

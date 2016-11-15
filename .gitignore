@@ -35,4 +35,5 @@ Release/
 .xdchelp
 .config/
 .launches/
-/sysbios/*
+\betaTag\src\makefile.libs
+\betaTag\src\sysbios\*

@@ -37,3 +37,4 @@ Release/
 .launches/
 \betaTag\src\makefile.libs
 \betaTag\src\sysbios\*
+makefile*

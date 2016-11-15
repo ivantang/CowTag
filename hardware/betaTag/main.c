@@ -64,9 +64,14 @@ int main(void)
     Task_Params_init(&taskParams);
     taskParams.stackSize = TASKSTACKSIZE;
     taskParams.stack = &task0Stack;
-    Task_construct(&task0Struct, (Task_FuncPtr)initLIS3DH, &taskParams, NULL);
+    //Task_construct(&task0Struct, (Task_FuncPtr)initLIS3DH, &taskParams, NULL);
 
     /* Open LED pins before BIOS*/
+    //Task_construct(&task0Struct, (Task_FuncPtr)initLIS3DH, &taskParams, NULL);
+    //Task_construct(&task0Struct, (Task_FuncPtr)initMIKROE1362, &taskParams, NULL);
+    //Task_construct(&task0Struct, (Task_FuncPtr)initMAX30100, &taskParams, NULL);
+    Task_construct(&task0Struct, (Task_FuncPtr)initSensors, &taskParams, NULL);
+    /* Open LED pins */
     ledPinHandle = PIN_open(&ledPinState, ledPinTable);
     if(!ledPinHandle) {
     	System_printf("led pin table error code %i \n", ledPinHandle);

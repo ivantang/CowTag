@@ -35,5 +35,5 @@ Release/
 .xdchelp
 .config/
 .launches/
-**\src\makefile.libs
-**\src\sysbios\*
+**/src/makefile.libs
+**/src/sysbios/*

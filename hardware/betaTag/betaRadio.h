@@ -21,7 +21,7 @@ enum NodeRadioOperationStatus {
 void BetaRadio_init(void);
 
 /* Sends an ADC value to the concentrator */
-enum NodeRadioOperationStatus NodeRadioTask_sendAdcData(uint16_t data);
+enum NodeRadioOperationStatus betaRadioSendData(uint16_t data);
 
 
 #endif /* TASKS_BETARADIO_H_ */

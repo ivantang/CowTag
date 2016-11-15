@@ -58,7 +58,7 @@
 #define NODE_TASK_PRIORITY   3
 
 #define NODE_EVENT_ALL                  0xFFFFFFFF
-#define NODE_EVENT_NEW_ADC_VALUE    (uint32_t)(1 << 0)
+#define NODE_EVENT_NEW_VALUE    (uint32_t)(1 << 0)
 
 /* A change mask of 0xFF0 means that changes in the lower 4 bits does not trigger a wakeup. */
 #define NODE_ADCTASK_CHANGE_MASK                    0xFF0
@@ -77,29 +77,22 @@ Task_Struct nodeTask;    /* not static so you can see in ROV */
 static uint8_t nodeTaskStack[NODE_TASK_STACK_SIZE];
 Event_Struct nodeEvent;  /* not static so you can see in ROV */
 static Event_Handle nodeEventHandle;
-static uint16_t latestAdcValue;
 
 /* Clock for the fast report timeout */
 Clock_Struct fastReportTimeoutClock;     /* not static so you can see in ROV */
 static Clock_Handle fastReportTimeoutClockHandle;
 
 /* Pin driver handle */
-static PIN_Handle buttonPinHandle;
-static PIN_State buttonPinState;
+PIN_Handle buttonPinHandle;
+PIN_State buttonPinState;
 
-/*
- * Application button pin configuration table:
- *   - Buttons interrupts are configured to trigger on falling edge.
- */
-PIN_Config buttonPinTable[] = {
-		Board_BUTTON0  | PIN_INPUT_EN | PIN_PULLUP | PIN_IRQ_NEGEDGE,
-		PIN_TERMINATE
-};
+static uint16_t latestBetaValue = 100;
+
 
 /***** Prototypes *****/
 static void nodeTaskFunction(UArg arg0, UArg arg1);
 void fastReportTimeoutCallback(UArg arg0);
-void adcCallback(uint16_t adcValue);
+void betaCallBack(uint16_t betaValue);
 void buttonCallback(PIN_Handle handle, PIN_Id pinId);
 
 
@@ -128,12 +121,13 @@ void BetaTask_init(void)
 	Task_construct(&nodeTask, nodeTaskFunction, &nodeTaskParams, NULL);
 }
 
+
 static void nodeTaskFunction(UArg arg0, UArg arg1)
 {
 
 	/* Start the SCE ADC task with 1s sample period and reacting to change in ADC value. */
 	SceAdc_init(0x00010000, NODE_ADCTASK_REPORTINTERVAL_FAST, NODE_ADCTASK_CHANGE_MASK);
-	SceAdc_registerAdcCallback(adcCallback);
+	SceAdc_registerAdcCallback(betaCallBack);
 	SceAdc_start();
 
 	/* setup timeout for fast report timeout */
@@ -161,35 +155,32 @@ static void nodeTaskFunction(UArg arg0, UArg arg1)
 		uint32_t events = Event_pend(nodeEventHandle, 0, NODE_EVENT_ALL, BIOS_WAIT_FOREVER);
 
 		/* If new ADC value, send this data */
-		if (events & NODE_EVENT_NEW_ADC_VALUE) {
+		if (events & NODE_EVENT_NEW_VALUE) {
 
 			/* Toggle activity LED */
 			PIN_setOutputValue(ledPinHandle, NODE_ACTIVITY_LED, !PIN_getOutputValue(NODE_ACTIVITY_LED) );
 
+			/* Send value to concentrator */
+			betaRadioSendData(latestBetaValue);
+
 
 			if(verbose){
-				System_printf("beta sending...\n");
+				System_printf("betaTask: updated value = %i \n", latestBetaValue);
 				System_flush();
 			}
-
-			/* Send ADC value to concentrator */
-			NodeRadioTask_sendAdcData(latestAdcValue);
 		}
 	}
+
 }
 
-void adcCallback(uint16_t adcValue)
-{
-	/* Save latest value */
-	//latestAdcValue = adcValue;
-	latestAdcValue = 1;
 
-	/* Post event */
-	Event_post(nodeEventHandle, NODE_EVENT_NEW_ADC_VALUE);
+void betaCallBack(uint16_t betaValue){
+	latestBetaValue = betaValue;
+	Event_post(nodeEventHandle, NODE_EVENT_NEW_VALUE);
 }
 
-/*
- *  ======== buttonCallback ========
+
+/*======== buttonCallback ========
  *  Pin interrupt Callback function board buttons configured in the pinTable.
  */
 void buttonCallback(PIN_Handle handle, PIN_Id pinId)

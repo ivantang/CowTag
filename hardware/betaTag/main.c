@@ -57,9 +57,8 @@ int main(void)
     Board_initGeneral(); // init board
     Board_initI2C(); // init i2C
 
-    /* Initialize rf sensor node tasks */
-    BetaRadio_init();
-    BetaTask_init();
+    BetaRadio_init(); // init rf beta
+    BetaTask_init(); // init beta
 
     /* Construct BIOS objects */
     Task_Params_init(&taskParams);
@@ -75,17 +74,11 @@ int main(void)
         System_abort("Error initializing board LED pins\n");
         //(already allocated pin in a PinList or non-existent pin in aPinList)
     }
+    PIN_setOutputValue(ledPinHandle, Board_LED1, 1); //signal init success
 
-    PIN_setOutputValue(ledPinHandle, Board_LED1, 1); //signal success
 
-
-    System_printf("Starting BIOS:\n"
-    			  "System provider is set to SysMin. \n"
-    			  "Halt the target to view any SysMin contents in "
-                  "ROV.\n");
+    System_printf("Starting BIOS:\n");
     System_flush();
-
-    /* Start BIOS */
     BIOS_start();
 
     return (0);

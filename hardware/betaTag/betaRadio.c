@@ -22,7 +22,7 @@
 #include <driverlib/trng.h>
 #include <driverlib/aon_batmon.h>
 #include "easylink/EasyLink.h"
-#include "RadioProtocol.h"
+#include "radioProtocol.h"
 
 #include "betaRadio.h"
 #include "debug.h"

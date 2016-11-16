@@ -64,9 +64,9 @@ Semaphore_Struct radioResultSem;  /* not static so you can see in ROV */
 static Semaphore_Handle radioResultSemHandle;
 
 static struct RadioOperation currentRadioOperation;
-static uint16_t adcData;
+//static uint16_t adcData;
 static uint8_t nodeAddress = 0;
-static struct DualModeSensorPacket dmSensorPacket;
+//static struct DualModeSensorPacket dmSensorPacket;
 
 static struct BetaPacket betaPacket;
 static struct BetaData betadata;
@@ -111,6 +111,7 @@ void BetaRadio_init(void) {
 	Task_construct(&nodeRadioTask, nodeRadioTaskFunction, &nodeRadioTaskParams, NULL);
 }
 
+//static uint16_t i = 0;
 static void nodeRadioTaskFunction(UArg arg0, UArg arg1)
 {
 	/* Initialize EasyLink */
@@ -143,23 +144,28 @@ static void nodeRadioTaskFunction(UArg arg0, UArg arg1)
 	betaPacket.header.sourceAddress = nodeAddress;
 	betaPacket.header.packetType = RADIO_PACKET_TYPE_BETA_PACKET;
 
-	/*testing send*/
-	//betaPacket.betadata.sensorData = (uint16_t)"42";
-
 	/* Enter main task loop */
 	while (1)
 	{
+
+
 		/* Wait for an event */
 		uint32_t events = Event_pend(radioOperationEventHandle, 0, RADIO_EVENT_ALL, BIOS_WAIT_FOREVER);
 
 		/* If we should send data */
 		if (events & RADIO_EVENT_SEND_DATA)
 		{
+			/*testing send*/
+			//betaPacket.betadata.sensorData = i;
+			//i++;
+			betaPacket.betadata = betadata;
 			sendBetaPacket(betaPacket, NODERADIO_MAX_RETRIES, NORERADIO_ACK_TIMEOUT_TIME_MS);
 
 			if(verbose){
-			System_printf("BetaRadio: sent packet with data = %s \n", betaPacket.betadata.sensorData);
-			System_flush();
+				System_printf("BetaRadio: betadata = %i \n", betadata.sensorData);
+				System_flush();
+				System_printf("BetaRadio: sent packet with data = %i \n", betaPacket.betadata.sensorData);
+				System_flush();
 			}
 		}
 

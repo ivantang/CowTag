@@ -64,9 +64,7 @@ Semaphore_Struct radioResultSem;  /* not static so you can see in ROV */
 static Semaphore_Handle radioResultSemHandle;
 
 static struct RadioOperation currentRadioOperation;
-//static uint16_t adcData;
 static uint8_t nodeAddress = 0;
-//static struct DualModeSensorPacket dmSensorPacket;
 
 static struct BetaPacket betaPacket;
 static struct BetaData betadata;
@@ -77,7 +75,6 @@ extern PIN_Handle ledPinHandle;
 /***** Prototypes *****/
 static void nodeRadioTaskFunction(UArg arg0, UArg arg1);
 static void returnRadioOperationStatus(enum NodeRadioOperationStatus status);
-static void sendDmPacket(struct DualModeSensorPacket sensorPacket, uint8_t maxNumberOfRetries, uint32_t ackTimeoutMs);
 static void resendPacket();
 static void rxDoneCallback(EasyLink_RxPacket * rxPacket, EasyLink_Status status);
 
@@ -162,8 +159,6 @@ static void nodeRadioTaskFunction(UArg arg0, UArg arg1)
 			sendBetaPacket(betaPacket, NODERADIO_MAX_RETRIES, NORERADIO_ACK_TIMEOUT_TIME_MS);
 
 			if(verbose){
-				System_printf("BetaRadio: betadata = %i \n", betadata.sensorData);
-				System_flush();
 				System_printf("BetaRadio: sent packet with data = %i \n", betaPacket.betadata.sensorData);
 				System_flush();
 			}

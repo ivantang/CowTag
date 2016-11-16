@@ -55,7 +55,7 @@ int main(void)
 	System_flush();
 
     Board_initGeneral(); // init board
-    //Board_initI2C(); // init i2C
+    Board_initI2C(); // init i2C
 
     BetaRadio_init(); // init rf beta
     BetaTask_init(); // init beta

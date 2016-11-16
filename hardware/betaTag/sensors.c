@@ -29,18 +29,32 @@
 #include <stdint.h>
 #include <assert.h>
 
-#include "i2c.h"
+#include <sensors.h>
 
 /*boolean to show if transfer is done*/
 bool	transferDone = false;
 /*boolean to show when ready to receive*/
 bool	receiveStart = false;
 bool	verbose = false;	//print out debug messages when true
-/**************************************************************************/
 
-/*
- *  Task for this function is created statically. See the project's .cfg file.
- */
+/**constants*/
+#define TASKSTACKSIZE		1024	//i2c
+
+/**structures*/
+Task_Struct task0Struct;
+Char task0Stack[TASKSTACKSIZE];
+
+
+/*function definition */
+void Sensors_init(void){
+    Task_Params taskParams;
+
+	Task_Params_init(&taskParams);
+	taskParams.stackSize = TASKSTACKSIZE;
+	taskParams.stack = &task0Stack;
+	Task_construct(&task0Struct, (Task_FuncPtr)testSensors, &taskParams, NULL);
+}
+
 Void echoFxn(UArg arg0, UArg arg1)
 {
     char input;
@@ -71,6 +85,8 @@ Void echoFxn(UArg arg0, UArg arg1)
     }
 }
 
+//callback function for i2c callback mode, currently not using blocking mode so not using this
+//can implement this later when needed
 static void transferCallback(I2C_Handle handle, I2C_Transaction *transac, bool result)
 {
     // Set length bytes
@@ -84,6 +100,7 @@ static void transferCallback(I2C_Handle handle, I2C_Transaction *transac, bool r
     System_flush();
 }
 
+//sends 8bit value to target i2c board address
 static void writeI2C(uint8_t board_address, uint8_t value){
 	unsigned int 	i;
 	uint8_t			txBuffer[1];
@@ -124,6 +141,9 @@ static void writeI2C(uint8_t board_address, uint8_t value){
 	System_flush();
 }
 
+//sends 8bit value to target address on target board address
+//first 8 bits in txbuffer is address on hardware we want to write to
+//seconds 8 bits in txbuffer is value we want to write
 static void writeI2CRegister(uint8_t board_address, uint8_t destination, uint8_t value){
 	unsigned int 	i;
 	uint8_t			txBuffer[2];
@@ -165,6 +185,7 @@ static void writeI2CRegister(uint8_t board_address, uint8_t destination, uint8_t
 	System_flush();
 }
 
+//similar to writeI2CRegister but instead takes arrays as arguments
 static void writeI2CRegisters(int8_t board_address, uint8_t destination[], uint8_t value[]){
 	unsigned int 	i;
 	uint8_t			txBuffer[sizeof(destination)+sizeof(value) + 2];
@@ -218,6 +239,7 @@ static void writeI2CRegisters(int8_t board_address, uint8_t destination[], uint8
 	System_flush();
 }
 
+//reads 8bit * 3 from target address
 static uint32_t readI2CWord(uint8_t board_address, uint8_t address){
 	uint8_t			txBuffer[1] = {address};
 	uint8_t			rxBuffer[3];
@@ -257,7 +279,7 @@ static uint32_t readI2CWord(uint8_t board_address, uint8_t address){
 }
 
 //input board address and address of register you want to read
-//returns value in the register
+//returns 8bit value in the register
 static uint8_t readI2CRegister(uint8_t board_address, uint8_t address){
 	uint8_t			txBuffer[1] = {address};
 	uint8_t			rxBuffer[1];
@@ -296,7 +318,7 @@ static uint8_t readI2CRegister(uint8_t board_address, uint8_t address){
 	System_flush();
 }
 
-Void initLIS3DH(){
+Void getAcceleration(){
 	if(verbose)System_printf("whoamI: 0x%x \n", readI2CRegister(Board_LIS3DH_ADDR, 15)); //should read 0x33
 	System_flush();
 
@@ -326,7 +348,7 @@ Void initLIS3DH(){
     System_flush();
 }
 
-Void initMIKROE1362(){
+Void getObjTemp(){
 	uint32_t temp_l, temp_h, flags;
 	uint8_t	 pec;
 	int i;
@@ -453,7 +475,7 @@ Void initMIKROE1362_1(){
     receiveStart = false;
 }
 
-Void initMAX30100(){
+Void getHeartRate(){
 	unsigned int	i;
 	uint8_t previous;
 	uint8_t	heartRate;
@@ -512,8 +534,8 @@ Void initMAX30100(){
 		System_flush();
 }
 
-void initSensors(){
-	initLIS3DH();
-	initMIKROE1362();
-	initMAX30100();
+void testSensors(){
+	getAcceleration();
+	getObjTemp();
+	getHeartRate();
 }

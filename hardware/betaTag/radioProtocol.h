@@ -24,12 +24,20 @@ struct PacketHeader {
     uint8_t packetType;
 };
 
+/* will be concat of data from all sensors */
+struct BetaData {
+	uint16_t sensorData; // TODO: change to uint64_t?
+};
 
 /* our custom beta packet with sensor info */
-struct betaPacket{
+struct BetaPacket{
 	struct PacketHeader header;
-	uint16_t data; // random data for now
+	struct BetaData betadata;
 };
+
+
+
+
 
 struct AdcSensorPacket {
     struct PacketHeader header;

@@ -29,16 +29,6 @@ static PIN_Config ledPinTable[] = {
 
 /************************/
 
-extern PIN_Handle buttonPinHandle;
-extern PIN_State buttonPinState;
-/*
- * Application button pin configuration table:
- *   - Buttons interrupts are configured to trigger on falling edge.
- */
-static PIN_Config buttonPinTable[] = {
-		Board_BUTTON0  | PIN_INPUT_EN | PIN_PULLUP | PIN_IRQ_NEGEDGE,
-		PIN_TERMINATE
-};
 
 
 #endif /* PINTABLE_H_ */

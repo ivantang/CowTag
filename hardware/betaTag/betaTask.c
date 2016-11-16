@@ -61,13 +61,13 @@
 #define NODE_EVENT_NEW_VALUE    (uint32_t)(1 << 0)
 
 /* A change mask of 0xFF0 means that changes in the lower 4 bits does not trigger a wakeup. */
-#define NODE_ADCTASK_CHANGE_MASK                    0xFF0
+//#define NODE_ADCTASK_CHANGE_MASK                    0xFF0
 
 /* Minimum slow Report interval is 50s (in units of samplingTime)*/
-#define NODE_ADCTASK_REPORTINTERVAL_SLOW                50
+//#define NODE_ADCTASK_REPORTINTERVAL_SLOW                50
 /* Minimum fast Report interval is 1s (in units of samplingTime) for 30s*/
-#define NODE_ADCTASK_REPORTINTERVAL_FAST                1
-#define NODE_ADCTASK_REPORTINTERVAL_FAST_DURIATION_MS   30000
+//#define NODE_ADCTASK_REPORTINTERVAL_FAST                1
+//#define NODE_ADCTASK_REPORTINTERVAL_FAST_DURIATION_MS   30000
 
 
 
@@ -79,13 +79,10 @@ Event_Struct nodeEvent;  /* not static so you can see in ROV */
 static Event_Handle nodeEventHandle;
 
 /* Clock for the fast report timeout */
-Clock_Struct fastReportTimeoutClock;     /* not static so you can see in ROV */
-static Clock_Handle fastReportTimeoutClockHandle;
+//Clock_Struct fastReportTimeoutClock;     /* not static so you can see in ROV */
+//static Clock_Handle fastReportTimeoutClockHandle;
 
-/* Pin driver handle */
-PIN_Handle buttonPinHandle;
-PIN_State buttonPinState;
-
+/*constants*/
 static uint16_t latestBetaValue = 100;
 
 
@@ -93,7 +90,6 @@ static uint16_t latestBetaValue = 100;
 static void nodeTaskFunction(UArg arg0, UArg arg1);
 void fastReportTimeoutCallback(UArg arg0);
 void betaCallBack(uint16_t betaValue);
-void buttonCallback(PIN_Handle handle, PIN_Id pinId);
 
 
 /***** Function definitions *****/
@@ -107,11 +103,11 @@ void BetaTask_init(void)
 	nodeEventHandle = Event_handle(&nodeEvent);
 
 	/* Create clock object which is used for fast report timeout */
-	Clock_Params clkParams;
+	/*Clock_Params clkParams;
 	clkParams.period = 0;
 	clkParams.startFlag = FALSE;
 	Clock_construct(&fastReportTimeoutClock, fastReportTimeoutCallback, 1, &clkParams);
-	fastReportTimeoutClockHandle = Clock_handle(&fastReportTimeoutClock);
+	fastReportTimeoutClockHandle = Clock_handle(&fastReportTimeoutClock);*/
 
 	/* Create the node task */
 	Task_Params_init(&nodeTaskParams);
@@ -124,50 +120,27 @@ void BetaTask_init(void)
 
 static void nodeTaskFunction(UArg arg0, UArg arg1)
 {
-
-	/* Start the SCE ADC task with 1s sample period and reacting to change in ADC value. */
-	SceAdc_init(0x00010000, NODE_ADCTASK_REPORTINTERVAL_FAST, NODE_ADCTASK_CHANGE_MASK);
-	SceAdc_registerAdcCallback(betaCallBack);
-	SceAdc_start();
-
 	/* setup timeout for fast report timeout */
-	Clock_setTimeout(fastReportTimeoutClockHandle,
-			NODE_ADCTASK_REPORTINTERVAL_FAST_DURIATION_MS * 1000 / Clock_tickPeriod);
+	//Clock_setTimeout(fastReportTimeoutClockHandle,
+	//		NODE_ADCTASK_REPORTINTERVAL_FAST_DURIATION_MS * 1000 / Clock_tickPeriod);
 
 	/* start fast report and timeout */
-	Clock_start(fastReportTimeoutClockHandle);
-
-
-	buttonPinHandle = PIN_open(&buttonPinState, buttonPinTable);
-	if (!buttonPinHandle)
-	{
-		System_abort("Error initializing button pins\n");
-	}
-
-	/* Setup callback for button pins */
-	if (PIN_registerIntCb(buttonPinHandle, &buttonCallback) != 0)
-	{
-		System_abort("Error registering button callback function");
-	}
+	//Clock_start(fastReportTimeoutClockHandle);
 
 	while(1) {
-		/* Wait for event */
-		uint32_t events = Event_pend(nodeEventHandle, 0, NODE_EVENT_ALL, BIOS_WAIT_FOREVER);
 
-		/* If new ADC value, send this data */
-		if (events & NODE_EVENT_NEW_VALUE) {
+		int delay = 10000;
+		CPUdelay(delay*1000);
 
-			/* Toggle activity LED */
-			PIN_setOutputValue(ledPinHandle, NODE_ACTIVITY_LED, !PIN_getOutputValue(NODE_ACTIVITY_LED) );
+		/* Toggle activity LED */
+		PIN_setOutputValue(ledPinHandle, NODE_ACTIVITY_LED, !PIN_getOutputValue(NODE_ACTIVITY_LED) );
 
-			/* Send value to concentrator */
-			betaRadioSendData(latestBetaValue);
+		/* Send value to concentrator */
+		betaRadioSendData(latestBetaValue);
 
-
-			if(verbose){
-				System_printf("betaTask: updated value = %i \n", latestBetaValue);
-				System_flush();
-			}
+		if(verbose){
+			System_printf("BetaTask: updated value = %i \n", latestBetaValue);
+			System_flush();
 		}
 	}
 
@@ -180,25 +153,8 @@ void betaCallBack(uint16_t betaValue){
 }
 
 
-/*======== buttonCallback ========
- *  Pin interrupt Callback function board buttons configured in the pinTable.
- */
-void buttonCallback(PIN_Handle handle, PIN_Id pinId)
-{
-	/* Debounce logic, only toggle if the button is still pushed (low) */
-	CPUdelay(8000*50);
-
-
-	if (PIN_getInputValue(Board_BUTTON0) == 0)
-	{
-		//start fast report and timeout
-		SceAdc_setReportInterval(NODE_ADCTASK_REPORTINTERVAL_FAST, NODE_ADCTASK_CHANGE_MASK);
-		Clock_start(fastReportTimeoutClockHandle);
-	}
-}
-
-void fastReportTimeoutCallback(UArg arg0)
+/*void fastReportTimeoutCallback(UArg arg0)
 {
 	//stop fast report
 	SceAdc_setReportInterval(NODE_ADCTASK_REPORTINTERVAL_SLOW, NODE_ADCTASK_CHANGE_MASK);
-}
+}*/

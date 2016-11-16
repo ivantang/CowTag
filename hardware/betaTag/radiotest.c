@@ -32,6 +32,7 @@
 
 /***** Includes *****/
 
+#include <radiotest.h>
 #include <xdc/std.h>
 #include <xdc/runtime/System.h>
 
@@ -47,8 +48,6 @@
 #include "Board.h"
 
 #include "debug.h"
-#include "SceAdc.h"
-#include "betaTask.h"
 #include "betaRadio.h"
 #include "pinTable.h"
 
@@ -93,7 +92,7 @@ void betaCallBack(uint16_t betaValue);
 
 
 /***** Function definitions *****/
-void BetaTask_init(void)
+void radiotest_init(void)
 {
 
 	/* Create event used internally for state changes */

@@ -6,6 +6,7 @@
  */
 
 /* XDCtools Header files */
+#include <radiotest.h>
 #include <xdc/std.h>
 #include <xdc/runtime/System.h>
 
@@ -26,7 +27,6 @@
 #include "Board.h"
 #include "i2c.h"
 #include "radioProtocol.h"
-#include "betaTask.h"
 #include "betaRadio.h"
 #include "pinTable.h"
 
@@ -58,7 +58,7 @@ int main(void)
     Board_initI2C(); // init i2C
 
     BetaRadio_init(); // init rf beta
-    BetaTask_init(); // init beta
+    radiotest_init(); // init beta
 
     /* Construct BIOS objects */
     Task_Params_init(&taskParams);
@@ -71,6 +71,7 @@ int main(void)
     //Task_construct(&task0Struct, (Task_FuncPtr)initMIKROE1362, &taskParams, NULL);
     //Task_construct(&task0Struct, (Task_FuncPtr)initMAX30100, &taskParams, NULL);
     Task_construct(&task0Struct, (Task_FuncPtr)initSensors, &taskParams, NULL);
+
     /* Open LED pins */
     ledPinHandle = PIN_open(&ledPinState, ledPinTable);
     if(!ledPinHandle) {

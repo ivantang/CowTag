@@ -12,6 +12,9 @@
 #include <ti/drivers/I2C.h> //i2c
 #include <ti/drivers/UART.h> //i2c
 
+/*initialize node task and create TI-RTOS objects*/
+void Sensors_init(void);
+
 /*LIS3DH ACCELEROMETER ADDRESSES*/
 #define     Board_LIS3DH_ADDR		 0x18 // 0011001
 #define 	LIS3DH_REG_STATUS1       0x07
@@ -94,11 +97,10 @@
 #define	MAX30100_LED_CURR_50MA			0x0f	//default LEDcurrent
 #define MAX30100_SPC_SPO2_HI_RES_EN     (1 << 6)
 
-Void echoFxn(UArg arg0, UArg arg1);
+//void echoFxn(UArg arg0, UArg arg1);
+void getAcceleration();
+void getObjTemp();
+void getHeartRate();
+void testSensors();
 
-Void initLIS3DH();
-Void initMIKROE1362();
-Void initMAX30100();
-void initSensors();
-
-#endif /* I2C_H_ */
+#endif /* SENSORS_H_ */

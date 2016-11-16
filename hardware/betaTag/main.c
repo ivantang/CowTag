@@ -6,6 +6,7 @@
  */
 
 /* XDCtools Header files */
+#include <sensors.h>
 #include <xdc/std.h>
 #include <xdc/runtime/System.h>
 
@@ -24,23 +25,10 @@
 
 /*custom headers*/
 #include "Board.h"
-#include "i2c.h"
 #include "radioProtocol.h"
 #include "betaTask.h"
 #include "betaRadio.h"
 #include "pinTable.h"
-
-/*******************************************/
-/**constants*/
-#define TASKSTACKSIZE		1024	//i2c
-
-/**registers*/
-#define	LIS3DH_TEMP			0x07  //i2c accelerometer temp result register
-
-/**structures*/
-
-Task_Struct task0Struct;
-Char task0Stack[TASKSTACKSIZE];
 
 /* Global PIN_Config table */
 PIN_State ledPinState;
@@ -49,28 +37,15 @@ PIN_Handle ledPinHandle;
 
 int main(void)
 {
-    Task_Params taskParams;
-
 	System_printf("Initializing tasks...\n");
 	System_flush();
 
     Board_initGeneral(); // init board
-    Board_initI2C(); // init i2C
+    Sensors_init(); // init i2C
 
     BetaRadio_init(); // init rf beta
     BetaTask_init(); // init beta
 
-    /* Construct BIOS objects */
-    Task_Params_init(&taskParams);
-    taskParams.stackSize = TASKSTACKSIZE;
-    taskParams.stack = &task0Stack;
-    //Task_construct(&task0Struct, (Task_FuncPtr)initLIS3DH, &taskParams, NULL);
-
-    /* Open LED pins before BIOS*/
-    //Task_construct(&task0Struct, (Task_FuncPtr)initLIS3DH, &taskParams, NULL);
-    //Task_construct(&task0Struct, (Task_FuncPtr)initMIKROE1362, &taskParams, NULL);
-    //Task_construct(&task0Struct, (Task_FuncPtr)initMAX30100, &taskParams, NULL);
-    Task_construct(&task0Struct, (Task_FuncPtr)initSensors, &taskParams, NULL);
     /* Open LED pins */
     ledPinHandle = PIN_open(&ledPinState, ledPinTable);
     if(!ledPinHandle) {

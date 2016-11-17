@@ -102,7 +102,6 @@ static void transferCallback(I2C_Handle handle, I2C_Transaction *transac, bool r
 
 //sends 8bit value to target i2c board address
 static void writeI2C(uint8_t board_address, uint8_t value){
-	unsigned int 	i;
 	uint8_t			txBuffer[1];
 	uint8_t         rxBuffer[1];
 
@@ -145,7 +144,6 @@ static void writeI2C(uint8_t board_address, uint8_t value){
 //first 8 bits in txbuffer is address on hardware we want to write to
 //seconds 8 bits in txbuffer is value we want to write
 static void writeI2CRegister(uint8_t board_address, uint8_t destination, uint8_t value){
-	unsigned int 	i;
 	uint8_t			txBuffer[2];
 	uint8_t         rxBuffer[1];
 
@@ -181,7 +179,9 @@ static void writeI2CRegister(uint8_t board_address, uint8_t destination, uint8_t
 
 	/*Deinitialized I2C */
 	I2C_close(t_handle);
-	//if(verbose)	System_printf("write closed\n");
+	if(verbose){
+		System_printf("write closed\n");
+	}
 	System_flush();
 }
 
@@ -235,7 +235,9 @@ static void writeI2CRegisters(int8_t board_address, uint8_t destination[], uint8
 
 	/*Deinitialized I2C */
 	I2C_close(t_handle);
-	if(verbose)	System_printf("write closed\n");
+	if(verbose){
+		System_printf("write closed\n");
+	}
 	System_flush();
 }
 
@@ -269,13 +271,20 @@ static uint32_t readI2CWord(uint8_t board_address, uint8_t address){
 
     I2C_transfer(handle, &i2cTransaction);
 
-    if(verbose)System_printf("rxBuffer: 0x%x%x%x read from 0x%x\n",rxBuffer[1],rxBuffer[0],rxBuffer[2],address);
-    System_flush();
+    if(verbose){
+    	System_printf("rxBuffer: 0x%x%x%x read from 0x%x\n",rxBuffer[1],rxBuffer[0],rxBuffer[2],address);
+        System_flush();
+    }
 
     I2C_close(handle);
-    return (rxBuffer[2] | rxBuffer[0] << 8 | rxBuffer[1] << 16);
-	//if(verbose)	System_printf("read closed\n");
+
+	if(verbose){
+		System_printf("read closed\n");
+	}
 	System_flush();
+    return (rxBuffer[2] | rxBuffer[0] << 8 | rxBuffer[1] << 16);
+
+
 }
 
 //input board address and address of register you want to read
@@ -313,9 +322,13 @@ static uint8_t readI2CRegister(uint8_t board_address, uint8_t address){
     System_flush();
 
     I2C_close(handle);
-    return rxBuffer[0];
-	//if(verbose)	System_printf("read closed\n");
+
+	if(verbose){
+		System_printf("read closed\n");
+	}
 	System_flush();
+    return rxBuffer[0];
+
 }
 
 Void getAcceleration(){
@@ -344,13 +357,16 @@ Void getAcceleration(){
     	}
     }
 
-    if(verbose)System_printf("\nI2C closed receiving finished\n");
+    if(verbose){
+    	System_printf("\nI2C closed receiving finished\n");
+    }
     System_flush();
 }
 
 Void getObjTemp(){
-	uint32_t temp_l, temp_h, flags;
-	uint8_t	 pec;
+	uint32_t temp_l, flags;
+	//uint32_t temp_h;
+	//uint8_t pec;
 	int i;
 
 	//System_printf("i am 0x%x\n", readI2CRegister(Board_MIKROE1362_ADDR,0x0E));
@@ -420,10 +436,10 @@ Void initMIKROE1362_1(){
 
     /*Deinitialized I2C */
     I2C_close(handle);
-    if(verbose) System_printf("Transfer finished\n");
-    System_flush();
-
-
+    if(verbose){
+    	System_printf("Transfer finished\n");
+        System_flush();
+    }
 
     /*RECEIVING NOW*/
     I2C_Params_init(&params);
@@ -469,7 +485,9 @@ Void initMIKROE1362_1(){
 
     /*Deinitialized I2C */
     I2C_close(handle);
-    if(verbose) System_printf("\nI2C closed receiving finished\n");
+    if(verbose){
+    	System_printf("\nI2C closed receiving finished\n");
+    }
 
     System_flush();
     receiveStart = false;

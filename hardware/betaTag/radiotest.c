@@ -33,6 +33,9 @@
 /***** Includes *****/
 
 #include <radiotest.h>
+#include <betaRadio.h>
+#include <radioProtocol.h>
+
 #include <xdc/std.h>
 #include <xdc/runtime/System.h>
 
@@ -46,9 +49,7 @@
 
 /* Board Header files */
 #include "Board.h"
-
 #include "debug.h"
-#include "betaRadio.h"
 #include "pinTable.h"
 
 
@@ -82,13 +83,12 @@ static Event_Handle nodeEventHandle;
 //static Clock_Handle fastReportTimeoutClockHandle;
 
 /*constants*/
-static uint16_t latestBetaValue = 100;
-
+static struct sampleData sampledata;
 
 /***** Prototypes *****/
 static void nodeTaskFunction(UArg arg0, UArg arg1);
 void fastReportTimeoutCallback(UArg arg0);
-void betaCallBack(uint16_t betaValue);
+void betaCallBack(struct sampleData newsampledata);
 
 
 /***** Function definitions *****/
@@ -128,6 +128,11 @@ static void nodeTaskFunction(UArg arg0, UArg arg1)
 
 	while(1) {
 
+
+		sampledata.tempData = 2;
+		sampledata.accelerometerData = 0;
+		sampledata.heartRateData = 1;
+
 		int delay = 10000;
 		CPUdelay(delay*1000);
 
@@ -135,10 +140,15 @@ static void nodeTaskFunction(UArg arg0, UArg arg1)
 		PIN_setOutputValue(ledPinHandle, NODE_ACTIVITY_LED, !PIN_getOutputValue(NODE_ACTIVITY_LED) );
 
 		/* Send value to concentrator */
-		betaRadioSendData(latestBetaValue);
+		betaRadioSendData(sampledata);
 
 		if(verbose){
-			System_printf("BetaTask: updated value = %i \n", latestBetaValue);
+			System_printf("BetaRadio: sent packet with acc.data = %i, "
+									      	  	  	  "temp.data = %i, "
+									      	  	  	  "heart.data = %i \n",
+													sampledata.accelerometerData,
+													sampledata.tempData,
+													sampledata.heartRateData);
 			System_flush();
 		}
 	}
@@ -146,11 +156,10 @@ static void nodeTaskFunction(UArg arg0, UArg arg1)
 }
 
 
-void betaCallBack(uint16_t betaValue){
-	latestBetaValue = betaValue;
-	Event_post(nodeEventHandle, NODE_EVENT_NEW_VALUE);
-}
-
+//void betaCallBack(struct sampleData newsampledata){
+//	sampledata = newsampledata;
+//	Event_post(nodeEventHandle, NODE_EVENT_NEW_VALUE);
+//}
 
 /*void fastReportTimeoutCallback(UArg arg0)
 {

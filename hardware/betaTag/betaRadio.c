@@ -66,8 +66,8 @@ static Semaphore_Handle radioResultSemHandle;
 static struct RadioOperation currentRadioOperation;
 static uint8_t nodeAddress = 0;
 
-static struct BetaPacket betaPacket;
-static struct BetaData betadata;
+static struct sensorPacket sensorPacket;
+static struct sampleData sampledata;
 
 /* Pin driver handle */
 extern PIN_Handle ledPinHandle;
@@ -78,7 +78,7 @@ static void returnRadioOperationStatus(enum NodeRadioOperationStatus status);
 static void resendPacket();
 static void rxDoneCallback(EasyLink_RxPacket * rxPacket, EasyLink_Status status);
 
-static void sendBetaPacket(struct BetaPacket betaPacket, uint8_t maxNumberOfRetries, uint32_t ackTimeoutMs);
+static void sendBetaPacket(struct sensorPacket betaPacket, uint8_t maxNumberOfRetries, uint32_t ackTimeoutMs);
 
 
 /***** Function definitions *****/
@@ -138,14 +138,12 @@ static void nodeRadioTaskFunction(UArg arg0, UArg arg1)
 	}
 
 	/* Setup header */
-	betaPacket.header.sourceAddress = nodeAddress;
-	betaPacket.header.packetType = RADIO_PACKET_TYPE_BETA_PACKET;
+	sensorPacket.header.sourceAddress = nodeAddress;
+	sensorPacket.header.packetType = RADIO_PACKET_TYPE_SENSOR_PACKET;
 
 	/* Enter main task loop */
 	while (1)
 	{
-
-
 		/* Wait for an event */
 		uint32_t events = Event_pend(radioOperationEventHandle, 0, RADIO_EVENT_ALL, BIOS_WAIT_FOREVER);
 
@@ -153,13 +151,18 @@ static void nodeRadioTaskFunction(UArg arg0, UArg arg1)
 		if (events & RADIO_EVENT_SEND_DATA)
 		{
 			/*testing send*/
-			//betaPacket.betadata.sensorData = i;
+			//sensorPacket.betadata.sensorData = i;
 			//i++;
-			betaPacket.betadata = betadata;
-			sendBetaPacket(betaPacket, NODERADIO_MAX_RETRIES, NORERADIO_ACK_TIMEOUT_TIME_MS);
+			sensorPacket.sampledata = sampledata;
+			sendBetaPacket(sensorPacket, NODERADIO_MAX_RETRIES, NORERADIO_ACK_TIMEOUT_TIME_MS);
 
 			if(verbose){
-				System_printf("BetaRadio: sent packet with data = %i \n", betaPacket.betadata.sensorData);
+				System_printf("BetaRadio: sent packet with acc.data = %i, "
+						      	  	  	  	  	  	  	  "temp.data = %i, "
+						      	  	  	  	  	  	  	  "heart.data = %i \n",
+														  sensorPacket.sampledata.accelerometerData,
+														  sensorPacket.sampledata.tempData,
+														  sensorPacket.sampledata.heartRateData);
 				System_flush();
 			}
 		}
@@ -195,14 +198,14 @@ static void nodeRadioTaskFunction(UArg arg0, UArg arg1)
 }
 
 
-enum NodeRadioOperationStatus betaRadioSendData(uint16_t data){
+enum NodeRadioOperationStatus betaRadioSendData(struct sampleData data){
 	enum NodeRadioOperationStatus status;
 
 	/* Get radio access sempahore */
 	Semaphore_pend(radioAccessSemHandle, BIOS_WAIT_FOREVER);
 
 	/* Save data to send */
-	betadata.sensorData = data;
+	sampledata = data;
 
 	/* Raise RADIO_EVENT_SEND_DATA event */
 	Event_post(radioOperationEventHandle, RADIO_EVENT_SEND_DATA);
@@ -230,14 +233,14 @@ static void returnRadioOperationStatus(enum NodeRadioOperationStatus result)
 
 
 
-static void sendBetaPacket(struct BetaPacket bp, uint8_t maxNumberOfRetries, uint32_t ackTimeoutMs){
+static void sendBetaPacket(struct sensorPacket bp, uint8_t maxNumberOfRetries, uint32_t ackTimeoutMs){
 
 	currentRadioOperation.easyLinkTxPacket.dstAddr[0] = RADIO_CONCENTRATOR_ADDRESS;
 
 	/* Copy packet to payload */
-	memcpy(currentRadioOperation.easyLinkTxPacket.payload, ((uint8_t*)&betaPacket), sizeof(struct BetaPacket));
-	//memcpy(currentRadioOperation.easyLinkTxPacket.payload, ((uint8_t*)&bp), sizeof(struct BetaPacket));
-	currentRadioOperation.easyLinkTxPacket.len = sizeof(struct BetaPacket);
+	memcpy(currentRadioOperation.easyLinkTxPacket.payload, ((uint8_t*)&sensorPacket), sizeof(struct sensorPacket));
+	//memcpy(currentRadioOperation.easyLinkTxPacket.payload, ((uint8_t*)&bp), sizeof(struct sensorPacket));
+	currentRadioOperation.easyLinkTxPacket.len = sizeof(struct sensorPacket);
 
 	/* Setup retries */
 	currentRadioOperation.maxNumberOfRetries = maxNumberOfRetries;

@@ -10,6 +10,7 @@
 #define TASKS_BETARADIO_H_
 
 #include "stdint.h"
+#include "radioProtocol.h"
 
 enum NodeRadioOperationStatus {
     NodeRadioStatus_Success,
@@ -21,7 +22,7 @@ enum NodeRadioOperationStatus {
 void BetaRadio_init(void);
 
 /* Sends an ADC value to the concentrator */
-enum NodeRadioOperationStatus betaRadioSendData(uint16_t data);
+enum NodeRadioOperationStatus betaRadioSendData(struct sampleData data);
 
 
 #endif /* TASKS_BETARADIO_H_ */

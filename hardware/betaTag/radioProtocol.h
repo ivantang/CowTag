@@ -17,7 +17,7 @@
 #define RADIO_PACKET_TYPE_ACK_PACKET             0
 #define RADIO_PACKET_TYPE_ADC_SENSOR_PACKET      1
 #define RADIO_PACKET_TYPE_DM_SENSOR_PACKET       2
-#define RADIO_PACKET_TYPE_BETA_PACKET    		 3
+#define RADIO_PACKET_TYPE_SENSOR_PACKET    		 3
 
 struct PacketHeader {
     uint8_t sourceAddress;
@@ -25,36 +25,20 @@ struct PacketHeader {
 };
 
 /* will be concat of data from all sensors */
-struct BetaData {
-	uint16_t sensorData; // TODO: change to uint64_t?
+struct sampleData {
+	uint8_t tempData;
+	uint8_t accelerometerData;
+	uint8_t heartRateData;
 };
 
 /* our custom beta packet with sensor info */
-struct BetaPacket{
+struct sensorPacket{
 	struct PacketHeader header;
-	struct BetaData betadata;
-};
-
-
-
-
-
-struct AdcSensorPacket {
-    struct PacketHeader header;
-    uint16_t adcValue;
-};
-
-struct DualModeSensorPacket {
-    struct PacketHeader header;
-    uint16_t adcValue;
-    uint16_t batt;
-    uint32_t time100MiliSec;
-    uint8_t button;
+	struct sampleData sampledata;
 };
 
 struct AckPacket {
     struct PacketHeader header;
 };
-
 
 #endif /* RADIOPROTOCOL_H_ */

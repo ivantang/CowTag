@@ -331,12 +331,12 @@ static uint8_t readI2CRegister(uint8_t board_address, uint8_t address){
 
 }
 
-void getAcceleration(){
+struct accelerationData getAcceleration(){
 	if(verbose)System_printf("whoamI: 0x%x \n", readI2CRegister(Board_LIS3DH_ADDR, 15)); //should read 0x33
 	System_flush();
 
 	unsigned int	i;
-	uint16_t		x, y, z;
+	struct accelerationData accelerationdata;
 
     writeI2CRegister(Board_LIS3DH_ADDR, LIS3DH_REG_CTRL1, 0x77);    //all axes , normal mode
     writeI2CRegister(Board_LIS3DH_ADDR, LIS3DH_REG_CTRL4, 0x0A);	//high res and BDU and self test 1
@@ -348,10 +348,10 @@ void getAcceleration(){
     for(i = 0 ; i < 30 ; i++){
     	if( (readI2CRegister(Board_LIS3DH_ADDR,0x27) & 0x8) >> 3 == 1 ){
     		if( (readI2CRegister(Board_LIS3DH_ADDR,0x27) >> 7) == 1 ){
-    			x = readI2CRegister(Board_LIS3DH_ADDR,0x28) | (readI2CRegister(Board_LIS3DH_ADDR,0x29) << 8) ;
-    			y = readI2CRegister(Board_LIS3DH_ADDR,0x2A) | (readI2CRegister(Board_LIS3DH_ADDR,0x2B) << 8) ;
-    			z = readI2CRegister(Board_LIS3DH_ADDR,0x2C) | (readI2CRegister(Board_LIS3DH_ADDR,0x2D) << 8) ;
-    			System_printf("x:%d y:%d z:%d\n", x ,y, z);
+    			accelerationdata.x = readI2CRegister(Board_LIS3DH_ADDR,0x28) | (readI2CRegister(Board_LIS3DH_ADDR,0x29) << 8) ;
+    			accelerationdata.y = readI2CRegister(Board_LIS3DH_ADDR,0x2A) | (readI2CRegister(Board_LIS3DH_ADDR,0x2B) << 8) ;
+    			accelerationdata.z = readI2CRegister(Board_LIS3DH_ADDR,0x2C) | (readI2CRegister(Board_LIS3DH_ADDR,0x2D) << 8) ;
+    			System_printf("x:%d y:%d z:%d\n", accelerationdata.x ,accelerationdata.y, accelerationdata.z);
     			System_flush();
     		}
     	}
@@ -361,10 +361,13 @@ void getAcceleration(){
     	System_printf("\nI2C closed receiving finished\n");
     }
     System_flush();
+
+    return accelerationdata;
 }
 
-void getObjTemp(){
-	uint32_t temp_l, temp_h, flags;
+struct temperatureData getObjTemp(){
+	struct temperatureData temperaturedata;
+	uint32_t flags;
 	uint8_t	 pec;
 
 	int i;
@@ -379,13 +382,15 @@ void getObjTemp(){
 //
 //	for(i = 0 ; i < 5 ; i++){
 //		//writeI2C(Board_MIKROE1362_ADDR,0xB4);
-//		temp_l = readI2CWord(Board_MIKROE1362_ADDR << 1,0x07);
-//		//temp_h = readI2CRegister(Board_MIKROE1362_ADDR << 1,0x07);
+//		temperaturedata.temp_l = readI2CWord(Board_MIKROE1362_ADDR << 1,0x07);
+//		//temperaturedata.temp_h = readI2CRegister(Board_MIKROE1362_ADDR << 1,0x07);
 //		//pec = readI2CRegister(Board_MIKROE1362_ADDR << 1,0x07);
 //		System_printf("temp:0x%x\n", temp_l);
 //		//System_printf("temp:0x%x 0x%x 0x%x\n",temp_h,temp_l,pec);
 //		System_flush();
 //	}
+
+	return temperaturedata;
 }
 
 
@@ -494,7 +499,8 @@ void initMIKROE1362_1(){
     receiveStart = false;
 }
 
-void getHeartRate(){
+struct heartrateData  getHeartRate(){
+	struct heartrateData heartratedata;
 	int write_reg, read_reg;
 	int i;
 	//check if device is connected
@@ -539,6 +545,8 @@ void getHeartRate(){
 		//print out intterupt status register
 		if(verbose) System_printf("Interupt Reg: 0x%x\n", readI2CRegister(Board_MAX30100_ADDR, 0x00));
 		System_flush();
+
+		return heartratedata;
 	}
 }
 

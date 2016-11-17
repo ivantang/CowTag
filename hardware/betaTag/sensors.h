@@ -97,10 +97,26 @@ void Sensors_init(void);
 #define	MAX30100_LED_CURR_50MA			0x0f	//default LEDcurrent
 #define MAX30100_SPC_SPO2_HI_RES_EN     (1 << 6)
 
+struct accelerationData {
+	uint16_t x;
+	uint16_t y;
+	uint16_t z;
+};
+
+struct temperatureData {
+	uint32_t temp_l;
+	uint32_t temp_h;
+};
+
+struct heartrateData {
+	uint16_t rate_l;
+	uint16_t rate_h;
+};
+
 //void echoFxn(UArg arg0, UArg arg1);
-void getAcceleration();
-void getObjTemp();
-void getHeartRate();
+struct accelerationData  getAcceleration();
+struct temperatureData getObjTemp();
+struct heartrateData  getHeartRate();
 void testSensors();
 
 #endif /* SENSORS_H_ */

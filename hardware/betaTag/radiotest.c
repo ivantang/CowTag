@@ -128,7 +128,6 @@ static void nodeTaskFunction(UArg arg0, UArg arg1)
 
 	while(1) {
 
-
 		sampledata.tempData = 2;
 		sampledata.accelerometerData = 0;
 		sampledata.heartRateData = 1;

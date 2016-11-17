@@ -41,7 +41,7 @@ int main(void)
 	System_flush();
 
     Board_initGeneral(); // init board
-    Sensors_init(); // init i2C
+    //Sensors_init(); // init i2C
 
     BetaRadio_init(); // init rf beta
     radiotest_init(); // init beta
@@ -64,14 +64,3 @@ int main(void)
 
     return (0);
 }
-
-
-
-
-
-
-
-
-
-
-

@@ -9,7 +9,7 @@
 #define DEBUG_H_
 
 // verbose for printing debug messages
-static const int verbose = 1;
+static const int verbose = 0;
 
 
 #endif /* DEBUG_H_ */

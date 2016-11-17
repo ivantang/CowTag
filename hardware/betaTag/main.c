@@ -46,6 +46,7 @@ int main(void)
     BetaRadio_init(); // init rf beta
     radiotest_init(); // init beta
 
+
     /* Open LED pins */
     ledPinHandle = PIN_open(&ledPinState, ledPinTable);
     if(!ledPinHandle) {

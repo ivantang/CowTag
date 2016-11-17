@@ -55,7 +55,7 @@ void Sensors_init(void){
 	Task_construct(&task0Struct, (Task_FuncPtr)testSensors, &taskParams, NULL);
 }
 
-Void echoFxn(UArg arg0, UArg arg1)
+void echoFxn(UArg arg0, UArg arg1)
 {
     char input;
     UART_Handle uart;
@@ -331,7 +331,7 @@ static uint8_t readI2CRegister(uint8_t board_address, uint8_t address){
 
 }
 
-Void getAcceleration(){
+void getAcceleration(){
 	if(verbose)System_printf("whoamI: 0x%x \n", readI2CRegister(Board_LIS3DH_ADDR, 15)); //should read 0x33
 	System_flush();
 
@@ -363,32 +363,33 @@ Void getAcceleration(){
     System_flush();
 }
 
-Void getObjTemp(){
-	uint32_t temp_l, flags;
-	//uint32_t temp_h;
-	//uint8_t pec;
+void getObjTemp(){
+	uint32_t temp_l, temp_h, flags;
+	uint8_t	 pec;
+
 	int i;
 
 	//System_printf("i am 0x%x\n", readI2CRegister(Board_MIKROE1362_ADDR,0x0E));
 	//System_flush();
 
+	System_printf("temp_a 0x%x\n",readI2CRegister(0xB4,0x06));
 
-	flags = readI2CRegister(Board_MIKROE1362_ADDR << 1,0xF0);
-	System_printf("flags:0x%x \n",flags);
-
-	for(i = 0 ; i < 5 ; i++){
-		//writeI2C(Board_MIKROE1362_ADDR,0xB4);
-		temp_l = readI2CWord(Board_MIKROE1362_ADDR << 1,0x07);
-		//temp_h = readI2CRegister(Board_MIKROE1362_ADDR << 1,0x07);
-		//pec = readI2CRegister(Board_MIKROE1362_ADDR << 1,0x07);
-		System_printf("temp:0x%x\n", temp_l);
-		//System_printf("temp:0x%x 0x%x 0x%x\n",temp_h,temp_l,pec);
-		System_flush();
-	}
+//	flags = readI2CRegister(Board_MIKROE1362_ADDR << 1,0xF0);
+//	System_printf("flags:0x%x \n",flags);
+//
+//	for(i = 0 ; i < 5 ; i++){
+//		//writeI2C(Board_MIKROE1362_ADDR,0xB4);
+//		temp_l = readI2CWord(Board_MIKROE1362_ADDR << 1,0x07);
+//		//temp_h = readI2CRegister(Board_MIKROE1362_ADDR << 1,0x07);
+//		//pec = readI2CRegister(Board_MIKROE1362_ADDR << 1,0x07);
+//		System_printf("temp:0x%x\n", temp_l);
+//		//System_printf("temp:0x%x 0x%x 0x%x\n",temp_h,temp_l,pec);
+//		System_flush();
+//	}
 }
 
 
-Void initMIKROE1362_1(){
+void initMIKROE1362_1(){
 	unsigned int	i;
 	uint16_t		temperature;
 	float			celcius;
@@ -493,7 +494,55 @@ Void initMIKROE1362_1(){
     receiveStart = false;
 }
 
-Void getHeartRate(){
+void getHeartRate(){
+	int write_reg, read_reg;
+	int i;
+	//check if device is connected
+	if(readI2CRegister(Board_MAX30100_ADDR,0xFF) != 0x11){
+		System_printf("Hardware is not the MAX30100 : 0x%x\n",readI2CRegister(Board_MAX30100_ADDR,0xFF));
+		System_flush();
+	}
+	writeI2CRegister(Board_MAX30100_ADDR, MAX30100_REG_MODE_CONFIGURATION, 0x02);	//enable HR only
+
+	//writeI2CRegister(Board_MAX30100_ADDR, MAX30100_REG_LED_CONFIGURATION, 0xFF);
+
+	writeI2CRegister(Board_MAX30100_ADDR, MAX30100_REG_MODE_CONFIGURATION, 0x0A);	//get temp reading
+	System_printf("temperature: %x.%x\n", (unsigned int)readI2CRegister(Board_MAX30100_ADDR, 0x16), (unsigned int)readI2CRegister(Board_MAX30100_ADDR, 0x17));
+	System_flush();
+
+	writeI2CRegister(Board_MAX30100_ADDR, 0x01, 0xE0);	//turn on interrupts
+	for(i = 0; i<10; i++){
+		if((readI2CRegister(Board_MAX30100_ADDR, 0x00) & 0x20) == 0x20){	//check if hr data is ready
+			//get read pointer
+			//readI2CRegister(Board_MAX30100_ADDR, MAX30100_REG_FIFO_READ_POINTER);
+
+			//currently writing to this register
+			if(verbose) System_printf("FIFO Write Pointer:0x%x\n", readI2CRegister(Board_MAX30100_ADDR,MAX30100_REG_FIFO_WRITE_POINTER));
+			//if reading fifo data, data is from this register
+			if(verbose) System_printf("FIFO Read Pointer:0x%x\n", readI2CRegister(Board_MAX30100_ADDR,MAX30100_REG_FIFO_READ_POINTER));
+
+			//write_reg = readI2CRegister(Board_MAX30100_ADDR,MAX30100_REG_FIFO_WRITE_POINTER);
+			//read_reg = readI2CRegister(Board_MAX30100_ADDR,MAX30100_REG_FIFO_READ_POINTER);
+
+			//System_printf("Avaliable samples:0x%x\n", write_reg-read_reg);
+			//fifo data is 16 bits so 4 reads is needed
+			//first 16 bits is IR data, in our case, HR data
+			System_printf("IR_Data_H:0x%x     ", readI2CRegister(Board_MAX30100_ADDR,MAX30100_REG_FIFO_DATA));
+			System_printf("IR_Data_L:0x%x\n", readI2CRegister(Board_MAX30100_ADDR,MAX30100_REG_FIFO_DATA));
+
+
+			//RED LED data, we dont need this unless looking at Oximeter
+			//System_printf("FIFO Data:0x%x\n", readI2CRegister(Board_MAX30100_ADDR,MAX30100_REG_FIFO_DATA));
+			//System_printf("FIFO Data:0x%x\n", readI2CRegister(Board_MAX30100_ADDR,MAX30100_REG_FIFO_DATA));
+			System_flush();
+		}
+		//print out intterupt status register
+		if(verbose) System_printf("Interupt Reg: 0x%x\n", readI2CRegister(Board_MAX30100_ADDR, 0x00));
+		System_flush();
+	}
+}
+
+void getHeartRate1(){
 	unsigned int	i;
 	uint8_t previous;
 	uint8_t	heartRate;
@@ -554,6 +603,8 @@ Void getHeartRate(){
 
 void testSensors(){
 	getAcceleration();
-	getObjTemp();
+	//getObjTemp();
 	getHeartRate();
+	System_printf("Tests done\n");
+	System_flush();
 }

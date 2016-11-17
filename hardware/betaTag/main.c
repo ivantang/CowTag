@@ -29,38 +29,48 @@
 #include "radioProtocol.h"
 #include "betaRadio.h"
 #include "pinTable.h"
+#include "alphaTask.h"
+#include "RadioReceive.h"
 
 /* Global PIN_Config table */
 PIN_State ledPinState;
 PIN_Handle ledPinHandle;
 /*******************************************/
 
+static int mode = 0; // 0 for alpha, 1 for beta
+
 int main(void)
 {
+	Task_Params taskParams;
+
 	System_printf("Initializing tasks...\n");
 	System_flush();
 
-    Board_initGeneral(); // init board
-    //Sensors_init(); // init i2C
+	Board_initGeneral(); // init board
+	//Sensors_init(); // init i2C
 
-    BetaRadio_init(); // init rf beta
-    radiotest_init(); // init beta
+	if(mode == 1){
+		BetaRadio_init(); // init rf beta
+		radiotest_init();
+	} else {
+		RadioReceive_init();
+		AlphaTask_init();
+	}
+
+	/* Open LED pins */
+	ledPinHandle = PIN_open(&ledPinState, ledPinTable);
+	if(!ledPinHandle) {
+		System_printf("led pin table error code %i \n", ledPinHandle);
+		System_flush();
+		System_abort("Error initializing board LED pins\n");
+		//(already allocated pin in a PinList or non-existent pin in aPinList)
+	}
+	PIN_setOutputValue(ledPinHandle, Board_LED1, 1); //signal init success
 
 
-    /* Open LED pins */
-    ledPinHandle = PIN_open(&ledPinState, ledPinTable);
-    if(!ledPinHandle) {
-    	System_printf("led pin table error code %i \n", ledPinHandle);
-    	System_flush();
-        System_abort("Error initializing board LED pins\n");
-        //(already allocated pin in a PinList or non-existent pin in aPinList)
-    }
-    PIN_setOutputValue(ledPinHandle, Board_LED1, 1); //signal init success
+	System_printf("Starting BIOS:\n");
+	System_flush();
+	BIOS_start();
 
-
-    System_printf("Starting BIOS:\n");
-    System_flush();
-    BIOS_start();
-
-    return (0);
+	return (0);
 }

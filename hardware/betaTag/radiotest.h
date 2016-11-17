@@ -9,6 +9,6 @@
 #define TASKS_BETATASK_H_
 
 /* Initializes the Node Task and creates all TI-RTOS objects */
-void BetaTask_init(void);
+void radiotest_init(void);
 
 #endif /* TASKS_BETATASK_H_ */

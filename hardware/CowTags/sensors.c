@@ -127,7 +127,7 @@ static void writeI2C(uint8_t board_address, uint8_t value){
 		System_abort("Error Initializing I2C for Transmitting\n");
 	}
 	else {
-		//if(verbose_sensors) System_printf("I2C Initialized for Transmitting!\n");
+		if(verbose_i2c) System_printf("I2C Initialized for Transmitting!\n");
 	}
 
 	//do i2c transfer
@@ -170,7 +170,7 @@ static void writeI2CRegister(uint8_t board_address, uint8_t destination, uint8_t
 		System_abort("Error Initializing I2C for Transmitting\n");
 	}
 	else {
-		//if(verbose_sensors) System_printf("I2C Initialized for Transmitting!\n");
+		if(verbose_i2c) System_printf("I2C Initialized for Transmitting!\n");
 	}
 
 	//do i2c transfer
@@ -178,7 +178,7 @@ static void writeI2CRegister(uint8_t board_address, uint8_t destination, uint8_t
 
 	/*Deinitialized I2C */
 	I2C_close(t_handle);
-	if(verbose_sensors){
+	if(verbose_i2c){
 		System_printf("write closed\n");
 	}
 	System_flush();
@@ -226,7 +226,7 @@ static void writeI2CRegisters(int8_t board_address, uint8_t destination[], uint8
 		System_abort("Error Initializing I2C for Transmitting\n");
 	}
 	else {
-		if(verbose_sensors) System_printf("I2C Initialized for Transmitting!\n");
+		if(verbose_i2c) System_printf("I2C Initialized for Transmitting!\n");
 	}
 
 	//do i2c transfer
@@ -234,14 +234,14 @@ static void writeI2CRegisters(int8_t board_address, uint8_t destination[], uint8
 
 	/*Deinitialized I2C */
 	I2C_close(t_handle);
-	if(verbose_sensors){
+	if(verbose_i2c){
 		System_printf("write closed\n");
 	}
 	System_flush();
 }
 
 //reads 8bit * 3 from target address
-static uint32_t readI2CWord(uint8_t board_address, uint8_t address){
+static uint32_t readI2CWord1kHz(uint8_t board_address, uint8_t address){
 	uint8_t			txBuffer[1] = {address};
 	uint8_t			rxBuffer[3];
 
@@ -251,7 +251,7 @@ static uint32_t readI2CWord(uint8_t board_address, uint8_t address){
 
     I2C_Params_init(&params);
     params.transferMode = I2C_MODE_BLOCKING;
-    params.bitRate = I2C_400kHz;
+    params.bitRate = I2C_100kHz;
 
     i2cTransaction.writeBuf = txBuffer;
 	i2cTransaction.writeCount = 1;
@@ -270,18 +270,18 @@ static uint32_t readI2CWord(uint8_t board_address, uint8_t address){
 
     I2C_transfer(handle, &i2cTransaction);
 
-    if(verbose_sensors){
+    if(verbose_i2c){
     	System_printf("rxBuffer: 0x%x%x%x read from 0x%x\n",rxBuffer[1],rxBuffer[0],rxBuffer[2],address);
         System_flush();
     }
 
     I2C_close(handle);
 
-	if(verbose_sensors){
+	if(verbose_i2c){
 		System_printf("read closed\n");
 	}
 	System_flush();
-    return (rxBuffer[2] | rxBuffer[0] << 8 | rxBuffer[1] << 16);
+    return (rxBuffer[2] | rxBuffer[1] << 8 | rxBuffer[0] << 16);
 
 
 }
@@ -317,19 +317,59 @@ static uint8_t readI2CRegister(uint8_t board_address, uint8_t address){
 
     I2C_transfer(handle, &i2cTransaction);
 
-    if(verbose_sensors)System_printf("rxBuffer: 0x%x read from 0x%x\n",rxBuffer[0],address);
+    if(verbose_i2c)System_printf("rxBuffer: 0x%x read from 0x%x\n",rxBuffer[0],address);
     System_flush();
 
     I2C_close(handle);
 
-	if(verbose_sensors) System_printf("read closed\n");
+	if(verbose_i2c) System_printf("read closed\n");
+	System_flush();
+    return rxBuffer[0];
+
+}
+
+static uint8_t readI2CRegister100kHz(uint8_t board_address, uint8_t address){
+	uint8_t			txBuffer[1] = {address};
+	uint8_t			rxBuffer[1];
+
+	I2C_Transaction i2cTransaction;
+	I2C_Handle handle;
+	I2C_Params params;
+
+    I2C_Params_init(&params);
+    params.transferMode = I2C_MODE_BLOCKING;
+    params.bitRate = I2C_100kHz;
+
+    i2cTransaction.writeBuf = txBuffer;
+	i2cTransaction.writeCount = 1;
+	i2cTransaction.readBuf = rxBuffer;
+	i2cTransaction.readCount = 1;
+	i2cTransaction.slaveAddress = board_address;
+
+	handle = I2C_open(Board_I2C, &params);
+	if (handle == NULL) {
+		System_abort("Error Initializing I2C\n");
+	}
+	else {
+		//if(verbose_sensors)System_printf("I2C Initialized!\n");
+	}
+	System_flush();
+
+    I2C_transfer(handle, &i2cTransaction);
+
+    if(verbose_i2c)System_printf("rxBuffer: 0x%x read from 0x%x\n",rxBuffer[0],address);
+    System_flush();
+
+    I2C_close(handle);
+
+	if(verbose_i2c) System_printf("read closed\n");
 	System_flush();
     return rxBuffer[0];
 
 }
 
 struct accelerationData getAcceleration(){
-	if(verbose_sensors)System_printf("whoamI: 0x%x \n", readI2CRegister(Board_LIS3DH_ADDR, 15)); //should read 0x33
+	if(verbose_sensors)System_printf("\n\nwhoamI: 0x%x \n", readI2CRegister(Board_LIS3DH_ADDR, 15)); //should read 0x33
 	System_flush();
 
 	unsigned int	i;
@@ -369,10 +409,16 @@ struct temperatureData getObjTemp(){
 
 	int i;
 
-	//System_printf("i am 0x%x\n", readI2CRegister(Board_MIKROE1362_ADDR,0x0E));
-	//System_flush();
+	if(verbose_sensors)System_printf("\n\ni am 0x%x\n", readI2CRegister100kHz(Board_MIKROE1362_ADDR,0x2E));
+	if(verbose_sensors)System_printf("flag 0x%x\n", readI2CWord1kHz(Board_MIKROE1362_ADDR,0xF0));
+	if(verbose_sensors)System_printf("id 1 0x%x\n", readI2CWord1kHz(Board_MIKROE1362_ADDR,0x3C));
+	if(verbose_sensors)System_printf("id 2 0x%x\n", readI2CWord1kHz(Board_MIKROE1362_ADDR,0x3D));
+	if(verbose_sensors)System_printf("id 3 0x%x\n", readI2CWord1kHz(Board_MIKROE1362_ADDR,0x3E));
+	if(verbose_sensors)System_printf("id 4 0x%x\n", readI2CWord1kHz(Board_MIKROE1362_ADDR,0x3F));
+	if(verbose_sensors)System_printf("config register 0x%x\n", readI2CWord1kHz(Board_MIKROE1362_ADDR,0x25));
 
-	if(verbose_sensors) System_printf("temp_a 0x%x\n",readI2CRegister(0xB4,0x06));
+
+	if(verbose_sensors) System_printf("temp_a 0x%x\n",readI2CWord1kHz(Board_MIKROE1362_ADDR,0x06));
 
 //	flags = readI2CRegister(Board_MIKROE1362_ADDR << 1,0xF0);
 //	System_printf("flags:0x%x \n",flags);
@@ -386,7 +432,7 @@ struct temperatureData getObjTemp(){
 //		//System_printf("temp:0x%x 0x%x 0x%x\n",temp_h,temp_l,pec);
 //		System_flush();
 //	}
-
+	System_flush();
 	return temperaturedata;
 }
 

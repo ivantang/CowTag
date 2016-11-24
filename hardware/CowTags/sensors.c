@@ -53,36 +53,6 @@ void Sensors_init(void){
 	Task_construct(&task0Struct, (Task_FuncPtr)testSensors, &taskParams, NULL);
 }
 
-//sends data to uart output. can be read via com
-void echoFxn(UArg arg0, UArg arg1)
-{
-    char input;
-    UART_Handle uart;
-    UART_Params uartParams;
-    const char echoPrompt[] = "Echoing characters:\r\n";
-    //const char newLine[] = "\n";
-
-    /* Create a UART with data processing off. */
-    UART_Params_init(&uartParams);
-    uartParams.writeDataMode = UART_DATA_BINARY;
-    uartParams.readDataMode = UART_DATA_BINARY;
-    uartParams.readReturnMode = UART_RETURN_FULL;
-    uartParams.readEcho = UART_ECHO_OFF;
-    uartParams.baudRate = 9600;
-    uart = UART_open(Board_UART0, &uartParams);
-
-    if (uart == NULL) {
-        System_abort("Error opening the UART");
-    }
-
-    UART_write(uart, echoPrompt, sizeof(echoPrompt));
-
-    /* Loop forever echoing */
-    while (1) {
-        UART_read(uart, &input, 1);
-        UART_write(uart, &input, 1);
-    }
-}
 
 struct accelerationData getAcceleration(){
 	if(verbose_sensors)System_printf("\n\nwhoamI: 0x%x \n", readI2CRegister(Board_LIS3DH_ADDR, 15)); //should read 0x33

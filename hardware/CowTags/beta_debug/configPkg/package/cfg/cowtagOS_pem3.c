@@ -1758,7 +1758,7 @@ __FAR__ const xdc_SizeT ti_sysbios_knl_Task_Module_State_terminatedQ__O = offset
  *  Define absolute path prefix for this executable's
  *  configuration generated files.
  */
-xdc__META(__ASM__, "@(#)__ASM__ = C:/Users/Ivan/Documents/GitHub/72point5/hardware/CowTags/beta_debug/configPkg/package/cfg/cowtagOS_pem3");
+xdc__META(__ASM__, "@(#)__ASM__ = /home/ivan/Documents/Github/72point5/hardware/CowTags/beta_debug/configPkg/package/cfg/cowtagOS_pem3");
 
 /*
  *  ======== __ISA__ ========

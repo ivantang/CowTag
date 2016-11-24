@@ -16,7 +16,8 @@ C_SRCS += \
 ../betaMain.c \
 ../betaRadioTest.c \
 ../ccfg.c \
-../sensors.c 
+../sensors.c \
+../uArtEcho.c 
 
 OBJS += \
 ./CC1310_LAUNCHXL.obj \
@@ -25,7 +26,8 @@ OBJS += \
 ./betaMain.obj \
 ./betaRadioTest.obj \
 ./ccfg.obj \
-./sensors.obj 
+./sensors.obj \
+./uArtEcho.obj 
 
 C_DEPS += \
 ./CC1310_LAUNCHXL.d \
@@ -34,7 +36,8 @@ C_DEPS += \
 ./betaMain.d \
 ./betaRadioTest.d \
 ./ccfg.d \
-./sensors.d 
+./sensors.d \
+./uArtEcho.d 
 
 GEN_MISC_DIRS += \
 ./configPkg/ 
@@ -50,11 +53,11 @@ GEN_FILES += \
 ./configPkg/compiler.opt 
 
 GEN_FILES__QUOTED += \
-"configPkg\linker.cmd" \
-"configPkg\compiler.opt" 
+"configPkg/linker.cmd" \
+"configPkg/compiler.opt" 
 
 GEN_MISC_DIRS__QUOTED += \
-"configPkg\" 
+"configPkg/" 
 
 C_DEPS__QUOTED += \
 "CC1310_LAUNCHXL.d" \
@@ -63,7 +66,8 @@ C_DEPS__QUOTED += \
 "betaMain.d" \
 "betaRadioTest.d" \
 "ccfg.d" \
-"sensors.d" 
+"sensors.d" \
+"uArtEcho.d" 
 
 OBJS__QUOTED += \
 "CC1310_LAUNCHXL.obj" \
@@ -72,7 +76,8 @@ OBJS__QUOTED += \
 "betaMain.obj" \
 "betaRadioTest.obj" \
 "ccfg.obj" \
-"sensors.obj" 
+"sensors.obj" \
+"uArtEcho.obj" 
 
 C_SRCS__QUOTED += \
 "../CC1310_LAUNCHXL.c" \
@@ -81,6 +86,7 @@ C_SRCS__QUOTED += \
 "../betaMain.c" \
 "../betaRadioTest.c" \
 "../ccfg.c" \
-"../sensors.c" 
+"../sensors.c" \
+"../uArtEcho.c" 
 
 

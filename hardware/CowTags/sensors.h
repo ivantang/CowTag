@@ -100,12 +100,14 @@ void Sensors_init(void);
 struct temperatureData {
 	uint16_t temp_l;
 	uint16_t temp_h;
+	uint32_t timestamp;
 };
 
 struct accelerationData {
 	uint16_t x;
 	uint16_t y;
 	uint16_t z;
+	uint32_t timestamp;
 };
 
 struct heartrateData {
@@ -113,6 +115,7 @@ struct heartrateData {
 	uint16_t temp_h;
 	uint16_t rate_l;
 	uint16_t rate_h;
+	uint32_t timestamp;
 };
 
 //void echoFxn(UArg arg0, UArg arg1);

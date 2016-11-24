@@ -6,10 +6,10 @@
  */
 
 
-
 /* XDCtools Header files */
 #include <xdc/std.h>
 #include <xdc/runtime/System.h>
+#include <xdc/runtime/Timestamp.h>
 
 /* BIOS Header files */
 #include <ti/sysbios/BIOS.h>
@@ -74,6 +74,7 @@ struct accelerationData getAcceleration(){
     			accelerationdata.x = readI2CRegister(Board_LIS3DH_ADDR,0x28) | (readI2CRegister(Board_LIS3DH_ADDR,0x29) << 8) ;
     			accelerationdata.y = readI2CRegister(Board_LIS3DH_ADDR,0x2A) | (readI2CRegister(Board_LIS3DH_ADDR,0x2B) << 8) ;
     			accelerationdata.z = readI2CRegister(Board_LIS3DH_ADDR,0x2C) | (readI2CRegister(Board_LIS3DH_ADDR,0x2D) << 8) ;
+    			accelerationdata.timestamp = Timestamp_get32();
     			if(verbose_sensors) System_printf("x:%d y:%d z:%d\n", accelerationdata.x ,accelerationdata.y, accelerationdata.z);
     			System_flush();
     			break;
@@ -106,6 +107,7 @@ struct temperatureData getObjTemp(){
 	//if(verbose_sensors) System_printf("temp_obj 0x%x\n",readI2CWord100kHz(Board_MIKROE1362_ADDR,0x06) >> 8);
 	//if(verbose_sensors) System_printf("temp_obj 0x%x\n",readI2CWord100kHz(Board_MIKROE1362_ADDR,0x06));
 	temperaturedata.temp_h = readI2CWord100kHz(Board_MIKROE1362_ADDR,0x06) >> 8;
+	temperaturedata.timestamp = Timestamp_get32();
 
 
 //	flags = readI2CRegister(Board_MIKROE1362_ADDR << 1,0xF0);
@@ -164,6 +166,7 @@ struct heartrateData getHeartRate(){
 		if(verbose_sensors) System_printf("IR_Data_H:0x%x ", heartratedata.rate_h);
 		heartratedata.rate_l = readI2CRegister(Board_MAX30100_ADDR,MAX30100_REG_FIFO_DATA);
 		if(verbose_sensors) System_printf("IR_Data_L:0x%x\n", heartratedata.rate_l);
+		heartratedata.timestamp = Timestamp_get32();
 
 
 		//RED LED data, we dont need this unless looking at Oximeter

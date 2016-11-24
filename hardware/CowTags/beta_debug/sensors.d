@@ -78,6 +78,19 @@ sensors.obj: /home/ivan/ti/xdctools_3_32_00_06_core/packages/xdc/runtime/IInstan
 sensors.obj: /home/ivan/ti/xdctools_3_32_00_06_core/packages/xdc/runtime/IGateProvider.h
 sensors.obj: /home/ivan/ti/xdctools_3_32_00_06_core/packages/xdc/runtime/package/System_SupportProxy.h
 sensors.obj: /home/ivan/ti/xdctools_3_32_00_06_core/packages/xdc/runtime/package/System_Module_GateProxy.h
+sensors.obj: /home/ivan/ti/xdctools_3_32_00_06_core/packages/xdc/runtime/Timestamp.h
+sensors.obj: /home/ivan/ti/xdctools_3_32_00_06_core/packages/xdc/runtime/Types.h
+sensors.obj: /home/ivan/ti/xdctools_3_32_00_06_core/packages/xdc/runtime/ITimestampClient.h
+sensors.obj: /home/ivan/ti/xdctools_3_32_00_06_core/packages/xdc/runtime/Types.h
+sensors.obj: /home/ivan/ti/xdctools_3_32_00_06_core/packages/xdc/runtime/IModule.h
+sensors.obj: /home/ivan/ti/xdctools_3_32_00_06_core/packages/xdc/runtime/Types.h
+sensors.obj: /home/ivan/ti/xdctools_3_32_00_06_core/packages/xdc/runtime/ITimestampProvider.h
+sensors.obj: /home/ivan/ti/xdctools_3_32_00_06_core/packages/xdc/runtime/Types.h
+sensors.obj: /home/ivan/ti/xdctools_3_32_00_06_core/packages/xdc/runtime/ITimestampClient.h
+sensors.obj: /home/ivan/ti/xdctools_3_32_00_06_core/packages/xdc/runtime/package/Timestamp_SupportProxy.h
+sensors.obj: /home/ivan/ti/xdctools_3_32_00_06_core/packages/xdc/runtime/Types.h
+sensors.obj: /home/ivan/ti/xdctools_3_32_00_06_core/packages/xdc/runtime/ITimestampProvider.h
+sensors.obj: /home/ivan/ti/xdctools_3_32_00_06_core/packages/xdc/runtime/package/Timestamp_SupportProxy.h
 sensors.obj: /home/ivan/ti/tirtos_cc13xx_cc26xx_2_21_00_06/products/bios_6_46_01_37/packages/ti/sysbios/BIOS.h
 sensors.obj: /home/ivan/ti/xdctools_3_32_00_06_core/packages/xdc/runtime/Types.h
 sensors.obj: /home/ivan/ti/tirtos_cc13xx_cc26xx_2_21_00_06/products/bios_6_46_01_37/packages/ti/sysbios/BIOS__prologue.h
@@ -271,6 +284,19 @@ sensors.obj: /home/ivan/Documents/Github/72point5/hardware/CowTags/IIC.h
 /home/ivan/ti/xdctools_3_32_00_06_core/packages/xdc/runtime/IGateProvider.h: 
 /home/ivan/ti/xdctools_3_32_00_06_core/packages/xdc/runtime/package/System_SupportProxy.h: 
 /home/ivan/ti/xdctools_3_32_00_06_core/packages/xdc/runtime/package/System_Module_GateProxy.h: 
+/home/ivan/ti/xdctools_3_32_00_06_core/packages/xdc/runtime/Timestamp.h: 
+/home/ivan/ti/xdctools_3_32_00_06_core/packages/xdc/runtime/Types.h: 
+/home/ivan/ti/xdctools_3_32_00_06_core/packages/xdc/runtime/ITimestampClient.h: 
+/home/ivan/ti/xdctools_3_32_00_06_core/packages/xdc/runtime/Types.h: 
+/home/ivan/ti/xdctools_3_32_00_06_core/packages/xdc/runtime/IModule.h: 
+/home/ivan/ti/xdctools_3_32_00_06_core/packages/xdc/runtime/Types.h: 
+/home/ivan/ti/xdctools_3_32_00_06_core/packages/xdc/runtime/ITimestampProvider.h: 
+/home/ivan/ti/xdctools_3_32_00_06_core/packages/xdc/runtime/Types.h: 
+/home/ivan/ti/xdctools_3_32_00_06_core/packages/xdc/runtime/ITimestampClient.h: 
+/home/ivan/ti/xdctools_3_32_00_06_core/packages/xdc/runtime/package/Timestamp_SupportProxy.h: 
+/home/ivan/ti/xdctools_3_32_00_06_core/packages/xdc/runtime/Types.h: 
+/home/ivan/ti/xdctools_3_32_00_06_core/packages/xdc/runtime/ITimestampProvider.h: 
+/home/ivan/ti/xdctools_3_32_00_06_core/packages/xdc/runtime/package/Timestamp_SupportProxy.h: 
 /home/ivan/ti/tirtos_cc13xx_cc26xx_2_21_00_06/products/bios_6_46_01_37/packages/ti/sysbios/BIOS.h: 
 /home/ivan/ti/xdctools_3_32_00_06_core/packages/xdc/runtime/Types.h: 
 /home/ivan/ti/tirtos_cc13xx_cc26xx_2_21_00_06/products/bios_6_46_01_37/packages/ti/sysbios/BIOS__prologue.h: 

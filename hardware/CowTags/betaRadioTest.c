@@ -149,6 +149,12 @@ static void nodeTaskFunction(UArg arg0, UArg arg1)
 																  sampledata.accelerometerData.z,
 																  sampledata.heartRateData.rate_h,
 																  sampledata.heartRateData.rate_l);
+						System_printf("Timestamps for Temp_Data = %i, "
+														"Acc_Data = %i, "
+															"IR_Data_H = %i\n",
+															sampledata.tempData.timestamp,
+															sampledata.accelerometerData.timestamp,
+															sampledata.heartRateData.timestamp);
 						System_flush();
 		}
 	}

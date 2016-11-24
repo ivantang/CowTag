@@ -140,11 +140,10 @@ static void nodeTaskFunction(UArg arg0, UArg arg1)
 		/* Send value to concentrator */
 		betaRadioSendData(sampledata);
 		if(verbose_antennas){
-						System_printf("BetaRadio: sent packet with Temp_Data = %i.%i, "
+						System_printf("BetaRadio: sent packet with Temp_Data = %i, "
 																  "Acc_Data= x=%i y=%i z=%i, "
 								      	  	  	  	  	  	  	  "IR_Data_H = %i, IR_Data_L = %i \n",
 																  sampledata.tempData.temp_h,
-																  sampledata.tempData.temp_l,
 																  sampledata.accelerometerData.x,
 																  sampledata.accelerometerData.y,
 																  sampledata.accelerometerData.z,

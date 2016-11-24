@@ -188,6 +188,10 @@ sensors.obj: C:/Users/Ivan/Documents/GitHub/72point5/hardware/CowTags/debug.h
 sensors.obj: C:/ti/ccsv6/tools/compiler/arm_15.12.3.LTS/include/assert.h
 sensors.obj: C:/ti/ccsv6/tools/compiler/arm_15.12.3.LTS/include/linkage.h
 sensors.obj: C:/Users/Ivan/Documents/GitHub/72point5/hardware/CowTags/sensors.h
+sensors.obj: C:/Users/Ivan/Documents/GitHub/72point5/hardware/CowTags/IIC.c
+sensors.obj: C:/ti/tirex-content/xdctools_3_32_00_06_core/packages/xdc/runtime/System.h
+sensors.obj: C:/ti/ccsv6/tools/compiler/arm_15.12.3.LTS/include/assert.h
+sensors.obj: C:/Users/Ivan/Documents/GitHub/72point5/hardware/CowTags/IIC.h
 
 ../sensors.c: 
 C:/ti/tirex-content/xdctools_3_32_00_06_core/packages/xdc/std.h: 
@@ -377,3 +381,7 @@ C:/Users/Ivan/Documents/GitHub/72point5/hardware/CowTags/debug.h:
 C:/ti/ccsv6/tools/compiler/arm_15.12.3.LTS/include/assert.h: 
 C:/ti/ccsv6/tools/compiler/arm_15.12.3.LTS/include/linkage.h: 
 C:/Users/Ivan/Documents/GitHub/72point5/hardware/CowTags/sensors.h: 
+C:/Users/Ivan/Documents/GitHub/72point5/hardware/CowTags/IIC.c: 
+C:/ti/tirex-content/xdctools_3_32_00_06_core/packages/xdc/runtime/System.h: 
+C:/ti/ccsv6/tools/compiler/arm_15.12.3.LTS/include/assert.h: 
+C:/Users/Ivan/Documents/GitHub/72point5/hardware/CowTags/IIC.h: 

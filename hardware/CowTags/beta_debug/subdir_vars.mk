@@ -11,6 +11,7 @@ CFG_SRCS += \
 
 C_SRCS += \
 ../CC1310_LAUNCHXL.c \
+../IIC.c \
 ../RadioSend.c \
 ../betaMain.c \
 ../betaRadioTest.c \
@@ -19,6 +20,7 @@ C_SRCS += \
 
 OBJS += \
 ./CC1310_LAUNCHXL.obj \
+./IIC.obj \
 ./RadioSend.obj \
 ./betaMain.obj \
 ./betaRadioTest.obj \
@@ -27,6 +29,7 @@ OBJS += \
 
 C_DEPS += \
 ./CC1310_LAUNCHXL.d \
+./IIC.d \
 ./RadioSend.d \
 ./betaMain.d \
 ./betaRadioTest.d \
@@ -55,6 +58,7 @@ GEN_MISC_DIRS__QUOTED += \
 
 C_DEPS__QUOTED += \
 "CC1310_LAUNCHXL.d" \
+"IIC.d" \
 "RadioSend.d" \
 "betaMain.d" \
 "betaRadioTest.d" \
@@ -63,6 +67,7 @@ C_DEPS__QUOTED += \
 
 OBJS__QUOTED += \
 "CC1310_LAUNCHXL.obj" \
+"IIC.obj" \
 "RadioSend.obj" \
 "betaMain.obj" \
 "betaRadioTest.obj" \
@@ -71,6 +76,7 @@ OBJS__QUOTED += \
 
 C_SRCS__QUOTED += \
 "../CC1310_LAUNCHXL.c" \
+"../IIC.c" \
 "../RadioSend.c" \
 "../betaMain.c" \
 "../betaRadioTest.c" \

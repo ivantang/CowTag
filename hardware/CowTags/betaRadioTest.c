@@ -130,7 +130,6 @@ static void nodeTaskFunction(UArg arg0, UArg arg1)
 		sampledata.tempData = getObjTemp();
 		sampledata.accelerometerData = getAcceleration();
 		sampledata.heartRateData = getHeartRate();
-
 		int delay = 10000;
 		CPUdelay(delay*1000);
 

@@ -33,7 +33,13 @@
 #include <IIC.c>
 #include <IIC.h>
 
+PIN_Config BoardGpioInitialTable[] = {
+//		Board_I2C0_SDA0 | PIN_GPIO_LOW,
+//		Board_I2C0_SCL0	| PIN_GPIO_HIGH,
+		PIN_TERMINATE
+};
 
+PIN_State pinState;
 
 /**constants*/
 #define TASKSTACKSIZE		1024	//i2c
@@ -44,7 +50,9 @@ Char task0Stack[TASKSTACKSIZE];
 
 /*function definition */
 void Sensors_init(void){
-    Task_Params taskParams;
+	PIN_init(BoardGpioInitialTable);
+
+	Task_Params taskParams;
 
 	Task_Params_init(&taskParams);
 	taskParams.stackSize = TASKSTACKSIZE;
@@ -87,11 +95,14 @@ struct accelerationData getAcceleration(){
 }
 
 struct temperatureData getObjTemp(){
-	struct temperatureData temperaturedata;
-	uint32_t flags;
-	uint8_t	 pec;
 
-	int i;
+	const PIN_Config TempPinConfig[] = {
+			Board_I2C0_SDA0 | PIN_GPIO_LOW,
+			Board_I2C0_SCL0 | PIN_GPIO_HIGH,
+			PIN_TERMINATE
+	};
+
+	struct temperatureData temperaturedata;
 
 	//if(verbose_sensors)System_printf("\n\ni am 0x%x\n", readI2CRegister100kHz(Board_MIKROE1362_ADDR,0x2E));
 //	if(verbose_sensors)System_printf("flag 0x%x\n", readI2CWord100kHz(Board_MIKROE1362_ADDR,0xF0));
@@ -122,6 +133,12 @@ struct temperatureData getObjTemp(){
 //		System_flush();
 //	}
 	//System_flush();
+	if(!PIN_open(&pinState, TempPinConfig)){
+		if (verbose_sensors) System_printf("Pin config failed\n");
+		System_flush();
+	}
+
+	PIN_close(&pinState);
 	return temperaturedata;
 }
 

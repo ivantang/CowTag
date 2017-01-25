@@ -77,6 +77,54 @@ static void writeI2C(uint8_t board_address, uint8_t value){
 	System_flush();
 }
 
+/**
+ * write an array to a slave i2c device
+ * the first element is the slave address
+ *
+ * @bytes[0]   slave address
+ * @bytes[1..] data
+ */
+static void writeI2CArray(uint8_t slaveAddr, uint8_t bytes[]) {
+	uint8_t			txBuffer[sizeof(bytes)];
+	uint8_t         rxBuffer[1];
+
+	I2C_Transaction t_i2cTransaction;
+	I2C_Handle 		t_handle;
+	I2C_Params		t_params;
+
+	// init clock speed and synch
+	I2C_Params_init(&t_params);
+    t_params.transferMode = I2C_MODE_BLOCKING;
+    t_params.bitRate = I2C_400kHz;
+
+    assert(sizeof(bytes) > 0);
+
+    // load data
+    int i;
+    int arrayLen = sizeof(bytes);
+    for (i = 0; i < arrayLen; i++){
+    	txBuffer[i] = bytes[i];
+    }
+
+    t_i2cTransaction.writeBuf = txBuffer;
+    t_i2cTransaction.writeCount = sizeof(bytes);
+    t_i2cTransaction.readBuf = rxBuffer;
+    t_i2cTransaction.readCount = 0;
+    t_i2cTransaction.slaveAddress = slaveAddr;
+
+	t_handle = I2C_open(Board_I2C, &t_params);
+	if (t_handle == NULL) {
+		System_abort("Error Initializing I2C for Transmitting\n");
+	}
+
+	if(I2C_transfer(t_handle, &t_i2cTransaction) == NULL){
+		System_abort("I2C Transfer Failed\n");
+	}
+
+
+	I2C_close(t_handle);
+}
+
 //sends 8bit value to target address on target board address
 //first 8 bits in txbuffer is address on hardware we want to write to
 //seconds 8 bits in txbuffer is value we want to write

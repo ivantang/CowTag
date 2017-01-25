@@ -16,6 +16,7 @@ C_SRCS += \
 ../betaMain.c \
 ../betaRadioTest.c \
 ../ccfg.c \
+../eeprom.c \
 ../sensors.c \
 ../uArtEcho.c 
 
@@ -26,6 +27,7 @@ OBJS += \
 ./betaMain.obj \
 ./betaRadioTest.obj \
 ./ccfg.obj \
+./eeprom.obj \
 ./sensors.obj \
 ./uArtEcho.obj 
 
@@ -36,6 +38,7 @@ C_DEPS += \
 ./betaMain.d \
 ./betaRadioTest.d \
 ./ccfg.d \
+./eeprom.d \
 ./sensors.d \
 ./uArtEcho.d 
 
@@ -66,6 +69,7 @@ C_DEPS__QUOTED += \
 "betaMain.d" \
 "betaRadioTest.d" \
 "ccfg.d" \
+"eeprom.d" \
 "sensors.d" \
 "uArtEcho.d" 
 
@@ -76,6 +80,7 @@ OBJS__QUOTED += \
 "betaMain.obj" \
 "betaRadioTest.obj" \
 "ccfg.obj" \
+"eeprom.obj" \
 "sensors.obj" \
 "uArtEcho.obj" 
 
@@ -86,6 +91,7 @@ C_SRCS__QUOTED += \
 "../betaMain.c" \
 "../betaRadioTest.c" \
 "../ccfg.c" \
+"../eeprom.c" \
 "../sensors.c" \
 "../uArtEcho.c" 
 

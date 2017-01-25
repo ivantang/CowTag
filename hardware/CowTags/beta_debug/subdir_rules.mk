@@ -56,6 +56,13 @@ configPkg/linker.cmd: build-1810874321
 configPkg/compiler.opt: build-1810874321
 configPkg/: build-1810874321
 
+eeprom.obj: ../eeprom.c $(GEN_OPTS) | $(GEN_HDRS)
+	@echo 'Building file: $<'
+	@echo 'Invoking: ARM Compiler'
+	"C:/ti/ccsv6/tools/compiler/arm_15.12.3.LTS/bin/armcl" -mv7M3 --code_state=16 --float_support=vfplib -me --include_path="C:/Users/Ivan/Documents/GitHub/72point5/hardware/CowTags" --include_path="C:/Users/Ivan/Documents/GitHub/72point5/hardware/CowTags/easylink" --include_path="C:/Users/Ivan/Documents/GitHub/72point5/hardware/CowTags/smartrf_settings" --include_path="C:/ti/tirex-content/tirtos_cc13xx_cc26xx_2_21_00_06/products/cc13xxware_2_04_03_17272" --include_path="C:/ti/ccsv6/tools/compiler/arm_15.12.3.LTS/include" -g --define=ccs --diag_wrap=off --diag_warning=225 --diag_warning=255 --display_error_number --gen_func_subsections=on --abi=eabi --preproc_with_compile --preproc_dependency="eeprom.d" $(GEN_OPTS__FLAG) "$<"
+	@echo 'Finished building: $<'
+	@echo ' '
+
 sensors.obj: ../sensors.c $(GEN_OPTS) | $(GEN_HDRS)
 	@echo 'Building file: $<'
 	@echo 'Invoking: ARM Compiler'

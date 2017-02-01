@@ -227,13 +227,18 @@ static void writeI2CRegisters(int8_t board_address, uint8_t destination[], uint8
 }
 
 //reads 8bit * 3 from target address
+//100kHz is compatible with SMBUS
+//this function is written to be used for the MLX90614 read format
 static uint32_t readI2CWord100kHz(uint8_t board_address, uint8_t address){
-	uint8_t			txBuffer[1] = {address};
+	uint8_t			txBuffer[1];
 	uint8_t			rxBuffer[3];
 
 	I2C_Transaction i2cTransaction;
 	I2C_Handle handle;
 	I2C_Params params;
+
+	//load txBuffer
+	txBuffer[0] = address;
 
     I2C_Params_init(&params);
     params.transferMode = I2C_MODE_BLOCKING;
@@ -247,28 +252,23 @@ static uint32_t readI2CWord100kHz(uint8_t board_address, uint8_t address){
 
 	handle = I2C_open(Board_I2C, &params);
 	if (handle == NULL) {
-		System_abort("Error Initializing I2C\n");
+		System_abort("Error Initializing I2C at readI2CWord100kHz\n");
 	}
 	else {
 		//if(verbose_sensors)System_printf("I2C Initialized!\n");
 	}
-	System_flush();
+	//System_flush();
 
-    I2C_transfer(handle, &i2cTransaction);
-
-    if(verbose_i2c){
-    	System_printf("rxBuffer: 0x%x%x%x read from 0x%x\n",rxBuffer[0],rxBuffer[1],rxBuffer[2],address);
-        System_flush();
-    }
-
-    I2C_close(handle);
-
-	if(verbose_i2c){
-		System_printf("read closed\n");
+	if (I2C_transfer(handle, &i2cTransaction) == NULL){
+		System_abort("I2C Transfer failed at readI2CWord100kHz\n");
 	}
-	System_flush();
-    //return ((rxBuffer[2]) + (rxBuffer[1] << 8) + (rxBuffer[0] << 16));
-    return ((rxBuffer[0] << 16) + (rxBuffer[1] <<8) + rxBuffer[2]);
+
+	I2C_close(handle);
+
+  	System_printf("data byte low: 0x%x | data byte high: 0x%x | PEC: 0x%x | command 0x%x\n",rxBuffer[0],rxBuffer[1],rxBuffer[2],address);
+    System_flush();
+
+    return ((rxBuffer[0]) + (rxBuffer[1] <<8));
 
 }
 

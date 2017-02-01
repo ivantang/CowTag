@@ -94,49 +94,33 @@ struct accelerationData getAcceleration(){
     return accelerationdata;
 }
 
+/*data byte low: 0xb6 | data byte high: 0x39 | PEC: 0x8e | command 0x6
+0x39b6
+I2C Transfer failed at readI2CWord100kHz
+*/
+
 struct temperatureData getObjTemp(){
 
-	const PIN_Config TempPinConfig[] = {
-			Board_I2C0_SDA0 | PIN_GPIO_LOW,
-			Board_I2C0_SCL0 | PIN_GPIO_HIGH,
-			PIN_TERMINATE
-	};
+//	const PIN_Config TempPinConfig[] = {
+//			Board_I2C0_SDA0 | PIN_GPIO_LOW,
+//			Board_I2C0_SCL0 | PIN_GPIO_HIGH,
+//			PIN_TERMINATE
+//	};
 
 	struct temperatureData temperaturedata;
 
-	//if(verbose_sensors)System_printf("\n\ni am 0x%x\n", readI2CRegister100kHz(Board_MIKROE1362_ADDR,0x2E));
-//	if(verbose_sensors)System_printf("flag 0x%x\n", readI2CWord100kHz(Board_MIKROE1362_ADDR,0xF0));
-//	if(verbose_sensors)System_printf("id 1 0x%x\n", readI2CWord100kHz(Board_MIKROE1362_ADDR,0x3C));
-//	if(verbose_sensors)System_printf("id 2 0x%x\n", readI2CWord100kHz(Board_MIKROE1362_ADDR,0x3D));
-//	if(verbose_sensors)System_printf("id 3 0x%x\n", readI2CWord100kHz(Board_MIKROE1362_ADDR,0x3E));
-//	if(verbose_sensors)System_printf("id 4 0x%x\n", readI2CWord100kHz(Board_MIKROE1362_ADDR,0x3F));
-//	if(verbose_sensors)System_printf("config register 0x%x\n", readI2CWord100kHz(Board_MIKROE1362_ADDR,0x25));
-	//writeI2C(Board_MIKROE1362_ADDR, 0xFF);    //all axes , normal mode
+	System_printf("0x%x\n",readI2CWord100kHz(Board_MIKROE1362_ADDR,0x06));
+	Task_sleep(100000 / Clock_tickPeriod);
+	System_printf("0x%x\n",readI2CWord100kHz(Board_MIKROE1362_ADDR,0x07));
+	System_flush();
+	//temperaturedata.temp_h = readI2CWord100kHz(Board_MIKROE1362_ADDR,0x07);
 
-
-	//if(verbose_sensors) System_printf("temp_obj 0x%x\n",readI2CWord100kHz(Board_MIKROE1362_ADDR,0x06) >> 8);
-	//if(verbose_sensors) System_printf("temp_obj 0x%x\n",readI2CWord100kHz(Board_MIKROE1362_ADDR,0x06));
-	temperaturedata.temp_h = readI2CWord100kHz(Board_MIKROE1362_ADDR,0x06) >> 8;
 	temperaturedata.timestamp = Timestamp_get32();
 
-	writeI2C(Board_MIKROE1362_ADDR,0xFF);
-//	flags = readI2CRegister(Board_MIKROE1362_ADDR << 1,0xF0);
-//	System_printf("flags:0x%x \n",flags);
-//
-//	for(i = 0 ; i < 5 ; i++){
-//		//writeI2C(Board_MIKROE1362_ADDR,0xB4);
-//		temperaturedata.temp_l = readI2CWord(Board_MIKROE1362_ADDR << 1,0x07);
-//		temperaturedata.temp_h = readI2CRegister(Board_MIKROE1362_ADDR << 1,0x07);
-//		//pec = readI2CRegister(Board_MIKROE1362_ADDR << 1,0x07);
-//		System_printf("temp:0x%x\n", temp_l);
-//		//System_printf("temp:0x%x 0x%x 0x%x\n",temp_h,temp_l,pec);
+//	if(!PIN_open(&pinState, TempPinConfig)){
+//		if (verbose_sensors) System_printf("Pin config failed\n");
 //		System_flush();
 //	}
-	//System_flush();
-	if(!PIN_open(&pinState, TempPinConfig)){
-		if (verbose_sensors) System_printf("Pin config failed\n");
-		System_flush();
-	}
 
 	PIN_close(&pinState);
 	return temperaturedata;

@@ -43,11 +43,10 @@ int main(void)
 	System_flush();
 
 	Board_initGeneral(); // init board
-	//Sensors_init(); // init i2C
 
-	//radioSend_init();	//
-	//betaRadioTest_init();	//
-	EEPROM_init();
+	radioSend_init();	//
+	betaRadioTest_init();	//
+	//EEPROM_init();
 
 
 	/* Open LED pins */

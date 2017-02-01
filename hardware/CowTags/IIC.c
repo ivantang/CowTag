@@ -17,6 +17,7 @@
 
 /* Example/Board Header files */
 #include "Board.h"
+#include "boolean.h"
 #include <debug.h>
 #include <stdint.h>
 #include <assert.h>
@@ -107,7 +108,7 @@ static void writeI2CArray(uint8_t slaveAddr, uint8_t bytes[]) {
     }
 
     t_i2cTransaction.writeBuf = txBuffer;
-    t_i2cTransaction.writeCount = sizeof(bytes);
+    t_i2cTransaction.writeCount = sizeof(*bytes) / sizeof(bytes[0]);
     t_i2cTransaction.readBuf = rxBuffer;
     t_i2cTransaction.readCount = 0;
     t_i2cTransaction.slaveAddress = slaveAddr;
@@ -351,5 +352,39 @@ static uint8_t readI2CRegister100kHz(uint8_t board_address, uint8_t address){
 	if(verbose_i2c) System_printf("read closed\n");
 	System_flush();
     return rxBuffer[0];
+}
 
+static uint8_t readEEPROMaddress(uint8_t slaveaddr, uint8_t addrHigh, uint8_t addrLow) {
+	uint8_t			txBuffer[2];
+	uint8_t			rxBuffer[1];
+
+	txBuffer[0] = addrHigh;
+	txBuffer[1] = addrLow;
+
+	I2C_Transaction i2cTransaction;
+	I2C_Handle handle;
+	I2C_Params params;
+
+	I2C_Params_init(&params);
+	params.transferMode = I2C_MODE_BLOCKING;
+	params.bitRate = I2C_400kHz;
+
+	i2cTransaction.writeBuf = txBuffer;
+	i2cTransaction.writeCount = 2;
+	i2cTransaction.readBuf = rxBuffer;
+	i2cTransaction.readCount = 1;
+	i2cTransaction.slaveAddress = slaveaddr;
+
+	handle = I2C_open(Board_I2C, &params);
+	if (handle == NULL) {
+		System_abort("Error Initializing I2C\n");
+	}
+
+	if(I2C_transfer(handle, &i2cTransaction) == NULL){
+		System_abort("I2C Transfer Failed at Read Random\n");
+	}
+
+	I2C_close(handle);
+
+	return rxBuffer[0];
 }

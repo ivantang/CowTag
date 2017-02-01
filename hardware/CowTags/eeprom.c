@@ -29,6 +29,7 @@
 #include <assert.h>
 
 #include "eeprom.h"
+#include "boolean.h"
 #include <IIC.c>
 #include <IIC.h>
 
@@ -39,98 +40,56 @@
 Task_Struct task0Struct;
 Char task0Stack[TASKSTACKSIZE];
 
-/*function definition
- * Creating a separate task for EEPROM as a means to test the memory component
- * */
-void EEPROM_init(void){
+bool eeprom_init() {
+	// start at beginning of memory addresses
+	currentAddress = 0x0000;
+
+	// start eeprom thread
 	Task_Params taskParams;
 	Task_Params_init(&taskParams);
 	taskParams.stackSize = TASKSTACKSIZE;
 	taskParams.stack = &task0Stack;
-	Task_construct(&task0Struct, (Task_FuncPtr)testEEPROM, &taskParams, NULL);
-}
-
-/* this function is a temporary function which tests the eeprom  separately from other tasks */
-void testEEPROM(){
-	unsigned int	i;
-	uint8_t controlbyte_write = 0x50;
-	uint8_t addr_upper = 0x40;
-	uint8_t addr_lower = 0x80;
-	uint8_t data = 0x01;
-
-	//random read write
-	uint8_t writeByte[] = {addr_upper,addr_lower,data};
-
-	//making the array
-	uint8_t writePage[66];
-	for(i = 2 ; i < sizeof(writePage) ; i++){
-		writePage[i] = data;
-		data++;
-	}
-	writePage[0] = addr_upper;
-	writePage[1] = addr_lower;
-
-	writeI2CArray(controlbyte_write,writeByte);
-	Task_sleep(100000 / Clock_tickPeriod);						//required to sleep in between write/read
-	EEPROMReadRandom(controlbyte_write,addr_upper,addr_lower);
-}
-
-/*
-bool eeprom_init() {
-	// initialize hardware
-	init24LC256();
-
-	// start at beginning of memory addresses
-	currentAddress = 0x000;
+	Task_construct(&task0Struct, (Task_FuncPtr)eeprom_testCapacity, &taskParams, NULL);
 
 	return true;
-}*/
+}
 
-bool eeprom_write(uint8_t byte) {
+bool eeprom_write(uint8_t bytes[]) {
 	assertAddress(currentAddress);
-	/* writeI2CByte(currentAddress, byte); */
 
-	// set current memory stack pointer
-	currentAddress++;
+	unsigned bytesLength = sizeof(*bytes) / sizeof(bytes[0]);
 
-	return true;
-}
+	// write a single byte
+	if (bytesLength == 1) {
+		uint8_t writeByte[] = {(currentAddress >> 8), currentAddress & 0xFF, bytes[0]};
+		writeI2CArray(BOARD_24LC256, writeByte);
+		currentAddress++;
 
-bool eeprom_writeMany(uint8_t byte[]) {
-	// if all bytes can fit, write them
-	if (eeprom_canFitMany(byte)) {
-		int numberOfBytes = sizeof(byte);
-		int i = 0;
-
-		for (i = 0; i < numberOfBytes; ++i) {
-			assertAddress(currentAddress);
-			/* writeI2CByte(currentAddress, byte[i]); */
-
-			// set current memory stack pointer
-			currentAddress++;
+	// write numerous bytes at once
+	} else if (bytesLength > 1) {
+		unsigned i;
+		uint8_t writePage[sizeof(bytes) + 2];  // +2 for the address to write
+		for(i = 2 ; i < sizeof(writePage) ; i++) {
+			writePage[i] = bytes[i];
 		}
 
-	// if all bytes can't fit, write until the memory is full
-	// then continue writing from MIN_EEPROM_ADDRESS
+		// address to start writing at
+		writePage[0] = (currentAddress >> 8);
+		writePage[1] = currentAddress & 0xFF;
+		currentAddress += bytesLength;
+
+		writeI2CArray(BOARD_24LC256, writePage);
+
+	// no bytes to write!
 	} else {
-		int numberOfBytes = sizeof(byte);
-		int i = 0;
+		System_printf("ERR: attempting to write empty bytes @ %x\n", currentAddress);
+		System_flush();
 
-		for (i = 0; i < numberOfBytes; ++i) {
-			assertAddress(currentAddress);
-
-			if (eeprom_canFit(byte[i])) {
-				/* writeI2CByte(currentAddress, byte[i]); */
-			} else {
-				// memory is full, start back at first address
-				currentAddress = MIN_EEPROM_ADDRESS;
-				/* writeI2CByte(currentAddress, byte[i]); */
-			}
-
-			// set current memory stack pointer
-			currentAddress++;
-		}
+		return false;
 	}
+
+	// delay
+	Task_sleep(100000 / Clock_tickPeriod);
 
 	return true;
 }
@@ -139,83 +98,17 @@ bool eeprom_writeMany(uint8_t byte[]) {
  * Returns the value in addrHigh addrLow
  * Increments address pointer to next entry
  * */
-static uint8_t EEPROMReadRandom(uint8_t slaveaddr, uint8_t addrHigh, uint8_t addrLow) {
-	uint8_t			txBuffer[2];
-	uint8_t			rxBuffer[1];
-
-	txBuffer[0] = addrHigh;
-	txBuffer[1] = addrLow;
-
-	I2C_Transaction i2cTransaction;
-	I2C_Handle handle;
-	I2C_Params params;
-
-	I2C_Params_init(&params);
-	params.transferMode = I2C_MODE_BLOCKING;
-	params.bitRate = I2C_400kHz;
-
-	i2cTransaction.writeBuf = txBuffer;
-	i2cTransaction.writeCount = 2;
-	i2cTransaction.readBuf = rxBuffer;
-	i2cTransaction.readCount = 1;
-	i2cTransaction.slaveAddress = slaveaddr;
-
-	handle = I2C_open(Board_I2C, &params);
-	if (handle == NULL) {
-		System_abort("Error Initializing I2C\n");
-	}
-
-	if(I2C_transfer(handle, &i2cTransaction) == NULL){
-		System_abort("I2C Transfer Failed at Read Random\n");
-	}
-
-	I2C_close(handle);
-
-	System_printf("random read at 0x%2x%2x: 0x%x \n",addrHigh,addrLow, rxBuffer[0]);
-	System_flush();
-
-	return rxBuffer[0];
+static uint8_t eeprom_readAddress(uint8_t addrHigh, uint8_t addrLow) {
+	assertAddress(currentAddress);
+	return readEEPROMaddress(BOARD_24LC256, addrHigh, addrLow);
 }
 
 /* Returns value referenced by address pointer on EEPROM
  * Does NOT change address pointer
 */
-static uint8_t EEPROMReadCurrent(uint8_t board_address){
-	uint8_t			txBuffer[0];
-	uint8_t			rxBuffer[1];
-
-	I2C_Transaction i2cTransaction;
-	I2C_Handle handle;
-	I2C_Params params;
-
-    I2C_Params_init(&params);
-    params.transferMode = I2C_MODE_BLOCKING;
-    params.bitRate = I2C_400kHz;
-
-    i2cTransaction.writeBuf = txBuffer;
-	i2cTransaction.writeCount = 0;
-	i2cTransaction.readBuf = rxBuffer;
-	i2cTransaction.readCount = 1;
-	i2cTransaction.slaveAddress = board_address;
-
-	handle = I2C_open(Board_I2C, &params);
-	if (handle == NULL) {
-		System_abort("Error Initializing I2C\n");
-	}
-	else {
-		//if(verbose)System_printf("I2C Initialized!\n");
-	}
-	System_flush();
-
-    I2C_transfer(handle, &i2cTransaction);
-
-    System_printf("read current 0x%x\n",rxBuffer[0]);
-    System_flush();
-
-    I2C_close(handle);
-    return rxBuffer[0];
-	//if(verbose)	System_printf("read closed\n");
-	System_flush();
+static uint8_t eeprom_readCurrentAddress() {
+	assertAddress(currentAddress);
+	return readEEPROMaddress(BOARD_24LC256, (currentAddress >> 8), currentAddress & 0xFF);
 }
 
 /* TODO:
@@ -223,10 +116,8 @@ static uint8_t EEPROMReadCurrent(uint8_t board_address){
  * Returns the value in addrHigh addrLow as well as the next readNum #'s of values in array
  * Increments address pointer to next entry after the last read
  * */
-static uint8_t EEPROMReadPage(uint8_t slaveaddr, uint8_t addrHigh, uint8_t addrLow, uint8_t readNum) {
+static void eeprom_readPage(uint8_t addrHigh, uint8_t addrLow, uint8_t rxBuffer[]) {
 	uint8_t			txBuffer[2];
-	uint8_t			rxBuffer[64];
-	uint8_t			i;
 
 	txBuffer[0] = addrHigh;
 	txBuffer[1] = addrLow;
@@ -242,8 +133,8 @@ static uint8_t EEPROMReadPage(uint8_t slaveaddr, uint8_t addrHigh, uint8_t addrL
 	i2cTransaction.writeBuf = txBuffer;
 	i2cTransaction.writeCount = 2;
 	i2cTransaction.readBuf = rxBuffer;
-	i2cTransaction.readCount = 64;
-	i2cTransaction.slaveAddress = slaveaddr;
+	i2cTransaction.readCount = 6;//sizeof(*rxBuffer) / sizeof(rxBuffer[0]);
+	i2cTransaction.slaveAddress = BOARD_24LC256;
 
 	handle = I2C_open(Board_I2C, &params);
 	if (handle == NULL) {
@@ -255,25 +146,19 @@ static uint8_t EEPROMReadPage(uint8_t slaveaddr, uint8_t addrHigh, uint8_t addrL
 	}
 
 	I2C_close(handle);
-
-	for(i = 0 ; i < 64 ; i++){
-		System_printf("Read 0x%x \n", rxBuffer[i]);
-	}
-
-	System_flush();
-
-	return rxBuffer[0];
 }
 
-
 bool eeprom_clear() {
-	currentAddress = MIN_EEPROM_ADDRESS;
-
+	// clear all bytes
 	uint16_t i = 0x0000;
+	uint8_t emptyByte[] = {0x00};
 	for (i = 0; i < MAX_EEPROM_ADDRESS; ++i) {
 		assertAddress(currentAddress);
-		/* writeI2CByte(currentAddress, 0x00); */
+		eeprom_write(emptyByte);
 	}
+
+	// reset address pointer
+	currentAddress = MIN_EEPROM_ADDRESS;
 
 	return true;
 }
@@ -321,4 +206,89 @@ int eeprom_spaceLeft() {
 
 void assertAddress(uint16_t address) {
 	assert(address < MAX_EEPROM_ADDRESS && address >= MIN_EEPROM_ADDRESS);
+}
+
+/*** tests ***/
+
+void eeprom_testCapacity() {
+	uint8_t input[] = { 0x00 };
+	uint8_t received = 0x00;
+	uint16_t testsize = 0x0020;
+	bool writeWorked[32];
+	bool readWorked[32];
+
+	currentAddress = MIN_EEPROM_ADDRESS;
+
+	for (; currentAddress < testsize;) {
+		input[0] = currentAddress & 0xff;
+		writeWorked[currentAddress - 1] = eeprom_write(input);
+
+		received = eeprom_readAddress((currentAddress - 1) >> 8, (currentAddress - 1) & 0xFF);
+
+		if (received == input[0]) {
+			readWorked[currentAddress - 1] = true;
+		} else {
+			readWorked[currentAddress - 1] = false;
+		}
+	}
+
+	// count successful writes/reads
+	unsigned write_wins = 0;
+	unsigned write_loses = 0;
+	unsigned read_wins = 0;
+	unsigned read_loses = 0;
+
+	uint16_t i;
+	for (i = 0x00; i < testsize; ++i) {
+		if (writeWorked[i] == true) {
+			write_wins++;
+		} else {
+			write_loses++;
+		}
+
+		if (readWorked[i] == true) {
+			read_wins++;
+		} else {
+			read_loses++;
+		}
+	}
+
+	System_printf("[eeprom_testCapacity]\n");
+	System_printf("WRITE -> Wins: %d, Loses: %d\n", write_wins, write_loses);
+	System_printf("READ - > Wins: %d, Loses: %d\n", read_wins, read_loses);
+	System_flush();
+}
+
+void eeprom_testPageWrite() {
+//	currentAddress = 0x0000;
+//
+//	uint8_t input[] = { 'a', 'b', 'c', 'd', 'e', 'f' };
+//
+//	bool success = eeprom_write(input);
+//
+//	System_printf("win?  %d\n", success);
+//
+//	currentAddress = 0x0000;
+//
+//	uint8_t received = eeprom_readAddress(currentAddress >> 8, currentAddress & 0xFF);
+//	System_printf("Read? %c\n", received);
+//	System_flush();
+//
+//	++currentAddress;
+//
+//	received = eeprom_readAddress(currentAddress >> 8, currentAddress & 0xFF);
+//	System_printf("Read? %c\n", received);
+//	System_flush();
+//
+//	++currentAddress;
+//
+//	received = eeprom_readAddress(currentAddress >> 8, currentAddress & 0xFF);
+//	System_printf("Read? %c\n", received);
+//	System_flush();
+//
+//	++currentAddress;
+//
+//	received = eeprom_readAddress(currentAddress >> 8, currentAddress & 0xFF);
+//	System_printf("Read? %c\n", received);
+//	System_flush();
 }

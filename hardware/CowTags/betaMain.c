@@ -38,7 +38,6 @@ PIN_Handle ledPinHandle;
 
 int main(void)
 {
-
 	System_printf("Initializing tasks...\n");
 	System_flush();
 
@@ -47,7 +46,7 @@ int main(void)
 
 	//radioSend_init();	//
 	//betaRadioTest_init();	//
-	EEPROM_init();
+	eeprom_init();
 
 
 	/* Open LED pins */

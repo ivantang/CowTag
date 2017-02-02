@@ -99,41 +99,16 @@ struct accelerationData getAcceleration(){
 I2C Transfer failed at readI2CWord100kHz
 */
 
-struct temperatureData getObjTemp(){
-
-//	const PIN_Config TempPinConfig[] = {
-//			Board_I2C0_SDA0 | PIN_GPIO_LOW,
-//			Board_I2C0_SCL0 | PIN_GPIO_HIGH,
-//			PIN_TERMINATE
-//	};
-
+struct temperatureData getTemp(){
 	struct temperatureData temperaturedata;
 
-	readI2CWord100kHz(Board_MIKROE1362_ADDR,0x06);
-	readI2CWord100kHz(Board_MIKROE1362_ADDR,0x07);
-	Task_sleep(1000000 / Clock_tickPeriod);
-	readI2CWord100kHz(Board_MIKROE1362_ADDR,0x06);
-	readI2CWord100kHz(Board_MIKROE1362_ADDR,0x07);
-//	System_printf("0x%x\n",readI2CWord100kHz(Board_MIKROE1362_ADDR,0x06));
-//	//Task_sleep(100000 / Clock_tickPeriod);
-//	System_printf("0x%x\n",readI2CWord100kHz3(Board_MIKROE1362_ADDR,0x07));
-//	Task_sleep(100000 / Clock_tickPeriod);
-//	System_printf("0x%x\n",readI2CWord100kHz(Board_MIKROE1362_ADDR,0x06));
-//
-//	System_flush();
-	//temperaturedata.temp_h = readI2CWord100kHz(Board_MIKROE1362_ADDR,0x07);
+	temperaturedata.temp_amb =  readI2CWord100kHz(Board_MIKROE1362_ADDR,0x06)*0.02 - 273.15;
+	temperaturedata.temp_obj = readI2CWord100kHz(Board_MIKROE1362_ADDR,0x07)*0.02 - 273.15;
 
 	temperaturedata.timestamp = Timestamp_get32();
 
-//	if(!PIN_open(&pinState, TempPinConfig)){
-//		if (verbose_sensors) System_printf("Pin config failed\n");
-//		System_flush();
-//	}
-
-//	PIN_close(&pinState);
 	return temperaturedata;
 }
-
 
 struct heartrateData getHeartRate(){
 	struct heartrateData heartratedata;

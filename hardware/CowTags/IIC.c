@@ -255,15 +255,12 @@ static uint32_t readI2CWord100kHz(uint8_t board_address, uint8_t address){
 		System_abort("Error Initializing I2C at readI2CWord100kHz\n");
 	}
 
-	if (I2C_transfer(handle, &i2cTransaction) == NULL){
-		System_abort("I2C Transfer failed at readI2CWord100kHz\n");
+	while (I2C_transfer(handle, &i2cTransaction) == NULL) {
 	}
 
 	I2C_close(handle);
 
-  	System_printf("data byte low: 0x%x | data byte high: 0x%x | PEC: 0x%x | command 0x%x\n",rxBuffer[0],rxBuffer[1],rxBuffer[2],address);
-    System_flush();
-
+    //First byte is lower 8 bits, second byte is high 8 bits
     return ((rxBuffer[0]) + (rxBuffer[1] <<8));
 
 }

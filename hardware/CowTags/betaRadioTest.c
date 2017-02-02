@@ -127,7 +127,7 @@ static void nodeTaskFunction(UArg arg0, UArg arg1)
 	//Clock_start(fastReportTimeoutClockHandle);
 
 	while(1) {
-		sampledata.tempData = getObjTemp();
+		sampledata.tempData = getTemp();
 		sampledata.accelerometerData = getAcceleration();
 		sampledata.heartRateData = getHeartRate();
 		int delay = 10000;
@@ -139,10 +139,11 @@ static void nodeTaskFunction(UArg arg0, UArg arg1)
 		/* Send value to concentrator */
 		betaRadioSendData(sampledata);
 		if(verbose_antennas){
-						System_printf("BetaRadio: sent packet with Temp_Data = %i, "
+						System_printf("BetaRadio: sent packet with Temp_Amb_Data = %i Temp_Obj_Data = %i, "
 																  "Acc_Data= x=%i y=%i z=%i, "
 								      	  	  	  	  	  	  	  "IR_Data_H = %i, IR_Data_L = %i \n",
-																  sampledata.tempData.temp_h,
+																  sampledata.tempData.temp_amb,
+																  sampledata.tempData.temp_obj,
 																  sampledata.accelerometerData.x,
 																  sampledata.accelerometerData.y,
 																  sampledata.accelerometerData.z,

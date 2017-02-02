@@ -98,8 +98,8 @@ void Sensors_init(void);
 #define MAX30100_SPC_SPO2_HI_RES_EN     (1 << 6)
 
 struct temperatureData {
-	uint16_t temp_l;
-	uint16_t temp_h;
+	uint32_t temp_amb;
+	uint32_t temp_obj;
 	uint32_t timestamp;
 };
 
@@ -120,7 +120,7 @@ struct heartrateData {
 
 //void echoFxn(UArg arg0, UArg arg1);
 struct accelerationData  getAcceleration();
-struct temperatureData getObjTemp();
+struct temperatureData getTemp();
 struct heartrateData  getHeartRate();
 void testSensors();
 

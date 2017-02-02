@@ -109,10 +109,18 @@ struct temperatureData getObjTemp(){
 
 	struct temperatureData temperaturedata;
 
-	System_printf("0x%x\n",readI2CWord100kHz(Board_MIKROE1362_ADDR,0x06));
-	Task_sleep(100000 / Clock_tickPeriod);
-	System_printf("0x%x\n",readI2CWord100kHz(Board_MIKROE1362_ADDR,0x07));
-	System_flush();
+	readI2CWord100kHz(Board_MIKROE1362_ADDR,0x06);
+	readI2CWord100kHz(Board_MIKROE1362_ADDR,0x07);
+	Task_sleep(1000000 / Clock_tickPeriod);
+	readI2CWord100kHz(Board_MIKROE1362_ADDR,0x06);
+	readI2CWord100kHz(Board_MIKROE1362_ADDR,0x07);
+//	System_printf("0x%x\n",readI2CWord100kHz(Board_MIKROE1362_ADDR,0x06));
+//	//Task_sleep(100000 / Clock_tickPeriod);
+//	System_printf("0x%x\n",readI2CWord100kHz3(Board_MIKROE1362_ADDR,0x07));
+//	Task_sleep(100000 / Clock_tickPeriod);
+//	System_printf("0x%x\n",readI2CWord100kHz(Board_MIKROE1362_ADDR,0x06));
+//
+//	System_flush();
 	//temperaturedata.temp_h = readI2CWord100kHz(Board_MIKROE1362_ADDR,0x07);
 
 	temperaturedata.timestamp = Timestamp_get32();
@@ -122,7 +130,7 @@ struct temperatureData getObjTemp(){
 //		System_flush();
 //	}
 
-	PIN_close(&pinState);
+//	PIN_close(&pinState);
 	return temperaturedata;
 }
 

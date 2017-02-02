@@ -231,7 +231,7 @@ static void writeI2CRegisters(int8_t board_address, uint8_t destination[], uint8
 //this function is written to be used for the MLX90614 read format
 static uint32_t readI2CWord100kHz(uint8_t board_address, uint8_t address){
 	uint8_t			txBuffer[1];
-	uint8_t			rxBuffer[3];
+	uint8_t			rxBuffer[2];
 
 	I2C_Transaction i2cTransaction;
 	I2C_Handle handle;
@@ -247,17 +247,13 @@ static uint32_t readI2CWord100kHz(uint8_t board_address, uint8_t address){
     i2cTransaction.writeBuf = txBuffer;
 	i2cTransaction.writeCount = 1;
 	i2cTransaction.readBuf = rxBuffer;
-	i2cTransaction.readCount = 3;
+	i2cTransaction.readCount = 2;
 	i2cTransaction.slaveAddress = board_address;
 
 	handle = I2C_open(Board_I2C, &params);
 	if (handle == NULL) {
 		System_abort("Error Initializing I2C at readI2CWord100kHz\n");
 	}
-	else {
-		//if(verbose_sensors)System_printf("I2C Initialized!\n");
-	}
-	//System_flush();
 
 	if (I2C_transfer(handle, &i2cTransaction) == NULL){
 		System_abort("I2C Transfer failed at readI2CWord100kHz\n");

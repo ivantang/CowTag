@@ -42,7 +42,7 @@ Char task0Stack[TASKSTACKSIZE];
 
 bool eeprom_init() {
 	// start at beginning of memory addresses
-	currentAddress = 0x0000;
+	eeprom_reset();
 
 	// start eeprom thread
 	Task_Params taskParams;
@@ -55,7 +55,7 @@ bool eeprom_init() {
 }
 
 bool eeprom_write(uint8_t bytes[], int numBytes) {
-	assertAddress(currentAddress);
+	assertAddress(eeprom_currentAddress);
 
 	unsigned i = 0;
 	while (i < numBytes) {
@@ -63,7 +63,7 @@ bool eeprom_write(uint8_t bytes[], int numBytes) {
 
 		// retry if read does not correlate with write
 		while (!writeSuccess) {
-			uint8_t writeByte[] = {(currentAddress >> 8), currentAddress & 0xFF, *bytes};
+			uint8_t writeByte[] = {(eeprom_currentAddress >> 8), eeprom_currentAddress & 0xFF, *bytes};
 
 			writeI2CArray(BOARD_24LC256, writeByte);
 
@@ -72,7 +72,7 @@ bool eeprom_write(uint8_t bytes[], int numBytes) {
 
 			// validate write
 			uint8_t received[1];
-			eeprom_readAddress(currentAddress >> 8, currentAddress & 0xff, 1, received);
+			eeprom_readAddress(eeprom_currentAddress >> 8, eeprom_currentAddress & 0xff, 1, received);
 
 			if (*received == *bytes) {
 				writeSuccess = true;
@@ -80,7 +80,7 @@ bool eeprom_write(uint8_t bytes[], int numBytes) {
 		}
 
 		++i;
-		++currentAddress;
+		++eeprom_currentAddress;
 		++bytes;
 	}
 
@@ -92,7 +92,7 @@ bool eeprom_write(uint8_t bytes[], int numBytes) {
  * Increments address pointer to next entry
  * */
 void eeprom_readAddress(uint8_t addrHigh, uint8_t addrLow, int numBytes, uint8_t *buf) {
-	assertAddress(currentAddress);
+	assertAddress(eeprom_currentAddress);
 
 	unsigned i = 0;
 	while (i < numBytes) {
@@ -108,8 +108,8 @@ void eeprom_readAddress(uint8_t addrHigh, uint8_t addrLow, int numBytes, uint8_t
  * Does NOT change address pointer
 */
 static uint8_t eeprom_readCurrentAddress() {
-	assertAddress(currentAddress);
-	return readEEPROMaddress(BOARD_24LC256, (currentAddress >> 8), currentAddress & 0xFF);
+	assertAddress(eeprom_currentAddress);
+	return readEEPROMaddress(BOARD_24LC256, (eeprom_currentAddress >> 8), eeprom_currentAddress & 0xFF);
 }
 
 /* TODO:
@@ -149,26 +149,14 @@ static void eeprom_readPage(uint8_t addrHigh, uint8_t addrLow, uint8_t rxBuffer[
 	I2C_close(handle);
 }
 
-bool eeprom_clear() {
-	// clear all bytes
-	uint16_t i = 0x0000;
-	uint8_t emptyByte[] = { 0x00 };
-
-	for (i = 0; i < MAX_EEPROM_ADDRESS; ++i) {
-		assertAddress(currentAddress);
-		eeprom_write(emptyByte, 1);
-	}
-
-	// reset address pointer
-	currentAddress = MIN_EEPROM_ADDRESS;
-
-	return true;
+void eeprom_reset() {
+	eeprom_currentAddress = MIN_EEPROM_ADDRESS;
 }
 
 /*** diagnostic ***/
 
 bool eeprom_isEmpty() {
-	if (currentAddress == MIN_EEPROM_ADDRESS) {
+	if (eeprom_currentAddress == MIN_EEPROM_ADDRESS) {
 		return true;
 	} else {
 		return false;
@@ -176,7 +164,7 @@ bool eeprom_isEmpty() {
 }
 
 bool eeprom_isFull() {
-	if (currentAddress < MAX_EEPROM_ADDRESS) {
+	if (eeprom_currentAddress < MAX_EEPROM_ADDRESS) {
 		return true;
 	} else {
 		return false;
@@ -184,7 +172,7 @@ bool eeprom_isFull() {
 }
 
 bool eeprom_canFit(uint8_t byte) {
-	if (currentAddress + SAMPLE_SIZE <= MAX_EEPROM_ADDRESS) {
+	if (eeprom_currentAddress + SAMPLE_SIZE <= MAX_EEPROM_ADDRESS) {
 		return true;
 	} else {
 		return false;
@@ -192,7 +180,7 @@ bool eeprom_canFit(uint8_t byte) {
 }
 
 bool eeprom_canFitMany(uint8_t bytes[]) {
-	if (currentAddress + (sizeof(bytes) * SAMPLE_SIZE) <= MAX_EEPROM_ADDRESS) {
+	if (eeprom_currentAddress + (sizeof(bytes) * SAMPLE_SIZE) <= MAX_EEPROM_ADDRESS) {
 		return true;
 	} else {
 		return false;
@@ -200,7 +188,7 @@ bool eeprom_canFitMany(uint8_t bytes[]) {
 }
 
 int eeprom_spaceLeft() {
-	uint16_t remainingAddresses = MAX_EEPROM_ADDRESS - currentAddress;
+	uint16_t remainingAddresses = MAX_EEPROM_ADDRESS - eeprom_currentAddress;
 	return remainingAddresses / SAMPLE_SIZE;
 }
 
@@ -224,12 +212,12 @@ void eeprom_testWriteReadSample() {
 			0x1f, 0x2e, 0x3d
 	};
 
-	currentAddress = MIN_EEPROM_ADDRESS;
+	eeprom_reset();
 	eeprom_write(sample, SAMPLE_SIZE);
-	currentAddress = MIN_EEPROM_ADDRESS;
+	eeprom_reset();
 
 	uint8_t received[18];
-	eeprom_readAddress(currentAddress >> 8, currentAddress & 0xff, 18, received);
+	eeprom_readAddress(eeprom_currentAddress >> 8, eeprom_currentAddress & 0xff, 18, received);
 
 	int matches = 0;
 	int i;
@@ -240,23 +228,7 @@ void eeprom_testWriteReadSample() {
 	}
 
 	System_printf("write/read matches = %d / 18!\n", matches);
-
 	System_flush();
-}
-
-void eeprom_testClearMemory() {
-	System_printf("[eeprom_testClearMemory]\n");
-	System_flush();
-
-	bool result = eeprom_clear();
-
-	if (result) {
-		System_printf("eeprom cleared!\n");
-		System_flush();
-	} else {
-		System_printf("ERR: eeprom not cleared correctly\n");
-		System_flush();
-	}
 }
 
 void eeprom_testValidateMemory() {
@@ -273,16 +245,16 @@ void eeprom_testValidateMemory() {
 	unsigned badReads = 0;
 
 	// reset memory pointer
-	currentAddress = MIN_EEPROM_ADDRESS;
+	eeprom_reset();
 
-	for (; currentAddress < testsize;) {
+	for (; eeprom_currentAddress < testsize;) {
 		// check write
 		if (!eeprom_write(input, 1)) {
 			badWrites++;
 		}
 
 		// check read
-		eeprom_readAddress((currentAddress - 1) >> 8, (currentAddress - 1) & 0xff, 1, received);
+		eeprom_readAddress((eeprom_currentAddress - 1) >> 8, (eeprom_currentAddress - 1) & 0xff, 1, received);
 
 		if (received[0] != input[0]) {
 			++badReads;

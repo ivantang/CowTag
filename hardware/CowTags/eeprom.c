@@ -64,11 +64,7 @@ bool eeprom_write(uint8_t bytes[], int numBytes) {
 		// retry if read does not correlate with write
 		while (!writeSuccess) {
 			uint8_t writeByte[] = {(eeprom_currentAddress >> 8), eeprom_currentAddress & 0xFF, *bytes};
-
 			writeI2CArray(BOARD_24LC256, writeByte);
-
-			// delay
-			Task_sleep(100000 / Clock_tickPeriod);
 
 			// validate write
 			uint8_t received[1];

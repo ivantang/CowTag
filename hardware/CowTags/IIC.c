@@ -380,9 +380,8 @@ static uint8_t readEEPROMaddress(uint8_t slaveaddr, uint8_t addrHigh, uint8_t ad
 		System_abort("Error Initializing I2C\n");
 	}
 
-	if(I2C_transfer(handle, &i2cTransaction) == NULL){
-		System_abort("I2C Transfer Failed at Read Random\n");
-	}
+	// loop until eeprom is ready
+	while (I2C_transfer(handle, &i2cTransaction) == NULL);
 
 	I2C_close(handle);
 

@@ -86,7 +86,7 @@ static void writeI2C(uint8_t board_address, uint8_t value){
  * @bytes[1..] data
  */
 static void writeI2CArray(uint8_t slaveAddr, uint8_t bytes[]) {
-	uint8_t			txBuffer[sizeof(bytes)];
+	uint8_t			txBuffer[sizeof(bytes) / sizeof(bytes[0]) - 1];
 	uint8_t         rxBuffer[1];
 
 	I2C_Transaction t_i2cTransaction;
@@ -108,7 +108,7 @@ static void writeI2CArray(uint8_t slaveAddr, uint8_t bytes[]) {
     }
 
     t_i2cTransaction.writeBuf = txBuffer;
-    t_i2cTransaction.writeCount = sizeof(*bytes) / sizeof(bytes[0]);
+    t_i2cTransaction.writeCount = sizeof(bytes) / sizeof(bytes[0]) - 1;
     t_i2cTransaction.readBuf = rxBuffer;
     t_i2cTransaction.readCount = 0;
     t_i2cTransaction.slaveAddress = slaveAddr;

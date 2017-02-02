@@ -233,7 +233,7 @@ void eeprom_testValidateMemory() {
 
 	// test settings
 	uint8_t input[] = { 0x22 };
-	uint16_t testsize = 0x000f;
+	uint16_t testsize = 0x01ff;
 	uint8_t received[1];
 
 	// tally bad bytes

@@ -122,7 +122,6 @@ static void writeI2CArray(uint8_t slaveAddr, uint8_t bytes[]) {
 		System_abort("I2C Transfer Failed\n");
 	}
 
-
 	I2C_close(t_handle);
 }
 
@@ -365,9 +364,9 @@ static uint8_t readEEPROMaddress(uint8_t slaveaddr, uint8_t addrHigh, uint8_t ad
 	I2C_Handle handle;
 	I2C_Params params;
 
-	I2C_Params_init(&params);
 	params.transferMode = I2C_MODE_BLOCKING;
 	params.bitRate = I2C_400kHz;
+	I2C_Params_init(&params);
 
 	i2cTransaction.writeBuf = txBuffer;
 	i2cTransaction.writeCount = 2;

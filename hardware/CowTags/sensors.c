@@ -32,14 +32,7 @@
 #include <sensors.h>
 #include <IIC.c>
 #include <IIC.h>
-
-PIN_Config BoardGpioInitialTable[] = {
-//		Board_I2C0_SDA0 | PIN_GPIO_LOW,
-//		Board_I2C0_SCL0	| PIN_GPIO_HIGH,
-		PIN_TERMINATE
-};
-
-PIN_State pinState;
+#include <radioProtocol.h>
 
 /**constants*/
 #define TASKSTACKSIZE		1024	//i2c
@@ -50,16 +43,57 @@ Char task0Stack[TASKSTACKSIZE];
 
 /*function definition */
 void Sensors_init(void){
-	PIN_init(BoardGpioInitialTable);
-
 	Task_Params taskParams;
-
 	Task_Params_init(&taskParams);
 	taskParams.stackSize = TASKSTACKSIZE;
 	taskParams.stack = &task0Stack;
 	Task_construct(&task0Struct, (Task_FuncPtr)testSensors, &taskParams, NULL);
 }
 
+void printAcceleration(){
+	if(verbose_sensors)System_printf("\n\nwhoamI: 0x%x \n", readI2CRegister(Board_LIS3DH_ADDR, 15)); //should read 0x33
+	System_flush();
+
+	unsigned int	i;
+	struct accelerationData accelerationdata;
+	struct accelerationPacket accelerationPacket;
+	struct accelerationSample accelerationSample;
+
+    //writeI2CRegister(Board_LIS3DH_ADDR, LIS3DH_REG_CTRL1, 0x77);    //all axes , normal mode
+    writeI2CRegister(Board_LIS3DH_ADDR, LIS3DH_REG_CTRL1, 0x2F);    //all axes , normal mode
+    writeI2CRegister(Board_LIS3DH_ADDR, LIS3DH_REG_CTRL4, 0x0A);	//high res and BDU and self test 1
+    //writeI2CRegister(Board_LIS3DH_ADDR, LIS3DH_REG_CTRL3, 0x10);    //DRDY on INT1
+    writeI2CRegister(Board_LIS3DH_ADDR, LIS3DH_REG_TEMPCFG, 0x80);    //enable adcs
+    //writeI2C(Board_LIS3DH_ADDR, LIS3DH_REG_OUT_X_L | 0x80);    //enable auto increment
+
+    //polling status register to check for new set of data
+    for(i = 0 ; i < NUM_ACCELERATION_PACKETS ; i){
+    	if( (readI2CRegister(Board_LIS3DH_ADDR,0x27) & 0x8) >> 3 == 1 ){
+    		if( (readI2CRegister(Board_LIS3DH_ADDR,0x27) >> 7) == 1 ){
+				accelerationPacket.accelerationSample[i].x = readI2CRegister(Board_LIS3DH_ADDR,0x28) | (readI2CRegister(Board_LIS3DH_ADDR,0x29) << 8);
+				accelerationPacket.accelerationSample[i].y = readI2CRegister(Board_LIS3DH_ADDR,0x2A) | (readI2CRegister(Board_LIS3DH_ADDR,0x2B) << 8);
+				accelerationPacket.accelerationSample[i].z = readI2CRegister(Board_LIS3DH_ADDR,0x2C) | (readI2CRegister(Board_LIS3DH_ADDR,0x2D) << 8);
+				accelerationPacket.accelerationSample[i].timestamp = Timestamp_get32();
+				i++;
+    		}
+    	}
+    }
+    for(i = 0 ; i < NUM_ACCELERATION_PACKETS ; i++){
+    	System_printf("i: %d | x: %d | y: %d | z: %d | time: %d\n",	i,
+																	accelerationPacket.accelerationSample[i].x,
+																	accelerationPacket.accelerationSample[i].y,
+																	accelerationPacket.accelerationSample[i].z,
+																	accelerationPacket.accelerationSample[i].timestamp);
+		System_flush();
+    }
+
+//    			System_printf("x:%d ", readI2CRegister(Board_LIS3DH_ADDR,0x28) | (readI2CRegister(Board_LIS3DH_ADDR,0x29) << 8) );
+//				System_printf("y:%d ", readI2CRegister(Board_LIS3DH_ADDR,0x2A) | (readI2CRegister(Board_LIS3DH_ADDR,0x2B) << 8) );
+//				System_printf("z:%d ", readI2CRegister(Board_LIS3DH_ADDR,0x2C) | (readI2CRegister(Board_LIS3DH_ADDR,0x2D) << 8) );
+//				System_printf("time:%d\n", Timestamp_get32() );
+//				System_flush();
+
+}
 
 struct accelerationData getAcceleration(){
 	if(verbose_sensors)System_printf("\n\nwhoamI: 0x%x \n", readI2CRegister(Board_LIS3DH_ADDR, 15)); //should read 0x33
@@ -176,9 +210,7 @@ struct heartrateData getHeartRate(){
 
 
 void testSensors(){
-	getAcceleration();
-	//getObjTemp();
-	getHeartRate();
+	printAcceleration();
 	System_printf("Tests done\n");
 	System_flush();
 }

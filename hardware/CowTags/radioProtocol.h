@@ -21,6 +21,8 @@
 #define RADIO_PACKET_TYPE_DM_SENSOR_PACKET       2
 #define RADIO_PACKET_TYPE_SENSOR_PACKET    		 3
 
+#define NUM_ACCELERATION_PACKETS				30
+
 struct PacketHeader {
     uint8_t sourceAddress;
     uint8_t packetType;
@@ -31,6 +33,12 @@ struct sampleData {
 	struct temperatureData tempData;
 	struct accelerationData accelerometerData;
 	struct heartrateData heartRateData;
+};
+
+//new struct
+struct accelerationPacket{
+	struct PacketHeader header;
+	struct accelerationSample accelerationSample[NUM_ACCELERATION_PACKETS];
 };
 
 /* our custom beta packet with sensor info */

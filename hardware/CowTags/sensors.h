@@ -110,6 +110,14 @@ struct accelerationData {
 	uint32_t timestamp;
 };
 
+//new struct
+struct accelerationSample {
+	uint16_t x;
+	uint16_t y;
+	uint16_t z;
+	uint32_t timestamp;
+};
+
 struct heartrateData {
 	uint16_t temp_l;
 	uint16_t temp_h;

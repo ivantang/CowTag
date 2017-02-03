@@ -44,8 +44,9 @@ int main(void)
 
 	Board_initGeneral(); // init board
 
-	radioSend_init();	//
-	betaRadioTest_init();	//
+	//radioSend_init();	//
+	//betaRadioTest_init();	//
+	Sensors_init();
 	//EEPROM_init();
 
 

@@ -14,7 +14,7 @@
 #define SAMPLE_SIZE 18
 
 // constants
-#define MAX_EEPROM_ADDRESS 0x7FFF
+#define MAX_EEPROM_ADDRESS 0x0037 //0x7FFF
 #define MIN_EEPROM_ADDRESS 0x0000
 #define BOARD_24LC256 0x50	//slave address for first eeprom (a1a2a3 = 000)
 
@@ -26,7 +26,7 @@ extern bool eeprom_hasWrapped;
 // functions
 bool eeprom_write(uint8_t byte[], int numBytes);  // write to next address
 void eeprom_readAddress(uint8_t addrHigh, uint8_t addrLow, int numByte, uint8_t *buf);
-void eeprom_getNext(uint8_t *buf);
+bool eeprom_getNext(uint8_t buf[]);
 void eeprom_reset(); // reset memory address pointer to 0x0000
 
 // diagnostic

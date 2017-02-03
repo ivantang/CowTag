@@ -11,12 +11,16 @@
 #include "eeprom.h"
 
 /*constants*/
-#define TASKSTACKSIZE		2048	//i2c
+#define TASKSTACKSIZE		1024	//i2c
 
 /*test prototypes*/
 bool eeprom_testStart();
 void eeprom_testWriteReadSample();
 void eeprom_testValidateMemory();
+void eeprom_testGetNext();
+
+/*helpers*/
+void eeprom_printSample(uint8_t *buf);
 
 /**structures*/
 Task_Struct task0Struct;
@@ -32,12 +36,55 @@ bool eeprom_testStart() {
 	Task_Params_init(&taskParams);
 	taskParams.stackSize = TASKSTACKSIZE;
 	taskParams.stack = &task0Stack;
-	Task_construct(&task0Struct, (Task_FuncPtr)eeprom_testValidateMemory, &taskParams, NULL);
+	Task_construct(&task0Struct, (Task_FuncPtr)eeprom_testGetNext, &taskParams, NULL);
 
 	return true;
 }
 
 /*** tests ***/
+
+void eeprom_testGetNext() {
+	System_printf("[eeprom_testGetNext]\n");
+	System_flush();
+
+	// 18 byte test sample
+	uint8_t sample[] = {
+			0x11, 0x22, 0x33, 0x44, 0x55,
+			0x66, 0x77, 0x88, 0x99, 0xaa,
+			0xbb, 0xcc, 0xdd, 0xee, 0xff,
+			0x1f, 0x2e, 0x3d
+	};
+
+	eeprom_reset();
+
+	// write thrice
+	eeprom_write(sample, SAMPLE_SIZE);
+	eeprom_write(sample, SAMPLE_SIZE);
+	eeprom_write(sample, SAMPLE_SIZE);
+	eeprom_write(sample, SAMPLE_SIZE);
+
+	// samples retieved from mem
+	unsigned samplesGotten = 0;
+
+	uint8_t buf[SAMPLE_SIZE];
+
+	// get from sample set, and loop until no samples left
+	eeprom_getNext(buf);
+	eeprom_printSample(buf);
+	++samplesGotten;
+	System_printf("0x%02x\n", eeprom_currentAddress);
+	while (!eeprom_getNext(buf)) {
+		++samplesGotten;
+		System_printf("Somple!\n");
+	}
+
+	// validate
+	if (samplesGotten == 4) {
+		System_printf("4 samples gotten! Correct!\n");
+	} else {
+		System_printf("ERR: failure to retrieve samples using getNext()\n");
+	}
+}
 
 // Pre-condition:  eeprom address set to 0x0000
 // Expects:        18 bytes written and read from eeprom
@@ -112,5 +159,12 @@ void eeprom_testValidateMemory() {
 	System_flush();
 }
 
+void eeprom_printSample(uint8_t *buf) {
+	int i;
+	for (i = 0; i < SAMPLE_SIZE; ++i) {
+		System_printf("0x%02x ", buf[i]);
+	}
+	System_printf("\n");
+}
 
 #endif /* EEPROM_TEST_H_ */

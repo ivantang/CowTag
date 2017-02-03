@@ -98,7 +98,7 @@ void eeprom_readAddress(uint8_t addrHigh, uint8_t addrLow, int numBytes, uint8_t
 	}
 }
 
-void eeprom_getNext(uint8_t *buf) {
+bool eeprom_getNext(uint8_t buf[]) {
 	// has wrapped: start back from beginning to read ALL samples
 	if (eeprom_hasWrapped) {
 		eeprom_lastAddress = MIN_EEPROM_ADDRESS;
@@ -112,11 +112,14 @@ void eeprom_getNext(uint8_t *buf) {
 		if (eeprom_lastAddress < eeprom_currentAddress) {
 			eeprom_readAddress(eeprom_lastAddress >> 8, eeprom_lastAddress & 0xff, SAMPLE_SIZE, buf);
 			eeprom_lastAddress += SAMPLE_SIZE;
+
 		} else {
 			eeprom_currentAddress = eeprom_lastAddress = MIN_EEPROM_ADDRESS;
-			buf = NULL;	// DONE
+			return true;  // DONE
 		}
 	}
+
+	return false;  // NOT DONE
 }
 
 /* TODO:

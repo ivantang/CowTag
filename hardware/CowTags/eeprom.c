@@ -47,6 +47,11 @@ bool eeprom_write(uint8_t bytes[], int numBytes) {
 	/* get eeprom access sempahore */
 	Semaphore_pend(eepromSemHandle, BIOS_WAIT_FOREVER);
 
+	if (!eeprom_canFit()) {
+		eeprom_currentAddress = MIN_EEPROM_ADDRESS;
+		eeprom_hasWrapped = true;
+	}
+
 	unsigned i = 0;
 	while (i < numBytes) {
 		bool writeSuccess = false;

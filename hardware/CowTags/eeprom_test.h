@@ -18,6 +18,7 @@ bool eeprom_testStart();
 void eeprom_testWriteReadSample();
 void eeprom_testValidateMemory();
 void eeprom_testGetNext();
+void eeprom_testGetNextWithWrap();
 
 /*helpers*/
 void eeprom_printSample(uint8_t *buf);
@@ -47,6 +48,8 @@ void eeprom_testGetNext() {
 	System_printf("[eeprom_testGetNext]\n");
 	System_flush();
 
+	unsigned testsize = 3;
+
 	// 18 byte test sample
 	uint8_t sample[] = {
 			0x11, 0x22, 0x33, 0x44, 0x55,
@@ -58,10 +61,11 @@ void eeprom_testGetNext() {
 	eeprom_reset();
 
 	// write thrice
-	eeprom_write(sample, SAMPLE_SIZE);
-	eeprom_write(sample, SAMPLE_SIZE);
-	eeprom_write(sample, SAMPLE_SIZE);
-	eeprom_write(sample, SAMPLE_SIZE);
+	unsigned iter = 0;
+	while (iter < testsize) {
+		eeprom_write(sample, SAMPLE_SIZE);
+		++iter;
+	}
 
 	// samples retieved from mem
 	unsigned samplesGotten = 0;
@@ -70,19 +74,57 @@ void eeprom_testGetNext() {
 
 	// get from sample set, and loop until no samples left
 	eeprom_getNext(buf);
-	eeprom_printSample(buf);
 	++samplesGotten;
-	System_printf("0x%02x\n", eeprom_currentAddress);
-	while (!eeprom_getNext(buf)) {
-		++samplesGotten;
-		System_printf("Somple!\n");
-	}
+
+	while (!eeprom_getNext(buf)) { ++samplesGotten; }
 
 	// validate
-	if (samplesGotten == 4) {
-		System_printf("4 samples gotten! Correct!\n");
+	if (samplesGotten == testsize) {
+		System_printf("%d samples gotten! Correct!\n", testsize);
 	} else {
-		System_printf("ERR: failure to retrieve samples using getNext()\n");
+		System_printf("ERR: failure to retrieve samples using getNext(): %d\n", samplesGotten);
+	}
+}
+
+void eeprom_testGetNextWithWrap() {
+	System_printf("[eeprom_testGetNextWithWrap]\n");
+	System_flush();
+
+	unsigned testsize = 5;
+
+	// 18 byte test sample
+	uint8_t sample[] = {
+			0x11, 0x22, 0x33, 0x44, 0x55,
+			0x66, 0x77, 0x88, 0x99, 0xaa,
+			0xbb, 0xcc, 0xdd, 0xee, 0xff,
+			0x1f, 0x2e, 0x3d
+	};
+
+	eeprom_reset();
+
+	// write thrice
+	unsigned iter = 0;
+	while (iter < testsize) {
+		eeprom_write(sample, SAMPLE_SIZE);
+		++iter;
+	}
+
+	// samples retieved from mem
+	unsigned samplesGotten = 0;
+
+	uint8_t buf[SAMPLE_SIZE];
+
+	// get from sample set, and loop until no samples left
+	eeprom_getNext(buf);
+	++samplesGotten;
+
+	while (!eeprom_getNext(buf)) { ++samplesGotten; }
+
+	// validate
+	if (samplesGotten == MAX_EEPROM_ADDRESS / SAMPLE_SIZE) {
+		System_printf("%d samples gotten! Correct!\n", MAX_EEPROM_ADDRESS / SAMPLE_SIZE);
+	} else {
+		System_printf("ERR: failure to retrieve samples using getNextWithWrap(): %d\n", samplesGotten);
 	}
 }
 

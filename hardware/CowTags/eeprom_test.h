@@ -11,7 +11,7 @@
 #include "eeprom.h"
 
 /*constants*/
-#define TASKSTACKSIZE		1024	//i2c
+#define TASKSTACKSIZE		2048	//i2c
 
 /*test prototypes*/
 bool eeprom_testStart();
@@ -32,7 +32,7 @@ bool eeprom_testStart() {
 	Task_Params_init(&taskParams);
 	taskParams.stackSize = TASKSTACKSIZE;
 	taskParams.stack = &task0Stack;
-	Task_construct(&task0Struct, (Task_FuncPtr)eeprom_testWriteReadSample, &taskParams, NULL);
+	Task_construct(&task0Struct, (Task_FuncPtr)eeprom_testValidateMemory, &taskParams, NULL);
 
 	return true;
 }
@@ -58,12 +58,12 @@ void eeprom_testWriteReadSample() {
 	eeprom_write(sample, SAMPLE_SIZE);
 	eeprom_reset();
 
-	uint8_t received[18];
-	eeprom_readAddress(eeprom_currentAddress >> 8, eeprom_currentAddress & 0xff, 18, received);
+	uint8_t received[SAMPLE_SIZE];
+	eeprom_readAddress(eeprom_currentAddress >> 8, eeprom_currentAddress & 0xff, SAMPLE_SIZE, received);
 
 	int matches = 0;
 	int i;
-	for (i = 0; i < 18; i++) {
+	for (i = 0; i < SAMPLE_SIZE; i++) {
 		if (sample[i] == received[i]) {
 			matches++;
 		}
@@ -81,8 +81,8 @@ void eeprom_testValidateMemory() {
 	System_flush();
 
 	// test settings
-	uint8_t input[] = { 0xef };
-	uint16_t testsize = MAX_EEPROM_ADDRESS;
+	uint8_t input[] = { 0x12 };
+	uint16_t testsize = 0x00ff;//MAX_EEPROM_ADDRESS;
 	uint8_t received[1];
 
 	// tally bad bytes

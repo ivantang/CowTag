@@ -14,7 +14,7 @@
 #define SAMPLE_SIZE 18
 
 // constants
-#define MAX_EEPROM_ADDRESS 0x0036 //0x7FFF
+#define MAX_EEPROM_ADDRESS 0x7FFF
 #define MIN_EEPROM_ADDRESS 0x0000
 #define BOARD_24LC256 0x50	//slave address for first eeprom (a1a2a3 = 000)
 

@@ -8,12 +8,15 @@
 #ifndef EEPROM_H_
 #define EEPROM_H_
 
+#include <stdint.h>
+#include <stdbool.h>
+
 #define SAMPLE_SIZE 18
 
 // constants
-const uint16_t MAX_EEPROM_ADDRESS = 0x7FFF;
-const uint16_t MIN_EEPROM_ADDRESS = 0x0000;
-const uint8_t BOARD_24LC256 = 0x50;	//slave address for first eeprom (a1a2a3 = 000)
+#define MAX_EEPROM_ADDRESS 0x7FFF
+#define MIN_EEPROM_ADDRESS 0x0000
+#define BOARD_24LC256 0x50	//slave address for first eeprom (a1a2a3 = 000)
 
 // members
 uint16_t eeprom_currentAddress;
@@ -36,12 +39,6 @@ int eeprom_spaceLeft();  // number of samples that can fit
 
 // assertions
 void assertAddress(uint16_t address);
-
-// tests
-void eeprom_testWriteReadSample();
-void eeprom_testClearMemory();
-void eeprom_testValidateMemory();
-void eeprom_testPageWrite();
 
 
 #endif /* EEPROM_H_ */

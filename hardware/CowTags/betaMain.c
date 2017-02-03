@@ -31,6 +31,9 @@
 #include "pinTable.h"
 #include "RadioReceive.h"
 
+/*test suites*/
+#include "eeprom_test.h"
+
 /* Global PIN_Config table */
 PIN_State ledPinState;
 PIN_Handle ledPinHandle;
@@ -46,7 +49,7 @@ int main(void)
 
 	//radioSend_init();	//
 	//betaRadioTest_init();	//
-	eeprom_init();
+	eeprom_testStart();
 
 
 	/* Open LED pins */

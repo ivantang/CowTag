@@ -99,30 +99,13 @@ void eeprom_readAddress(uint8_t addrHigh, uint8_t addrLow, int numBytes, uint8_t
 }
 
 void eeprom_getNext(uint8_t *buf) {
-	// complex case
+	// has wrapped: start back from beginning to read ALL samples
 	if (eeprom_hasWrapped) {
-		// set lastAddress to currentAddress and get samples until lastAddress has wrapped around
-		if (eeprom_lastAddress > eeprom_currentAddress) {
-			eeprom_readAddress(eeprom_lastAddress >> 8, eeprom_lastAddress & 0xff, SAMPLE_SIZE, buf);
-
-			// wrap around if needed
-			if (MAX_EEPROM_ADDRESS - eeprom_lastAddress < SAMPLE_SIZE) {
-				eeprom_lastAddress = MIN_EEPROM_ADDRESS;
-				eeprom_hasWrapped = false;
-
-			// continue reading up to MAX_EEPROM_ADDRESS
-			} else {
-				eeprom_lastAddress += SAMPLE_SIZE;
-			}
-
-		// continue reading up to currentAddress
-		} else if (eeprom_lastAddress < eeprom_currentAddress) {
-			eeprom_readAddress(eeprom_lastAddress >> 8, eeprom_lastAddress & 0xff, SAMPLE_SIZE, buf);
-			eeprom_lastAddress += SAMPLE_SIZE;
-
-		} else {
-			buf = NULL;  // DONE
-		}
+		eeprom_lastAddress = MIN_EEPROM_ADDRESS;
+		eeprom_currentAddress = MAX_EEPROM_ADDRESS;
+		eeprom_readAddress(eeprom_lastAddress >> 8, eeprom_lastAddress & 0xff, SAMPLE_SIZE, buf);
+		eeprom_lastAddress += SAMPLE_SIZE;
+		eeprom_hasWrapped = false;
 
 	// no wrapping: read samples from lastAddress to currentAddress
 	} else {

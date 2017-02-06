@@ -18,6 +18,7 @@ C_SRCS += \
 ../ccfg.c \
 ../eeprom.c \
 ../sensors.c \
+../serialize.c \
 ../uArtEcho.c 
 
 OBJS += \
@@ -29,6 +30,7 @@ OBJS += \
 ./ccfg.obj \
 ./eeprom.obj \
 ./sensors.obj \
+./serialize.obj \
 ./uArtEcho.obj 
 
 C_DEPS += \
@@ -40,6 +42,7 @@ C_DEPS += \
 ./ccfg.d \
 ./eeprom.d \
 ./sensors.d \
+./serialize.d \
 ./uArtEcho.d 
 
 GEN_MISC_DIRS += \
@@ -71,6 +74,7 @@ C_DEPS__QUOTED += \
 "ccfg.d" \
 "eeprom.d" \
 "sensors.d" \
+"serialize.d" \
 "uArtEcho.d" 
 
 OBJS__QUOTED += \
@@ -82,6 +86,7 @@ OBJS__QUOTED += \
 "ccfg.obj" \
 "eeprom.obj" \
 "sensors.obj" \
+"serialize.obj" \
 "uArtEcho.obj" 
 
 C_SRCS__QUOTED += \
@@ -93,6 +98,7 @@ C_SRCS__QUOTED += \
 "../ccfg.c" \
 "../eeprom.c" \
 "../sensors.c" \
+"../serialize.c" \
 "../uArtEcho.c" 
 
 

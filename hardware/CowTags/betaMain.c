@@ -33,6 +33,7 @@
 
 /*test suites*/
 #include "eeprom_test.h"
+#include "serialize_test.h"
 
 /* Global PIN_Config table */
 PIN_State ledPinState;
@@ -49,8 +50,8 @@ int main(void)
 
 	//radioSend_init();	//
 	//betaRadioTest_init();	//
-	eeprom_testStart();
-
+//	eeprom_testStart();
+	serialize_testStart();
 
 	/* Open LED pins */
 	ledPinHandle = PIN_open(&ledPinState, ledPinTable);

@@ -20,7 +20,7 @@ bool serialize_testStart();
 void serialize_testSerializePacket();
 
 bool serialize_testStart() {
-	// start eeprom thread
+	// start test thread
 	Task_Params taskParams;
 	Task_Params_init(&taskParams);
 	taskParams.stackSize = TASKSTACKSIZE;

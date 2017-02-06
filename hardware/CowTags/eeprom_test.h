@@ -50,33 +50,36 @@ void eeprom_testGetNext() {
 
 	unsigned testsize = 3;
 
-	// 18 byte test sample
-	uint8_t sample[] = {
-			0x11, 0x22, 0x33, 0x44, 0x55,
-			0x66, 0x77, 0x88, 0x99, 0xaa,
-			0xbb, 0xcc, 0xdd, 0xee, 0xff,
-			0x1f, 0x2e, 0x3d
-	};
+	// test packet
+	struct sensorPacket packet;
+	packet.header.sourceAddress = 1;
+	packet.header.packetType = RADIO_PACKET_TYPE_SENSOR_PACKET;
+	packet.sampledata.tempData.timestamp = 0x12345678;
+	packet.sampledata.tempData.temp_h = 0x5678;
+	packet.sampledata.tempData.temp_l = 0x8765;
+	packet.sampledata.heartRateData.rate_h = 0x7890;
+	packet.sampledata.heartRateData.rate_l = 0x0987;
+	packet.sampledata.heartRateData.temp_h = 0x2345;
+	packet.sampledata.heartRateData.temp_l = 0x5432;
 
 	eeprom_reset();
 
 	// write thrice
 	unsigned iter = 0;
 	while (iter < testsize) {
-		eeprom_write(sample, SAMPLE_SIZE);
+		eeprom_write(&packet);
 		++iter;
 	}
 
 	// samples retieved from mem
 	unsigned samplesGotten = 0;
 
-	uint8_t buf[SAMPLE_SIZE];
-
 	// get from sample set, and loop until no samples left
-	eeprom_getNext(buf);
+	struct sensorPacket packet2;
+	eeprom_getNext(&packet2);
 	++samplesGotten;
 
-	while (!eeprom_getNext(buf)) { ++samplesGotten; }
+	while (!eeprom_getNext(&packet2)) { ++samplesGotten; }
 
 	// validate
 	if (samplesGotten == testsize) {
@@ -92,37 +95,41 @@ void eeprom_testGetNextWithWrap() {
 
 	unsigned testsize = 5;
 
-	// 18 byte test sample
-	uint8_t sample[] = {
-			0x11, 0x22, 0x33, 0x44, 0x55,
-			0x66, 0x77, 0x88, 0x99, 0xaa,
-			0xbb, 0xcc, 0xdd, 0xee, 0xff,
-			0x1f, 0x2e, 0x3d
-	};
+	// test packet
+	struct sensorPacket packet;
+	packet.header.sourceAddress = 1;
+	packet.header.packetType = RADIO_PACKET_TYPE_SENSOR_PACKET;
+	packet.sampledata.tempData.timestamp = 0x12345678;
+	packet.sampledata.tempData.temp_h = 0x5678;
+	packet.sampledata.tempData.temp_l = 0x8765;
+	packet.sampledata.heartRateData.rate_h = 0x7890;
+	packet.sampledata.heartRateData.rate_l = 0x0987;
+	packet.sampledata.heartRateData.temp_h = 0x2345;
+	packet.sampledata.heartRateData.temp_l = 0x5432;
 
 	eeprom_reset();
 
 	// write thrice
 	unsigned iter = 0;
 	while (iter < testsize) {
-		eeprom_write(sample, SAMPLE_SIZE);
+		eeprom_write(&packet);
 		++iter;
 	}
 
 	// samples retieved from mem
 	unsigned samplesGotten = 0;
 
-	uint8_t buf[SAMPLE_SIZE];
 
 	// get from sample set, and loop until no samples left
-	eeprom_getNext(buf);
+	struct sensorPacket packet2;
+	eeprom_getNext(&packet2);
 	++samplesGotten;
 
-	while (!eeprom_getNext(buf)) { ++samplesGotten; }
+	while (!eeprom_getNext(&packet2)) { ++samplesGotten; }
 
 	// validate
 	if (samplesGotten == MAX_EEPROM_ADDRESS / SAMPLE_SIZE) {
-		System_printf("%d samples gotten! Correct!\n", MAX_EEPROM_ADDRESS / SAMPLE_SIZE);
+		System_printf("%d eeprom samples written/read!\n", MAX_EEPROM_ADDRESS / SAMPLE_SIZE);
 	} else {
 		System_printf("ERR: failure to retrieve samples using getNextWithWrap(): %d\n", samplesGotten);
 	}
@@ -135,70 +142,81 @@ void eeprom_testWriteReadSample() {
 	System_printf("[eeprom_testWriteReadSample]\n");
 	System_flush();
 
-	// 18 byte test sample
-	uint8_t sample[] = {
-			0x11, 0x22, 0x33, 0x44, 0x55,
-			0x66, 0x77, 0x88, 0x99, 0xaa,
-			0xbb, 0xcc, 0xdd, 0xee, 0xff,
-			0x1f, 0x2e, 0x3d
-	};
+	// test packet
+	struct sensorPacket packet;
+	packet.header.sourceAddress = 1;
+	packet.header.packetType = RADIO_PACKET_TYPE_SENSOR_PACKET;
+	packet.sampledata.tempData.timestamp = 0x12345678;
+	packet.sampledata.tempData.temp_h = 0x5678;
+	packet.sampledata.tempData.temp_l = 0x8765;
+	packet.sampledata.heartRateData.rate_h = 0x7890;
+	packet.sampledata.heartRateData.rate_l = 0x0987;
+	packet.sampledata.heartRateData.temp_h = 0x2345;
+	packet.sampledata.heartRateData.temp_l = 0x5432;
 
 	eeprom_reset();
-	eeprom_write(sample, SAMPLE_SIZE);
+	eeprom_write(&packet);
 	eeprom_reset();
 
-	uint8_t received[SAMPLE_SIZE];
-	eeprom_readAddress(eeprom_currentAddress >> 8, eeprom_currentAddress & 0xff, SAMPLE_SIZE, received);
+	// recreate packet from serialized bytes
+	struct sensorPacket packet2;
+	eeprom_getNext(&packet2);
 
-	int matches = 0;
-	int i;
-	for (i = 0; i < SAMPLE_SIZE; i++) {
-		if (sample[i] == received[i]) {
-			matches++;
-		}
+	// verify unserialized packet
+	bool success = packet.header.sourceAddress == packet2.header.sourceAddress;
+	success = packet.header.packetType == packet2.header.packetType;
+	success = packet.sampledata.tempData.timestamp = packet2.sampledata.tempData.timestamp;
+	success = packet.sampledata.tempData.temp_h = packet2.sampledata.tempData.temp_h;
+	success = packet.sampledata.tempData.temp_l = packet2.sampledata.tempData.temp_l;
+	success = packet.sampledata.heartRateData.rate_h = packet2.sampledata.heartRateData.rate_h;
+	success = packet.sampledata.heartRateData.rate_l = packet2.sampledata.heartRateData.rate_l;
+	success = packet.sampledata.heartRateData.temp_h = packet2.sampledata.heartRateData.temp_h;
+	success = packet.sampledata.heartRateData.temp_l = packet2.sampledata.heartRateData.temp_l;
+
+	if (success) {
+		System_printf("eeprom sample successfully written/read\n");
+	} else {
+		System_printf("ERR: eeprom sample failed to write/read!\n");
 	}
-
-	System_printf("write/read matches = %d / 18!\n", matches);
-	System_flush();
 }
 
 // Pre-condition:  eeprom address set to 0x0000
 // Expects:        all eeprom addresses written and read
 // Post-condition: eeprom full of test data
 void eeprom_testValidateMemory() {
-	System_printf("[eeprom_testValidateMemory]\n");
-	System_flush();
-
-	// test settings
-	uint8_t input[] = { 0x12 };
-	uint16_t testsize = 0x00ff;//MAX_EEPROM_ADDRESS;
-	uint8_t received[1];
-
-	// tally bad bytes
-	unsigned badWrites = 0;
-	unsigned badReads = 0;
-
-	// reset memory pointer
-	eeprom_reset();
-
-	for (; eeprom_currentAddress < testsize;) {
-		// check write
-		if (!eeprom_write(input, 1)) {
-			badWrites++;
-		}
-
-		// check read
-		eeprom_readAddress((eeprom_currentAddress - 1) >> 8, (eeprom_currentAddress - 1) & 0xff, 1, received);
-
-		if (received[0] != input[0]) {
-			++badReads;
-		}
-	}
-
-	// count successful writes/reads
-	System_printf("Bad Writes = %d / %d\n", badWrites, testsize);
-	System_printf("Bad Reads = %d / %d\n", badReads, testsize);
-	System_flush();
+//	System_printf("[eeprom_testValidateMemory]\n");
+//	System_flush();
+//
+//	// test settings
+//	uint8_t input[] = { 0x12 };
+//	uint16_t testsize = 0x00ff;//MAX_EEPROM_ADDRESS;
+//	uint8_t received[1];
+//
+//	// tally bad bytes
+//	unsigned badWrites = 0;
+//	unsigned badReads = 0;
+//
+//	// reset memory pointer
+//	eeprom_reset();
+//
+//	for (; eeprom_currentAddress < testsize;) {
+//		// check write
+//		if (!eeprom_write(input, 1)) {
+//			badWrites++;
+//		}
+//
+//		// check read
+//		eeprom_readAddress((eeprom_currentAddress - 1) >> 8, (eeprom_currentAddress - 1) & 0xff, 1, received);
+//
+//		if (received[0] != input[0]) {
+//			++badReads;
+//		}
+//	}
+//
+//	// count successful writes/reads
+//	System_printf("Bad Writes = %d / %d\n", badWrites, testsize);
+//	System_printf("Bad Reads = %d / %d\n", badReads, testsize);
+//	System_flush();
 }
 
 void eeprom_printSample(uint8_t *buf) {

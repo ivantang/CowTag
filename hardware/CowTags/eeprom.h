@@ -11,6 +11,8 @@
 #include <stdint.h>
 #include <stdbool.h>
 
+#include "radioProtocol.h"
+
 #define SAMPLE_SIZE 18
 
 // constants
@@ -24,9 +26,9 @@ extern uint16_t eeprom_lastAddress;
 extern bool eeprom_hasWrapped;
 
 // functions
-bool eeprom_write(uint8_t byte[], int numBytes);  // write to next address
+bool eeprom_write(struct sensorPacket *packet);  // write to next address
+bool eeprom_getNext(struct sensorPacket *packet);
 void eeprom_readAddress(uint8_t addrHigh, uint8_t addrLow, int numByte, uint8_t *buf);
-bool eeprom_getNext(uint8_t buf[]);
 void eeprom_reset(); // reset memory address pointer to 0x0000
 
 // diagnostic

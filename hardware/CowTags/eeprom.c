@@ -28,6 +28,7 @@
 #include <assert.h>
 
 #include "eeprom.h"
+#include "serialize.h"
 #include <IIC.c>
 #include <IIC.h>
 
@@ -40,7 +41,7 @@ uint16_t eeprom_lastAddress = MIN_EEPROM_ADDRESS;
 Semaphore_Struct eepromSem;
 Semaphore_Handle eepromSemHandle;
 
-bool eeprom_write(uint8_t bytes[], int numBytes) {
+bool eeprom_write(struct sensorPacket *packet) {
 	assertAddress(eeprom_currentAddress);
 	assertSemaphore();
 
@@ -52,22 +53,26 @@ bool eeprom_write(uint8_t bytes[], int numBytes) {
 		eeprom_hasWrapped = true;
 	}
 
+	// serialize packet data to bytes
+	uint8_t bytes[18];
+	serializePacket(packet, bytes);
+
 	unsigned i = 0;
-	while (i < numBytes) {
+	while (i < SAMPLE_SIZE) {
 		bool writeSuccess = false;
 		int maxRetry = 3;
 		int currentRetry = 0;
 
 		// retry if read does not correlate with write
 		while (!writeSuccess) {
-			uint8_t writeByte[] = {(eeprom_currentAddress >> 8), eeprom_currentAddress & 0xFF, *bytes};
+			uint8_t writeByte[] = {(eeprom_currentAddress >> 8), eeprom_currentAddress & 0xFF, bytes[i]};
 			writeI2CArray(BOARD_24LC256, writeByte);
 
 			// validate write
 			uint8_t received[1];
 			eeprom_readAddress(eeprom_currentAddress >> 8, eeprom_currentAddress & 0xff, 1, received);
 
-			if (*received == *bytes) {
+			if (*received == bytes[i]) {
 				writeSuccess = true;
 			} else {
 				currentRetry++;
@@ -79,7 +84,6 @@ bool eeprom_write(uint8_t bytes[], int numBytes) {
 
 		++i;
 		++eeprom_currentAddress;
-		++bytes;
 	}
 
 	/* return eeprom access semaphore */
@@ -103,7 +107,9 @@ void eeprom_readAddress(uint8_t addrHigh, uint8_t addrLow, int numBytes, uint8_t
 	}
 }
 
-bool eeprom_getNext(uint8_t buf[]) {
+bool eeprom_getNext(struct sensorPacket *packet) {
+	uint8_t buf[SAMPLE_SIZE];
+
 	// has wrapped: start back from beginning to read ALL samples
 	if (eeprom_hasWrapped) {
 		eeprom_lastAddress = MIN_EEPROM_ADDRESS;
@@ -112,11 +118,17 @@ bool eeprom_getNext(uint8_t buf[]) {
 		eeprom_lastAddress += SAMPLE_SIZE;
 		eeprom_hasWrapped = false;
 
+		// convert bytes to sensorPacket struct
+		unserializePacket(packet, buf);
+
 	// no wrapping: read samples from lastAddress to currentAddress
 	} else {
 		if (eeprom_lastAddress < eeprom_currentAddress) {
 			eeprom_readAddress(eeprom_lastAddress >> 8, eeprom_lastAddress & 0xff, SAMPLE_SIZE, buf);
 			eeprom_lastAddress += SAMPLE_SIZE;
+
+			// convert bytes to sensorPacket struct
+			unserializePacket(packet, buf);
 
 		} else {
 			eeprom_currentAddress = eeprom_lastAddress = MIN_EEPROM_ADDRESS;

@@ -13,8 +13,7 @@
 /* BIOS Header files */
 #include <ti/sysbios/BIOS.h>
 #include <ti/sysbios/knl/Clock.h> //i2c
-
-
+#include <ti/sysbios/knl/Semaphore.h>
 #include <ti/sysbios/knl/Task.h>
 
 /* TI-RTOS Header files */
@@ -32,13 +31,32 @@
 #include <IIC.c>
 #include <IIC.h>
 
+bool eeprom_semaphoreInit = false;
+bool eeprom_hasWrapped = false;
+uint16_t eeprom_currentAddress = MIN_EEPROM_ADDRESS;
+uint16_t eeprom_lastAddress = MIN_EEPROM_ADDRESS;
+
+// sync primitive for eeprom
+Semaphore_Struct eepromSem;
+Semaphore_Handle eepromSemHandle;
 
 bool eeprom_write(uint8_t bytes[], int numBytes) {
 	assertAddress(eeprom_currentAddress);
+	assertSemaphore();
+
+	/* get eeprom access sempahore */
+	Semaphore_pend(eepromSemHandle, BIOS_WAIT_FOREVER);
+
+	if (!eeprom_canFit()) {
+		eeprom_currentAddress = MIN_EEPROM_ADDRESS;
+		eeprom_hasWrapped = true;
+	}
 
 	unsigned i = 0;
 	while (i < numBytes) {
 		bool writeSuccess = false;
+		int maxRetry = 3;
+		int currentRetry = 0;
 
 		// retry if read does not correlate with write
 		while (!writeSuccess) {
@@ -51,6 +69,11 @@ bool eeprom_write(uint8_t bytes[], int numBytes) {
 
 			if (*received == *bytes) {
 				writeSuccess = true;
+			} else {
+				currentRetry++;
+				if (currentRetry >= maxRetry) {
+					writeSuccess = true;
+				}
 			}
 		}
 
@@ -58,6 +81,9 @@ bool eeprom_write(uint8_t bytes[], int numBytes) {
 		++eeprom_currentAddress;
 		++bytes;
 	}
+
+	/* return eeprom access semaphore */
+	Semaphore_post(eepromSemHandle);
 
 	return true;
 }
@@ -68,23 +94,37 @@ bool eeprom_write(uint8_t bytes[], int numBytes) {
  * */
 void eeprom_readAddress(uint8_t addrHigh, uint8_t addrLow, int numBytes, uint8_t *buf) {
 	assertAddress(eeprom_currentAddress);
+	assertSemaphore();
 
 	unsigned i = 0;
 	while (i < numBytes) {
 		buf[i] = readEEPROMaddress(BOARD_24LC256, addrHigh + (i >> 8), addrLow + (i & 0xff));
 		++i;
-
-		// delay
-		Task_sleep(100000 / Clock_tickPeriod);
 	}
 }
 
-/* Returns value referenced by address pointer on EEPROM
- * Does NOT change address pointer
-*/
-static uint8_t eeprom_readCurrentAddress() {
-	assertAddress(eeprom_currentAddress);
-	return readEEPROMaddress(BOARD_24LC256, (eeprom_currentAddress >> 8), eeprom_currentAddress & 0xFF);
+bool eeprom_getNext(uint8_t buf[]) {
+	// has wrapped: start back from beginning to read ALL samples
+	if (eeprom_hasWrapped) {
+		eeprom_lastAddress = MIN_EEPROM_ADDRESS;
+		eeprom_currentAddress = MAX_EEPROM_ADDRESS;
+		eeprom_readAddress(eeprom_lastAddress >> 8, eeprom_lastAddress & 0xff, SAMPLE_SIZE, buf);
+		eeprom_lastAddress += SAMPLE_SIZE;
+		eeprom_hasWrapped = false;
+
+	// no wrapping: read samples from lastAddress to currentAddress
+	} else {
+		if (eeprom_lastAddress < eeprom_currentAddress) {
+			eeprom_readAddress(eeprom_lastAddress >> 8, eeprom_lastAddress & 0xff, SAMPLE_SIZE, buf);
+			eeprom_lastAddress += SAMPLE_SIZE;
+
+		} else {
+			eeprom_currentAddress = eeprom_lastAddress = MIN_EEPROM_ADDRESS;
+			return true;  // DONE
+		}
+	}
+
+	return false;  // NOT DONE
 }
 
 /* TODO:
@@ -126,6 +166,7 @@ static void eeprom_readPage(uint8_t addrHigh, uint8_t addrLow, uint8_t rxBuffer[
 
 void eeprom_reset() {
 	eeprom_currentAddress = MIN_EEPROM_ADDRESS;
+	eeprom_lastAddress = MIN_EEPROM_ADDRESS;
 }
 
 /*** diagnostic ***/
@@ -139,23 +180,15 @@ bool eeprom_isEmpty() {
 }
 
 bool eeprom_isFull() {
-	if (eeprom_currentAddress < MAX_EEPROM_ADDRESS) {
+	if (eeprom_currentAddress >= MAX_EEPROM_ADDRESS) {
 		return true;
 	} else {
 		return false;
 	}
 }
 
-bool eeprom_canFit(uint8_t byte) {
+bool eeprom_canFit() {
 	if (eeprom_currentAddress + SAMPLE_SIZE <= MAX_EEPROM_ADDRESS) {
-		return true;
-	} else {
-		return false;
-	}
-}
-
-bool eeprom_canFitMany(uint8_t bytes[]) {
-	if (eeprom_currentAddress + (sizeof(bytes) * SAMPLE_SIZE) <= MAX_EEPROM_ADDRESS) {
 		return true;
 	} else {
 		return false;
@@ -170,5 +203,16 @@ int eeprom_spaceLeft() {
 /*** assertions ***/
 
 void assertAddress(uint16_t address) {
-	assert(address < MAX_EEPROM_ADDRESS && address >= MIN_EEPROM_ADDRESS);
+	assert(address <= MAX_EEPROM_ADDRESS);
+}
+
+void assertSemaphore() {
+	if (!eeprom_semaphoreInit) {
+		eeprom_semaphoreInit = true;
+
+		Semaphore_Params semParam;
+		Semaphore_Params_init(&semParam);
+		Semaphore_construct(&eepromSem, 1, &semParam);
+		eepromSemHandle = Semaphore_handle(&eepromSem);
+	}
 }

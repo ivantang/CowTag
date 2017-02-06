@@ -160,7 +160,9 @@ static void writeI2CRegister(uint8_t board_address, uint8_t destination, uint8_t
 	}
 
 	//do i2c transfer
-	I2C_transfer(t_handle, &t_i2cTransaction);
+	if( I2C_transfer(t_handle, &t_i2cTransaction) == NULL ){
+		System_abort("I2C failed at writeI2CRegister()\n");
+	}
 
 	/*Deinitialized I2C */
 	I2C_close(t_handle);
@@ -216,7 +218,9 @@ static void writeI2CRegisters(int8_t board_address, uint8_t destination[], uint8
 	}
 
 	//do i2c transfer
-	I2C_transfer(t_handle, &t_i2cTransaction);
+	if ( I2C_transfer(t_handle, &t_i2cTransaction) == NULL){
+		System_abort("I2C failed at writeI2CRegisters()\n");
+	}
 
 	/*Deinitialized I2C */
 	I2C_close(t_handle);
@@ -294,15 +298,12 @@ static uint8_t readI2CRegister(uint8_t board_address, uint8_t address){
 	}
 	System_flush();
 
-    I2C_transfer(handle, &i2cTransaction);
-
-    if(verbose_i2c)System_printf("rxBuffer: 0x%x read from 0x%x\n",rxBuffer[0],address);
-    System_flush();
+    if ( I2C_transfer(handle, &i2cTransaction) == NULL ){
+		System_abort("I2C failed at readI2CRegister()\n");
+    }
 
     I2C_close(handle);
 
-	if(verbose_i2c) System_printf("read closed\n");
-	System_flush();
     return rxBuffer[0];
 
 }

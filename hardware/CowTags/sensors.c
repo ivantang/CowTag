@@ -208,9 +208,61 @@ struct heartrateData getHeartRate(){
 	return heartratedata;
 }
 
+void printHeartRate(){
+	System_printf("Setting registers\n");
+	System_flush();
+	int i = 0;
+	uint16_t numValues = 100;
+	uint16_t HRData[100];
+	uint32_t timestamp[100];
+	//check if device is connected
+//	if(readI2CRegister(Board_MAX30100_ADDR,0xFF) != 0x11){
+//		System_printf("Hardware is not the MAX30100 : 0x%x\n",readI2CRegister(Board_MAX30100_ADDR,0xFF));
+//		System_flush();
+//	}
+
+	writeI2CRegister(Board_MAX30100_ADDR, MAX30100_REG_MODE_CONFIGURATION, 0x02);	//enable HR only
+	writeI2CRegister(Board_MAX30100_ADDR, MAX30100_REG_LED_CONFIGURATION, MAX30100_LED_CURR_50MA);	//set LED 50mA
+	writeI2CRegister(Board_MAX30100_ADDR, 0x01, 0xE0);	//turn on interrupts
+
+	//clearing FIFO write pointer, overflow counter and read pointer
+//	writeI2CRegister(Board_MAX30100_ADDR, MAX30100_REG_FIFO_WRITE_POINTER, 0x00);
+//	writeI2CRegister(Board_MAX30100_ADDR, MAX30100_REG_FIFO_OVERFLOW_COUNTER, 0x00);
+//	writeI2CRegister(Board_MAX30100_ADDR, MAX30100_REG_FIFO_READ_POINTER, 0x00);
+
+	System_printf("Getting data\n");
+	System_flush();
+
+	while(i < numValues){
+		while((readI2CRegister(Board_MAX30100_ADDR, 0x00) & 0x20) != 0x20){	//check if hr data is ready
+			//fifo data is 16 bits so 4 reads is needed
+			//first 16 bits is IR data, in our case, HR data
+			//HRData[i] = readI2CRegister(Board_MAX30100_ADDR,MAX30100_REG_FIFO_DATA);
+			HRData[i] = readI2CRegister(Board_MAX30100_ADDR,MAX30100_REG_FIFO_DATA)<<8 + readI2CRegister(Board_MAX30100_ADDR,MAX30100_REG_FIFO_DATA);
+			while(HRData[i] == 0){
+				HRData[i] = readI2CRegister(Board_MAX30100_ADDR,MAX30100_REG_FIFO_DATA)<<8 + readI2CRegister(Board_MAX30100_ADDR,MAX30100_REG_FIFO_DATA);
+			}
+			timestamp[i] = Timestamp_get32();
+			System_printf("%d" , HRData[i]);
+			System_printf("  %d\n" , timestamp[i]);
+			System_flush();
+			i++;
+		}
+	}
+	//print out interrupt status register
+	for(i = 0 ; i < numValues ; i++){
+		System_printf("%d" , HRData[i]);
+		System_printf("  %d\n" , timestamp[i]);
+		System_flush();
+	}
+}
 
 void testSensors(){
-	printAcceleration();
+	//printAcceleration();			//this function tests making the accel packet
+	System_printf("Tests starting\n");
+	System_flush();
+	//getHeartRate();
+	printHeartRate();
 	System_printf("Tests done\n");
 	System_flush();
 }

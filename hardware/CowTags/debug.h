@@ -9,7 +9,7 @@
 #define DEBUG_H_
 
 // verbose for printing debug messages
-static const int verbose_sensors = 0;
+static const int verbose_sensors = 1;
 static const int verbose_antennas = 1;
 static const int verbose_i2c = 0;
 

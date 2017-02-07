@@ -37,7 +37,7 @@ bool eeprom_testStart() {
 	Task_Params_init(&taskParams);
 	taskParams.stackSize = TASKSTACKSIZE;
 	taskParams.stack = &task0Stack;
-	Task_construct(&task0Struct, (Task_FuncPtr)eeprom_testGetNext, &taskParams, NULL);
+	Task_construct(&task0Struct, (Task_FuncPtr)eeprom_testValidateMemory, &taskParams, NULL);
 
 	return true;
 }
@@ -184,39 +184,66 @@ void eeprom_testWriteReadSample() {
 // Expects:        all eeprom addresses written and read
 // Post-condition: eeprom full of test data
 void eeprom_testValidateMemory() {
-//	System_printf("[eeprom_testValidateMemory]\n");
-//	System_flush();
-//
-//	// test settings
-//	uint8_t input[] = { 0x12 };
-//	uint16_t testsize = 0x00ff;//MAX_EEPROM_ADDRESS;
-//	uint8_t received[1];
-//
-//	// tally bad bytes
-//	unsigned badWrites = 0;
-//	unsigned badReads = 0;
-//
-//	// reset memory pointer
-//	eeprom_reset();
-//
-//	for (; eeprom_currentAddress < testsize;) {
-//		// check write
-//		if (!eeprom_write(input, 1)) {
-//			badWrites++;
-//		}
-//
-//		// check read
-//		eeprom_readAddress((eeprom_currentAddress - 1) >> 8, (eeprom_currentAddress - 1) & 0xff, 1, received);
-//
-//		if (received[0] != input[0]) {
-//			++badReads;
-//		}
-//	}
-//
-//	// count successful writes/reads
-//	System_printf("Bad Writes = %d / %d\n", badWrites, testsize);
-//	System_printf("Bad Reads = %d / %d\n", badReads, testsize);
-//	System_flush();
+	System_printf("[eeprom_testValidateMemory]\n");
+	System_flush();
+
+	// test settings
+	uint16_t testsize = MAX_EEPROM_ADDRESS / SAMPLE_SIZE;
+
+	// tally bad bytes
+	unsigned badWrites = 0;
+	unsigned badReads = 0;
+
+	// test packet
+	struct sensorPacket packet;
+	packet.header.sourceAddress = 1;
+	packet.header.packetType = RADIO_PACKET_TYPE_SENSOR_PACKET;
+	packet.sampledata.tempData.timestamp = 0x12345678;
+	packet.sampledata.tempData.temp_h = 0x5678;
+	packet.sampledata.tempData.temp_l = 0x8765;
+	packet.sampledata.heartRateData.rate_h = 0x7890;
+	packet.sampledata.heartRateData.rate_l = 0x0987;
+	packet.sampledata.heartRateData.temp_h = 0x2345;
+	packet.sampledata.heartRateData.temp_l = 0x5432;
+
+	// reset memory pointer
+	eeprom_reset();
+
+	// check writes
+	for (; eeprom_currentAddress < testsize;) {
+		if (!eeprom_write(&packet)) {
+			badWrites++;
+		}
+	}
+
+	// read packet
+	struct sensorPacket packet2;
+	packet2.header.packetType = RADIO_PACKET_TYPE_SENSOR_PACKET;
+
+	// check reads
+	for (; eeprom_currentAddress < testsize;) {
+		eeprom_getNext(&packet2);
+
+		// verify unserialized packet
+		bool success = packet.header.sourceAddress == packet2.header.sourceAddress;
+		success = packet.header.packetType == packet2.header.packetType;
+		success = packet.sampledata.tempData.timestamp = packet2.sampledata.tempData.timestamp;
+		success = packet.sampledata.tempData.temp_h = packet2.sampledata.tempData.temp_h;
+		success = packet.sampledata.tempData.temp_l = packet2.sampledata.tempData.temp_l;
+		success = packet.sampledata.heartRateData.rate_h = packet2.sampledata.heartRateData.rate_h;
+		success = packet.sampledata.heartRateData.rate_l = packet2.sampledata.heartRateData.rate_l;
+		success = packet.sampledata.heartRateData.temp_h = packet2.sampledata.heartRateData.temp_h;
+		success = packet.sampledata.heartRateData.temp_l = packet2.sampledata.heartRateData.temp_l;
+
+		if (!success) {
+			++badReads;
+		}
+	}
+
+	// count successful writes/reads
+	System_printf("Good Writes = %d / %d\n", testsize - badWrites, testsize);
+	System_printf("Good Reads = %d / %d\n", testsize - badReads, testsize);
+	System_flush();
 }
 
 void eeprom_printSample(uint8_t *buf) {

@@ -9,6 +9,7 @@
 /* XDCtools Header files */
 #include <xdc/std.h>
 #include <xdc/runtime/System.h>
+#include <xdc/runtime/Types.h>
 #include <xdc/runtime/Timestamp.h>
 
 /* BIOS Header files */
@@ -214,7 +215,15 @@ void printHeartRate(){
 	int i = 0;
 	uint16_t numValues = 100;
 	uint16_t HRData[100];
-	uint32_t timestamp[100];
+	uint32_t start_timestamp;
+	uint32_t end_timestamp;
+	uint32_t start_clock;
+	uint32_t end_clock;
+
+
+	Types_FreqHz frequency;
+	//Types_FreqHz *frequency_p = &frequency;
+
 	//check if device is connected
 //	if(readI2CRegister(Board_MAX30100_ADDR,0xFF) != 0x11){
 //		System_printf("Hardware is not the MAX30100 : 0x%x\n",readI2CRegister(Board_MAX30100_ADDR,0xFF));
@@ -233,28 +242,49 @@ void printHeartRate(){
 	System_printf("Getting data\n");
 	System_flush();
 
+	start_clock = Clock_getTicks();
+	end_clock = Clock_getTicks();
 	while(i < numValues){
-		while((readI2CRegister(Board_MAX30100_ADDR, 0x00) & 0x20) != 0x20){	//check if hr data is ready
-			//fifo data is 16 bits so 4 reads is needed
-			//first 16 bits is IR data, in our case, HR data
-			//HRData[i] = readI2CRegister(Board_MAX30100_ADDR,MAX30100_REG_FIFO_DATA);
-			HRData[i] = readI2CRegister(Board_MAX30100_ADDR,MAX30100_REG_FIFO_DATA)<<8 + readI2CRegister(Board_MAX30100_ADDR,MAX30100_REG_FIFO_DATA);
-			while(HRData[i] == 0){
-				HRData[i] = readI2CRegister(Board_MAX30100_ADDR,MAX30100_REG_FIFO_DATA)<<8 + readI2CRegister(Board_MAX30100_ADDR,MAX30100_REG_FIFO_DATA);
-			}
-			timestamp[i] = Timestamp_get32();
-			System_printf("%d" , HRData[i]);
-			System_printf("  %d\n" , timestamp[i]);
-			System_flush();
-			i++;
+	//while((end_clock-start_clock)/100000 < 5){
+		while((readI2CRegister(Board_MAX30100_ADDR, 0x00) & 0x20) != 0x20){
+			//check if hr data is ready
 		}
+		//fifo data is 16 bits so 4 reads is needed
+		//first 16 bits is IR data, in our case, HR data
+		//HRData[i] = readI2CRegister(Board_MAX30100_ADDR,MAX30100_REG_FIFO_DATA);
+		HRData[i] = readI2CRegister(Board_MAX30100_ADDR,MAX30100_REG_FIFO_DATA)<<8 + readI2CRegister(Board_MAX30100_ADDR,MAX30100_REG_FIFO_DATA);
+		while(HRData[i] == 0){
+			HRData[i] = readI2CRegister(Board_MAX30100_ADDR,MAX30100_REG_FIFO_DATA)<<8 + readI2CRegister(Board_MAX30100_ADDR,MAX30100_REG_FIFO_DATA);
+		}
+
+		Timestamp_getFreq(&frequency);
+
+		if(i == 0){
+			start_timestamp = Timestamp_get32();
+		}
+
+		Task_sleep(100000 / Clock_tickPeriod);						//required to sleep in between write/read
+
+		end_timestamp = Timestamp_get32();
+		end_clock = Clock_getTicks();
+
+		//System_printf("%d\n" , HRData[i]);
+		i++;
 	}
-	//print out interrupt status register
+
 	for(i = 0 ; i < numValues ; i++){
-		System_printf("%d" , HRData[i]);
-		System_printf("  %d\n" , timestamp[i]);
-		System_flush();
+		System_printf("%d\n",HRData[i]);
 	}
+
+	System_printf("Timestamp diff: %d\n" , end_timestamp-start_timestamp);
+	System_printf("Frequency %d\n", frequency.hi << 8 | frequency.lo);
+	System_printf("Time elapsed: %d\n" , (end_timestamp-start_timestamp) / (frequency.hi << 8 | frequency.lo));
+
+	System_printf("Clock diff: %d\n" , end_clock-start_clock);
+	System_printf("Time elapsed: %d\n" , (end_clock-start_clock)/100000);
+
+	System_flush();
+
 }
 
 void testSensors(){

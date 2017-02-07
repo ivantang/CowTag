@@ -263,7 +263,7 @@ void printHeartRate(){
 			start_timestamp = Timestamp_get32();
 		}
 
-		Task_sleep(100000 / Clock_tickPeriod);						//required to sleep in between write/read
+		Task_sleep(100000 / Clock_tickPeriod);						//adding this to extend measurement to 10 seconds
 
 		end_timestamp = Timestamp_get32();
 		end_clock = Clock_getTicks();

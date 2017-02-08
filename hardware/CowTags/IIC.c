@@ -113,6 +113,7 @@ static void writeI2CArray(uint8_t slaveAddr, uint8_t bytes[]) {
     t_i2cTransaction.readCount = 0;
     t_i2cTransaction.slaveAddress = slaveAddr;
 
+
 	t_handle = I2C_open(Board_I2C, &t_params);
 	if (t_handle == NULL) {
 		System_abort("Error Initializing I2C for Transmitting\n");

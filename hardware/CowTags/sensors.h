@@ -5,8 +5,8 @@
  *      Author: annik
  */
 
-#ifndef I2C_H_
-#define I2C_H_
+#ifndef SENSORS_H_
+#define SENSORS_H_
 
 /* TI-RTOS Header files */
 #include <ti/drivers/I2C.h> //i2c

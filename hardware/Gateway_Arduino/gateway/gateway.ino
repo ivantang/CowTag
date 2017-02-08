@@ -16,6 +16,7 @@
 // Modified by Erik Dandanell
 #include <ArduinoJson.h>
 #include <SPI.h>
+#include <Wire.h>
 //#include <SPI_Anything.h>
 #include <Ethernet2.h>
 #include <time.h>
@@ -34,6 +35,7 @@ const size_t MAX_CONTENT_SIZE = 512;       // max size of the HTTP response
 
 typedef enum {OK, LOWBATTERY, SENSORERROR} errCode;
 
+//change
 struct TemperatureData {
   char temp_l[16];
   char temp_h[16];

@@ -96,7 +96,7 @@ static void writeI2CArray(uint8_t slaveAddr, uint8_t bytes[]) {
 	// init clock speed and synch
 	I2C_Params_init(&t_params);
     t_params.transferMode = I2C_MODE_BLOCKING;
-    t_params.bitRate = I2C_400kHz;
+    t_params.bitRate = I2C_100kHz;
 
     assert(sizeof(bytes) > 0);
 
@@ -118,9 +118,10 @@ static void writeI2CArray(uint8_t slaveAddr, uint8_t bytes[]) {
 		System_abort("Error Initializing I2C for Transmitting\n");
 	}
 
-	if(I2C_transfer(t_handle, &t_i2cTransaction) == NULL){
-		System_abort("I2C Transfer Failed\n");
-	}
+//	if(I2C_transfer(t_handle, &t_i2cTransaction) == NULL){
+//		System_abort("I2C Transfer Failed\n");
+//	}
+	while(I2C_transfer(t_handle, &t_i2cTransaction) == NULL);
 
 	I2C_close(t_handle);
 }
@@ -160,7 +161,9 @@ static void writeI2CRegister(uint8_t board_address, uint8_t destination, uint8_t
 	}
 
 	//do i2c transfer
-	I2C_transfer(t_handle, &t_i2cTransaction);
+	if(I2C_transfer(t_handle, &t_i2cTransaction)==NULL){
+		System_abort("I2C failed at I2CWriteRegister()");
+	}
 
 	/*Deinitialized I2C */
 	I2C_close(t_handle);

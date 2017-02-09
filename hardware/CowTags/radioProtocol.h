@@ -12,8 +12,8 @@
 #include <sensors.h>
 #include "easylink/EasyLink.h"
 
-#define RADIO_CONCENTRATOR_ADDRESS     0x00
-#define RADIO_NODE_ADDRESS				0x10
+#define RADIO_CONCENTRATOR_ADDRESS    0x00
+#define RADIO_NODE_ADDRESS			  0x10
 #define RADIO_EASYLINK_MODULATION     EasyLink_Phy_Custom
 
 #define RADIO_PACKET_TYPE_ACK_PACKET             0
@@ -22,13 +22,16 @@
 #define RADIO_PACKET_TYPE_SENSOR_PACKET    		 3
 
 struct PacketHeader {
-    uint8_t sourceAddress;
+    uint8_t sourceAddress;  // current hardware id
     uint8_t packetType;
-    uint8_t error;
 };
 
 /* will be concat of data from all sensors */
 struct sampleData {
+	uint8_t cowID;  // sample source id
+	uint8_t packetType;
+    uint8_t error;
+	uint32_t timestamp;
 	struct temperatureData tempData;
 	struct accelerationData accelerometerData;
 	struct heartrateData heartRateData;

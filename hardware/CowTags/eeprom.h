@@ -13,7 +13,7 @@
 
 #include "radioProtocol.h"
 
-#define SAMPLE_SIZE 20
+#define SAMPLE_SIZE 19
 
 // constants
 #define MAX_EEPROM_ADDRESS 0x7FFF

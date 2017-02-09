@@ -40,8 +40,7 @@ PIN_State ledPinState;
 PIN_Handle ledPinHandle;
 /*******************************************/
 
-int main(void)
-{
+int main(void) {
 	System_printf("Initializing tasks...\n");
 	System_flush();
 
@@ -50,8 +49,8 @@ int main(void)
 
 	//radioSend_init();	//
 	//betaRadioTest_init();	//
-//	eeprom_testStart();
-	serialize_testStart();
+	eeprom_testStart();
+//	serialize_testStart();
 
 	/* Open LED pins */
 	ledPinHandle = PIN_open(&ledPinState, ledPinTable);

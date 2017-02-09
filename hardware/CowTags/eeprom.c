@@ -54,7 +54,7 @@ bool eeprom_write(struct sensorPacket *packet) {
 	}
 
 	// serialize packet data to bytes
-	uint8_t bytes[18];
+	uint8_t bytes[SAMPLE_SIZE];
 	serializePacket(packet, bytes);
 
 	unsigned i = 0;
@@ -185,14 +185,6 @@ void eeprom_reset() {
 
 bool eeprom_isEmpty() {
 	if (eeprom_currentAddress == MIN_EEPROM_ADDRESS) {
-		return true;
-	} else {
-		return false;
-	}
-}
-
-bool eeprom_isFull() {
-	if (eeprom_currentAddress >= MAX_EEPROM_ADDRESS) {
 		return true;
 	} else {
 		return false;

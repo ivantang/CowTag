@@ -24,6 +24,7 @@
 struct PacketHeader {
     uint8_t sourceAddress;
     uint8_t packetType;
+    uint8_t error;
 };
 
 /* will be concat of data from all sensors */

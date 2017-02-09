@@ -17,9 +17,7 @@ void serializePacket(struct sensorPacket *packet, uint8_t *buffer) {
 	buffer[0] = packet->header.sourceAddress;
 	buffer[1] = packet->header.packetType;
 
-	if (packet->header.packetType == RADIO_PACKET_TYPE_ACK_PACKET) {
-
-	} else if (packet->header.packetType == RADIO_PACKET_TYPE_SENSOR_PACKET) {
+	if (packet->header.packetType == RADIO_PACKET_TYPE_SENSOR_PACKET) {
 		buffer[2] = packet->sampledata.tempData.timestamp >> 24 & 0xff;
 		buffer[3] = packet->sampledata.tempData.timestamp >> 16 & 0xff;
 		buffer[4] = packet->sampledata.tempData.timestamp >> 8 & 0xff;
@@ -36,6 +34,7 @@ void serializePacket(struct sensorPacket *packet, uint8_t *buffer) {
 		buffer[15] = packet->sampledata.heartRateData.temp_h & 0xff;
 		buffer[16] = packet->sampledata.heartRateData.temp_l >> 8 & 0xff;
 		buffer[17] = packet->sampledata.heartRateData.temp_l & 0xff;
+		buffer[18] = packet->header.error = 0;
 	} else {
 		System_printf("ERR: unrecognized packet type when serializing: %d\n", packet->header.sourceAddress);
 	}
@@ -58,6 +57,7 @@ void unserializePacket(struct sensorPacket *packet, uint8_t *buffer) {
 		packet->sampledata.heartRateData.rate_l = (buffer[12] << 8) | buffer[13];
 		packet->sampledata.heartRateData.temp_h = (buffer[14] << 8) | buffer[15];
 		packet->sampledata.heartRateData.temp_l = (buffer[16] << 8) | buffer[17];
+		packet->header.error = buffer[18];
 	} else {
 		System_printf("ERR: unrecognized packet type when unserializing: %d\n", packet->header.sourceAddress);
 	}

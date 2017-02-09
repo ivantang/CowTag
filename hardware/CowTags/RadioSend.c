@@ -116,26 +116,26 @@ static void nodeRadioTaskFunction(UArg arg0, UArg arg1)
 		System_abort("EasyLink_init failed");
 	}
 
-		/* Use the True Random Number Generator to generate sensor node address randomly */;
-	    Power_setDependency(PowerCC26XX_PERIPH_TRNG);
-	    TRNGEnable();
-	    /* Do not accept the same address as the concentrator, in that case get a new random value */
-	    do
-	    {
-	        while (!(TRNGStatusGet() & TRNG_NUMBER_READY))
-	        {
-	            //wiat for randum number generator
-	        }
-	        nodeAddress = (uint8_t)TRNGNumberGet(TRNG_LOW_WORD);
-	    } while (nodeAddress == RADIO_CONCENTRATOR_ADDRESS);
-	    TRNGDisable();
-	    Power_releaseDependency(PowerCC26XX_PERIPH_TRNG);
+	/* Use the True Random Number Generator to generate sensor node address randomly */;
+	Power_setDependency(PowerCC26XX_PERIPH_TRNG);
+	TRNGEnable();
+	/* Do not accept the same address as the concentrator, in that case get a new random value */
+	do
+	{
+		while (!(TRNGStatusGet() & TRNG_NUMBER_READY))
+		{
+			//wiat for randum number generator
+		}
+		nodeAddress = (uint8_t)TRNGNumberGet(TRNG_LOW_WORD);
+	} while (nodeAddress == RADIO_CONCENTRATOR_ADDRESS);
+	TRNGDisable();
+	Power_releaseDependency(PowerCC26XX_PERIPH_TRNG);
 
-	    /* Set the filter to the generated random address */
-	    if (EasyLink_enableRxAddrFilter(&nodeAddress, 1, 1) != EasyLink_Status_Success)
-	    {
-	        System_abort("EasyLink_enableRxAddrFilter failed");
-	    }
+	/* Set the filter to the generated random address */
+	if (EasyLink_enableRxAddrFilter(&nodeAddress, 1, 1) != EasyLink_Status_Success)
+	{
+		System_abort("EasyLink_enableRxAddrFilter failed");
+	}
 
 	/* Setup header */
 	sensorPacket.header.sourceAddress = nodeAddress;

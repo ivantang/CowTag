@@ -13,7 +13,7 @@
 
 #include "radioProtocol.h"
 
-#define SAMPLE_SIZE 18
+#define SAMPLE_SIZE 19
 
 // constants
 #define MAX_EEPROM_ADDRESS 0x7FFF
@@ -33,7 +33,6 @@ void eeprom_reset(); // reset memory address pointer to 0x0000
 
 // diagnostic
 bool eeprom_isEmpty();
-bool eeprom_isFull();
 bool eeprom_canFit();
 int eeprom_spaceLeft();  // number of samples that can fit
 

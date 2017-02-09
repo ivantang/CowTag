@@ -50,8 +50,8 @@ int main(void)
 
 	//radioSend_init();	//
 	//betaRadioTest_init();	//
-	eeprom_testStart();
-//	serialize_testStart();
+//	eeprom_testStart();
+	serialize_testStart();
 
 	/* Open LED pins */
 	ledPinHandle = PIN_open(&ledPinState, ledPinTable);

@@ -17,7 +17,8 @@
 
 /* test prototypes */
 bool serialize_testStart();
-void serialize_testSerializePacket();
+void serialize_testSerializeNormal();
+void serialize_testSerializeAccelerometer();
 
 bool serialize_testStart() {
 	// start test thread
@@ -25,41 +26,75 @@ bool serialize_testStart() {
 	Task_Params_init(&taskParams);
 	taskParams.stackSize = TASKSTACKSIZE;
 	taskParams.stack = &task0Stack;
-	Task_construct(&task0Struct, (Task_FuncPtr)serialize_testSerializePacket, &taskParams, NULL);
+	Task_construct(&task0Struct, (Task_FuncPtr)serialize_testSerializeAccelerometer, &taskParams, NULL);
 
 	return true;
 }
 
-void serialize_testSerializePacket() {
-	System_printf("[serialize_testSerialPacket]\n");
+void serialize_testSerializeNormal() {
+	System_printf("[serialize_testSerializeNormal]\n");
 
-	struct sensorPacket packet;
-	packet.header.sourceAddress = 1;
-	packet.header.packetType = RADIO_PACKET_TYPE_SENSOR_PACKET;
-	packet.sampledata.tempData.timestamp = 0x12345678;
-	packet.sampledata.tempData.temp_h = 0x5678;
-	packet.sampledata.tempData.temp_l = 0x8765;
-	packet.sampledata.heartRateData.rate_h = 0x7890;
-	packet.sampledata.heartRateData.rate_l = 0x0987;
-	packet.sampledata.heartRateData.temp_h = 0x2345;
-	packet.sampledata.heartRateData.temp_l = 0x5432;
+	// test packet
+	struct sampleData sampledata;
+	sampledata.cowID = 1;
+	sampledata.packetType = RADIO_PACKET_TYPE_SENSOR_PACKET;
+	sampledata.timestamp = 0x12345678;
+	sampledata.tempData.temp_h = 0x5678;
+	sampledata.tempData.temp_l = 0x8765;
+	sampledata.heartRateData.rate_h = 0x7890;
+	sampledata.heartRateData.rate_l = 0x0987;
+	sampledata.heartRateData.temp_h = 0x2345;
+	sampledata.heartRateData.temp_l = 0x5432;
 
-	uint8_t buffer[18];
-	serializePacket(&packet, buffer);
+	uint8_t buffer[SAMPLE_SIZE];
+	serializePacket(&sampledata, buffer);
 
-	struct sensorPacket packet2;
-	packet2.header.packetType = RADIO_PACKET_TYPE_SENSOR_PACKET;
-	unserializePacket(&packet2, buffer);
+	struct sampleData sample2;
+	unserializePacket(&sample2, buffer);
 
-	bool success = packet.header.sourceAddress == packet2.header.sourceAddress;
-	success = packet.header.packetType == packet2.header.packetType;
-	success = packet.sampledata.tempData.timestamp = packet2.sampledata.tempData.timestamp;
-	success = packet.sampledata.tempData.temp_h = packet2.sampledata.tempData.temp_h;
-	success = packet.sampledata.tempData.temp_l = packet2.sampledata.tempData.temp_l;
-	success = packet.sampledata.heartRateData.rate_h = packet2.sampledata.heartRateData.rate_h;
-	success = packet.sampledata.heartRateData.rate_l = packet2.sampledata.heartRateData.rate_l;
-	success = packet.sampledata.heartRateData.temp_h = packet2.sampledata.heartRateData.temp_h;
-	success = packet.sampledata.heartRateData.temp_l = packet2.sampledata.heartRateData.temp_l;
+	// verify unserialized packet
+	bool success = sampledata.cowID == sample2.cowID;
+	success = sampledata.packetType == sample2.packetType;
+	success = sampledata.tempData.timestamp = sample2.tempData.timestamp;
+	success = sampledata.tempData.temp_h = sample2.tempData.temp_h;
+	success = sampledata.tempData.temp_l = sample2.tempData.temp_l;
+	success = sampledata.heartRateData.rate_h = sample2.heartRateData.rate_h;
+	success = sampledata.heartRateData.rate_l = sample2.heartRateData.rate_l;
+	success = sampledata.heartRateData.temp_h = sample2.heartRateData.temp_h;
+	success = sampledata.heartRateData.temp_l = sample2.heartRateData.temp_l;
+
+	if (success) {
+		System_printf("packet successfully un/serialized\n");
+	} else {
+		System_printf("ERR: packet failed to un/serialize!\n");
+	}
+}
+
+void serialize_testSerializeAccelerometer() {
+	System_printf("[serialize_testSerializeAccelerometer]\n");
+
+	// test packet
+	struct sampleData sampledata;
+	sampledata.cowID = 1;
+	sampledata.packetType = RADIO_PACKET_TYPE_ACCEL_PACKET;
+	sampledata.timestamp = 0x12345678;
+	sampledata.accelerometerData.x = 0x5678;
+	sampledata.accelerometerData.y = 0x6789;
+	sampledata.accelerometerData.z = 0x7890;
+
+	uint8_t buffer[SAMPLE_SIZE];
+	serializePacket(&sampledata, buffer);
+
+	struct sampleData sample2;
+	unserializePacket(&sample2, buffer);
+
+	// verify unserialized packet
+	bool success = sampledata.cowID == sample2.cowID;
+	success = sampledata.packetType == sample2.packetType;
+	success = sampledata.tempData.timestamp = sample2.tempData.timestamp;
+	sampledata.accelerometerData.x = sample2.accelerometerData.x;
+	sampledata.accelerometerData.y = sample2.accelerometerData.y;
+	sampledata.accelerometerData.z = sample2.accelerometerData.z;
 
 	if (success) {
 		System_printf("packet successfully un/serialized\n");

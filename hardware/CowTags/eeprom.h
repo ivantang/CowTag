@@ -26,8 +26,8 @@ extern uint16_t eeprom_lastAddress;
 extern bool eeprom_hasWrapped;
 
 // functions
-bool eeprom_write(struct sensorPacket *packet);  // write to next address
-bool eeprom_getNext(struct sensorPacket *packet);
+bool eeprom_write(struct sampleData *data);  // write to next address
+bool eeprom_getNext(struct sampleData *data);
 void eeprom_readAddress(uint8_t addrHigh, uint8_t addrLow, int numByte, uint8_t *buf);
 void eeprom_reset(); // reset memory address pointer to 0x0000
 

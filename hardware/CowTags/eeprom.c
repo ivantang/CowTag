@@ -41,7 +41,7 @@ uint16_t eeprom_lastAddress = MIN_EEPROM_ADDRESS;
 Semaphore_Struct eepromSem;
 Semaphore_Handle eepromSemHandle;
 
-bool eeprom_write(struct sensorPacket *packet) {
+bool eeprom_write(struct sampleData *data) {
 	assertAddress(eeprom_currentAddress);
 	assertSemaphore();
 
@@ -55,7 +55,7 @@ bool eeprom_write(struct sensorPacket *packet) {
 
 	// serialize packet data to bytes
 	uint8_t bytes[SAMPLE_SIZE];
-	serializePacket(packet, bytes);
+	serializePacket(data, bytes);
 
 	unsigned i = 0;
 	while (i < SAMPLE_SIZE) {
@@ -107,7 +107,7 @@ void eeprom_readAddress(uint8_t addrHigh, uint8_t addrLow, int numBytes, uint8_t
 	}
 }
 
-bool eeprom_getNext(struct sensorPacket *packet) {
+bool eeprom_getNext(struct sampleData *data) {
 	uint8_t buf[SAMPLE_SIZE];
 
 	// has wrapped: start back from beginning to read ALL samples
@@ -119,7 +119,7 @@ bool eeprom_getNext(struct sensorPacket *packet) {
 		eeprom_hasWrapped = false;
 
 		// convert bytes to sensorPacket struct
-		unserializePacket(packet, buf);
+		unserializePacket(data, buf);
 
 	// no wrapping: read samples from lastAddress to currentAddress
 	} else {
@@ -128,7 +128,7 @@ bool eeprom_getNext(struct sensorPacket *packet) {
 			eeprom_lastAddress += SAMPLE_SIZE;
 
 			// convert bytes to sensorPacket struct
-			unserializePacket(packet, buf);
+			unserializePacket(data, buf);
 
 		} else {
 			eeprom_currentAddress = eeprom_lastAddress = MIN_EEPROM_ADDRESS;

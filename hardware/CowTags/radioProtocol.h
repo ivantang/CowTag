@@ -20,6 +20,7 @@
 #define RADIO_PACKET_TYPE_ADC_SENSOR_PACKET      1
 #define RADIO_PACKET_TYPE_DM_SENSOR_PACKET       2
 #define RADIO_PACKET_TYPE_SENSOR_PACKET    		 3
+#define RADIO_PACKET_TYPE_ACCEL_PACKET           4
 
 struct PacketHeader {
     uint8_t sourceAddress;  // current hardware id
@@ -28,13 +29,13 @@ struct PacketHeader {
 
 /* will be concat of data from all sensors */
 struct sampleData {
-	uint8_t cowID;  // sample source id
+	uint8_t cowID;        // sample source id
 	uint8_t packetType;
-    uint8_t error;
 	uint32_t timestamp;
 	struct temperatureData tempData;
 	struct accelerationData accelerometerData;
 	struct heartrateData heartRateData;
+    uint8_t error;
 };
 
 /* our custom beta packet with sensor info */

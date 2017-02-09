@@ -66,7 +66,7 @@ bool eeprom_write(struct sampleData *data) {
 		// retry if read does not correlate with write
 		while (!writeSuccess) {
 			uint8_t writeByte[] = {(eeprom_currentAddress >> 8), eeprom_currentAddress & 0xFF, bytes[i]};
-			writeI2CArray(BOARD_24LC256, writeByte);
+			writeI2Ceeprom(BOARD_24LC256, writeByte);
 
 			// validate write
 			uint8_t received[1];

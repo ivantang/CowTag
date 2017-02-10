@@ -10,6 +10,7 @@ CFG_SRCS += \
 ../cowtagOS.cfg 
 
 C_SRCS += \
+../Arduino.c \
 ../CC1310_LAUNCHXL.c \
 ../IIC.c \
 ../RadioSend.c \
@@ -22,6 +23,7 @@ C_SRCS += \
 ../uArtEcho.c 
 
 OBJS += \
+./Arduino.obj \
 ./CC1310_LAUNCHXL.obj \
 ./IIC.obj \
 ./RadioSend.obj \
@@ -34,6 +36,7 @@ OBJS += \
 ./uArtEcho.obj 
 
 C_DEPS += \
+./Arduino.d \
 ./CC1310_LAUNCHXL.d \
 ./IIC.d \
 ./RadioSend.d \
@@ -66,6 +69,7 @@ GEN_MISC_DIRS__QUOTED += \
 "configPkg/" 
 
 C_DEPS__QUOTED += \
+"Arduino.d" \
 "CC1310_LAUNCHXL.d" \
 "IIC.d" \
 "RadioSend.d" \
@@ -78,6 +82,7 @@ C_DEPS__QUOTED += \
 "uArtEcho.d" 
 
 OBJS__QUOTED += \
+"Arduino.obj" \
 "CC1310_LAUNCHXL.obj" \
 "IIC.obj" \
 "RadioSend.obj" \
@@ -90,6 +95,7 @@ OBJS__QUOTED += \
 "uArtEcho.obj" 
 
 C_SRCS__QUOTED += \
+"../Arduino.c" \
 "../CC1310_LAUNCHXL.c" \
 "../IIC.c" \
 "../RadioSend.c" \

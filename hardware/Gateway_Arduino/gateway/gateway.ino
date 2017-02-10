@@ -254,10 +254,12 @@ void setup() {
   // disable SD SPI
   pinMode(4, OUTPUT);
   digitalWrite(4, HIGH);
-
+  
   initSerial();
   initEthernet();
 
+  Wire.begin(6);
+  Wire.onReceive(receiveEvent);
   // disable cc1310 SPI
   // pinMode(8,OUTPUT);
   // digitalWrite(8,HIGH);
@@ -300,4 +302,13 @@ void loop() {
   //}
 
   wait();
+}
+
+void receiveEvent(int howMany) {
+  Serial.println("Receiving");
+  while (1 <= Wire.available()) { // loop through all but the last
+    int c = Wire.read(); // receive byte as a character
+    Serial.println(c);         // print the character
+  }
+  Serial.println("Done");
 }

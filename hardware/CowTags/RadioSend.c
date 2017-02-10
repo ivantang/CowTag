@@ -38,8 +38,8 @@
 #define RADIO_EVENT_ACK_TIMEOUT         (uint32_t)(1 << 2)
 #define RADIO_EVENT_SEND_FAIL           (uint32_t)(1 << 3)
 
-#define NODERADIO_MAX_RETRIES 2
-#define NORERADIO_ACK_TIMEOUT_TIME_MS (160)
+#define NODERADIO_MAX_RETRIES 3
+#define NORERADIO_ACK_TIMEOUT_TIME_MS (250)
 
 
 /***** Type declarations *****/
@@ -117,20 +117,21 @@ static void nodeRadioTaskFunction(UArg arg0, UArg arg1)
 	}
 
 	System_printf("Starting Radio Send\n");
+
 	/* Use the True Random Number Generator to generate sensor node address randomly */;
-	//	    Power_setDependency(PowerCC26XX_PERIPH_TRNG);
-	//	    TRNGEnable();
-	//	    /* Do not accept the same address as the concentrator, in that case get a new random value */
-	//	    do
-	//	    {
-	//	        while (!(TRNGStatusGet() & TRNG_NUMBER_READY))
-	//	        {
-	//	            //wiat for randum number generator
-	//	        }
-	//	        nodeAddress = (uint8_t)TRNGNumberGet(TRNG_LOW_WORD);
-	//	    } while (nodeAddress == RADIO_CONCENTRATOR_ADDRESS);
-	//	    TRNGDisable();
-	//	    Power_releaseDependency(PowerCC26XX_PERIPH_TRNG);
+//	Power_setDependency(PowerCC26XX_PERIPH_TRNG);
+//	TRNGEnable();
+//	/* Do not accept the same address as the concentrator, in that case get a new random value */
+//	do
+//	{
+//		while (!(TRNGStatusGet() & TRNG_NUMBER_READY))
+//		{
+//			//wiat for randum number generator
+//		}
+//		nodeAddress = (uint8_t)TRNGNumberGet(TRNG_LOW_WORD);
+//	} while (nodeAddress == RADIO_CONCENTRATOR_ADDRESS);
+//	TRNGDisable();
+//	Power_releaseDependency(PowerCC26XX_PERIPH_TRNG);
 
 	nodeAddress = BETA_ADDRESS;
 
@@ -141,7 +142,7 @@ static void nodeRadioTaskFunction(UArg arg0, UArg arg1)
 	}
 
 	/* Setup header */
-	sensorPacket.header.sourceAddress = nodeAddress;
+	sensorPacket.header.sourceAddress = 0x0; // GATEWAY_ADDRESS
 	sensorPacket.header.packetType = RADIO_PACKET_TYPE_SENSOR_PACKET;
 
 	/* Enter main task loop */
@@ -154,9 +155,8 @@ static void nodeRadioTaskFunction(UArg arg0, UArg arg1)
 		if (events & RADIO_EVENT_SEND_DATA)
 		{
 			sensorPacket.sampledata = sampledata;
-			System_printf("Sending data...\n");
+			//System_printf("Sending data...\n");
 			sendBetaPacket(sensorPacket, NODERADIO_MAX_RETRIES, NORERADIO_ACK_TIMEOUT_TIME_MS);
-			System_printf("Data Sent!\n");
 
 		}
 
@@ -164,7 +164,7 @@ static void nodeRadioTaskFunction(UArg arg0, UArg arg1)
 		if (events & RADIO_EVENT_DATA_ACK_RECEIVED)
 		{
 			returnRadioOperationStatus(NodeRadioStatus_Success);
-			System_printf("ACK RECEIVED! Transmission successful.\n");
+			//System_printf("ACK RECEIVED! Transmission successful.\n");
 		}
 
 		/* If we get an ACK timeout */
@@ -179,16 +179,18 @@ static void nodeRadioTaskFunction(UArg arg0, UArg arg1)
 			else
 			{
 				/* Else return send fail */
-				Event_post(radioOperationEventHandle, RADIO_EVENT_SEND_FAIL);
-				System_printf("Timed out: max tries exceeded\n");
+
+				returnRadioOperationStatus(NodeRadioStatus_Failed);
+
 			}
 		}
 
 		/* If send fail */
 		if (events & RADIO_EVENT_SEND_FAIL)
 		{
-			returnRadioOperationStatus(NodeRadioStatus_Failed);
-			System_printf("Send Failed \n");
+
+			returnRadioOperationStatus(NodeRadioStatus_FailedNotConnected);
+
 		}
 
 	}
@@ -312,6 +314,6 @@ static void rxDoneCallback(EasyLink_RxPacket * rxPacket, EasyLink_Status status)
 		/* The Ack reception may have been corrupted causing an error.
 		 * Treat this as a timeout
 		 */
-		Event_post(radioOperationEventHandle, RADIO_EVENT_ACK_TIMEOUT);
+		Event_post(radioOperationEventHandle, RADIO_EVENT_SEND_FAIL);
 	}
 }

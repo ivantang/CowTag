@@ -49,7 +49,11 @@ int main(void) {
 
 	radioSend_init();	//
 	betaRadioTest_init();	//
+<<<<<<< HEAD
 	//eeprom_testStart();
+=======
+//	eeprom_testStart();
+>>>>>>> refs/remotes/origin/master
 //	serialize_testStart();
 
 	/* Open LED pins */
@@ -61,7 +65,6 @@ int main(void) {
 		//(already allocated pin in a PinList or non-existent pin in aPinList)
 	}
 	PIN_setOutputValue(ledPinHandle, Board_LED1, 1); //signal init success
-
 
 	System_printf("Starting BIOS:\n");
 	System_flush();

@@ -47,6 +47,7 @@ void serializePacket(struct sampleData *data, uint8_t *buffer) {
 
 	} else {
 		System_printf("ERR: unrecognized packet type when serializing: %d\n", data->cowID);
+		data->error = 0x1;
 	}
 }
 
@@ -79,5 +80,6 @@ void unserializePacket(struct sampleData *data, uint8_t *buffer) {
 
 	} else {
 		System_printf("ERR: unrecognized packet type when unserializing: %d\n", data->cowID);
+		data->error = 0x1;
 	}
 }

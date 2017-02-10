@@ -13,7 +13,7 @@
 #include "easylink/EasyLink.h"
 
 
-//#define RADIO_CONCENTRATOR_ADDRESS     0x00
+#define RADIO_CONCENTRATOR_ADDRESS     0x00
 //#define RADIO_NODE_ADDRESS				0x10
 
 #define RADIO_EASYLINK_MODULATION     EasyLink_Phy_Custom

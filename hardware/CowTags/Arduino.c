@@ -98,7 +98,6 @@ static void writeI2CArduino(uint8_t slaveAddr, uint8_t bytes[]) {
 void testArduino(){
 	//uint8_t Packet[] = {0x1,0x2,0x3,0x4};
 	//writeI2CArduino(0x6,Packet);
-
 	uint8_t buf[SAMPLE_SIZE];
 	unsigned i;
 
@@ -116,8 +115,9 @@ void testArduino(){
 	serializePacket(&sampledata, buf);
 
 	for(i = 0 ; i<SAMPLE_SIZE; i++){
-		System_printf("%x\n", buf[i]);
+		System_printf("%x ", buf[i]);
 	}
+	System_printf("\n");
 	System_flush();
 	writeI2CArduino(0x6, buf);
 
@@ -127,4 +127,5 @@ void testArduino(){
 	//writeI2CRegister(ARDUINO_ADDR,0x3,0x4);
 	System_printf("testArduino finished\n");
 	System_flush();
+
 }

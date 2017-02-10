@@ -35,32 +35,32 @@ const unsigned PACKET_SIZE = 19;
 
 typedef enum {OK, LOWBATTERY, SENSORERROR} errCode;
 
-uint8_t buffer[PACKET_SIZE];
+char buffer[PACKET_SIZE];
 
 
 //change
 struct TemperatureData {
-  char temp_l[16];
-  char temp_h[16];
+  char temp_l[2];
+  char temp_h[2];
 };
 
 struct AccelerationData {
-  char x[16];
-  char y[16];
-  char z[16];
+  char x[2];
+  char y[2];
+  char z[2];
 };
 
 struct HeartrateData {
-  char temp_l[16];
-  char temp_h[16];
-  char rate_l[16];
-  char rate_h[16];
+  char temp_l[2];
+  char temp_h[2];
+  char rate_l[2];
+  char rate_h[2];
 };
 
 /* will be concat of data from all sensors */
 struct SampleData {
-  uint8_t cowID;
-  uint8_t packetType;
+  char cowID;
+  char packetType;
   struct TemperatureData tempData;
   struct AccelerationData accelerometerData;
   struct HeartrateData heartRateData;
@@ -108,15 +108,16 @@ void printSampleData(const struct SampleData* data) {
 
 void serializeSampleData(const struct SampleData* sampleData, char *data)
 {
-  sprintf(data, "{\cowID\": %s, \"packetType\": %s, \"timestamp\": %ld, \"otemp_h\": %s, \"otemp_l\": %s, \"hrate_h\": %s, \"hrate_l\": %s, \"atemp_h\": %s, \"atemp_l\": %s \"}\n",
+  //sprintf(data, "{\cowID\": %s, \"packetType\": %s, \"timestamp\": %ld, \"otemp_h\": %s, \"otemp_l\": %s, \"hrate_h\": %s, \"hrate_l\": %s, \"atemp_h\": %s, \"atemp_l\": %s \"}\n",
+  sprintf(data, "{\"body_temp\": %s, \"ext_temp\": %s, \"x\": %s, \"y\": %s, \"z\": %s, \"respire\": %s, \"cow_id\": %s, \"timestamp\": %ld, \"error\": \" %i \"}\n",
             sampleData->cowID,
             sampleData->packetType,
-            sampleData->timestamp,
             sampleData->tempData.temp_h,
             sampleData->tempData.temp_l,
             sampleData->heartRateData.rate_h,
             sampleData->heartRateData.rate_l,
             sampleData->heartRateData.temp_h,
+            sampleData->timestamp,
             sampleData->heartRateData.temp_l);
 }
 
@@ -151,16 +152,32 @@ bool parseSampleData(char* content, struct SampleData* sampleData) {
     return false;
   }
 
-  // Here were copy the strings we're interested in
   strcpy(sampleData->tempData.temp_l, root["body_temp"]);;
-  strcpy(sampleData->heartRateData.temp_l, root["ext_temp"]);
-  strcpy(sampleData->accelerometerData.x, root["x"]);
-  strcpy(sampleData->accelerometerData.y, root["y"]);
-  strcpy(sampleData->accelerometerData.z, root["z"]);
-  strcpy(sampleData->heartRateData.rate_l, root["respire"]);
-  strcpy(sampleData->nodeAddress, root["cow_id"]);
-  strcpy(sampleData->nodeAddress, root["cow_id"]);
+  strcpy(sampleData->tempData.temp_h, root["ext_temp"]);
+  strcpy(&sampleData->cowID, root["x"]);
+  strcpy(&sampleData->packetType, root["y"]);
+  strcpy(sampleData->heartRateData.rate_l, root["z"]);
+  strcpy(sampleData->heartRateData.rate_h, root["respire"]);
+  strcpy(sampleData->heartRateData.temp_h, root["cow_id"]);
+  strcpy(sampleData->heartRateData.temp_l, root["cow_id"]);
   sampleData->timestamp = root["timestamp"];
+
+
+  // Here were copy the strings we're interested in
+//  strcpy(&sampleData->cowID, root["cow_id"]);
+//  strcpy(&sampleData->packetType, root["packetType"]);
+//  root["timestamp"] = sampleData->timestamp;
+//  strcpy(sampleData->tempData.temp_l, root["otemp_l"]);
+//  strcpy(sampleData->tempData.temp_h, root["otemp_h"]);
+//  strcpy(sampleData->heartRateData.rate_l, root["hrate_l"]);
+//  strcpy(sampleData->heartRateData.rate_h, root["hrate_h"]);
+//  strcpy(sampleData->heartRateData.temp_h, root["atemp_h"]);
+//  strcpy(sampleData->heartRateData.temp_l, root["atemp_l"]);
+
+//  strcpy(sampleData->accelerometerData.x, root["x"]);
+//  strcpy(sampleData->accelerometerData.y, root["y"]);
+//  strcpy(sampleData->accelerometerData.z, root["z"]);
+  
   int errorcode =  root["error"];
   if (errorcode == 0) {
     sampleData->errorCode = OK;
@@ -169,7 +186,6 @@ bool parseSampleData(char* content, struct SampleData* sampleData) {
   } else {
     sampleData->errorCode = SENSORERROR;
   }
-
   return true;
 }
 
@@ -283,28 +299,28 @@ bool newTagDataRequest(struct SampleData* sampleData) {
 
 // ARDUINO entry point #2: runs over and over again forever
 void loop() {
-  SampleData sampleData;
-  char data[MAX_CONTENT_SIZE];
-
-  // //struc acrobatics
-  Serial.println(json_string);
-  strncpy(data,json_string,sizeof(json_string));
-   Serial.println("parsing and printing sampledata");
-   parseSampleData(data,&sampleData);
-   printSampleData(&sampleData);
-   Serial.println("serializing sampledata");
-   serializeSampleData(&sampleData,data);
-  Serial.println(data);
-
-  //if(newTagDataRequest(&sampleData)){
-  // printSampleData(&sampleData);
-  // serializeSampleData(&sampleData,data);
-  if (!postPage(serverName, serverPort, pageName, data)) {
-    Serial.println(F("Fail "));
-  }
-  else {
-    Serial.println(F("Pass "));
-  }
+//  SampleData sampleData;
+//  char data[MAX_CONTENT_SIZE];
+//
+//  //struc acrobatics
+//  Serial.println(json_string);
+//  strncpy(data,json_string,sizeof(json_string));
+//   Serial.println("parsing and printing sampledata");
+//   parseSampleData(data,&sampleData);
+//   printSampleData(&sampleData);
+//   Serial.println("serializing sampledata");
+//   serializeSampleData(&sampleData,data);
+//  Serial.println(data);
+//
+//  //if(newTagDataRequest(&sampleData)){
+//  // printSampleData(&sampleData);
+//  // serializeSampleData(&sampleData,data);
+//  if (!postPage(serverName, serverPort, pageName, data)) {
+//    Serial.println(F("Fail "));
+//  }
+//  else {
+//    Serial.println(F("Pass "));
+//  }
   //}
 
   wait();
@@ -315,6 +331,8 @@ void receiveEvent(int howMany) {
   int i = 0;
   
   SampleData sampleData;
+  char data[MAX_CONTENT_SIZE];
+
   
   //Get Data via I2C
   while (1 <= Wire.available()) { // loop through all but the last
@@ -324,17 +342,38 @@ void receiveEvent(int howMany) {
   }
   
   //Store in JSON object and post to gateway
-  sampleData.cowID = buffer[0];
-  sampleData.packetType = buffer[1];
-  sampleData.timestamp = buffer[2]<<24 & buffer[3]<<16 & buffer[4]<<8 & buffer[5];
-  sampleData.tempData.temp_h = buffer[6]<<8 & buffer[7];
-  sampleData.tempData.temp_l = buffer[8]<<8 & buffer[9]];
-  sampleData.heartRateData.rate_h = buffer[10]<<8 & buffer[11];
-  sampleData.heartRateData.rate_l = buffer[12]<<8 & buffer[13];
-  sampleData.heartRateData.temp_h = buffer[14]<<8 & buffer[15];
-  sampleData.heartRateData.temp_l = buffer[16]<<8 & buffer[17];
+//  sampleData.cowID = buffer[0];
+//  sampleData.packetType = buffer[1];
+//  sampleData.timestamp = buffer[2]<<24 & buffer[3]<<16 & buffer[4]<<8 & buffer[5];
+//  sampleData.tempData.temp_h = buffer[6]<<8 & buffer[7];
+//  sampleData.tempData.temp_l = buffer[8]<<8 & buffer[9];
+//  sampleData.heartRateData.rate_h = buffer[10]<<8 & buffer[11];
+//  sampleData.heartRateData.rate_l = buffer[12]<<8 & buffer[13];
+//  sampleData.heartRateData.temp_h = buffer[14]<<8 & buffer[15];
+//  sampleData.heartRateData.temp_l = buffer[16]<<8 & buffer[17];
+   sprintf(&sampleData.cowID, "%d", buffer[0]);
+   sprintf(&sampleData.packetType, "%d", buffer[1]);sampleData.timestamp = buffer[2]<<24 & buffer[3]<<16 & buffer[4]<<8 & buffer[5];
+   sprintf(sampleData.tempData.temp_h, "%d", buffer[6]<<8 & buffer[7]);
+   sprintf(sampleData.tempData.temp_l, "%d", buffer[8]<<8 & buffer[9]);
+   sprintf(sampleData.heartRateData.rate_h, "%d", buffer[10]<<8 & buffer[11]);
+   sprintf(sampleData.heartRateData.rate_l, "%d", buffer[12]<<8 & buffer[13]);
+   sprintf(sampleData.heartRateData.temp_h, "%d", buffer[14]<<8 & buffer[15]);
+   sprintf(sampleData.heartRateData.temp_l, "%d", buffer[16]<<8 & buffer[17]);  
   
+  strncpy(data,json_string,sizeof(json_string));
+  parseSampleData(data,&sampleData);
+  printSampleData(&sampleData);
+
+  serializeSampleData(&sampleData,data);
+  Serial.println(data);
+
   
-  
+  if (!postPage(serverName, serverPort, pageName, data)) {
+    Serial.println(F("Fail "));
+  }
+  else {
+    Serial.println(F("Pass "));
+  }
+
   Serial.println("Done");
 }

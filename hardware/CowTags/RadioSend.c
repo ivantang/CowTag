@@ -64,7 +64,7 @@ Semaphore_Struct radioResultSem;  /* not static so you can see in ROV */
 static Semaphore_Handle radioResultSemHandle;
 
 static struct RadioOperation currentRadioOperation;
-static uint8_t nodeAddress = 0;
+static uint8_t nodeAddress = 0x0; // ending in 0
 
 static struct sensorPacket sensorPacket;
 static struct sampleData sampledata;
@@ -116,20 +116,21 @@ static void nodeRadioTaskFunction(UArg arg0, UArg arg1)
 		System_abort("EasyLink_init failed");
 	}
 
+
 	/* Use the True Random Number Generator to generate sensor node address randomly */;
-	Power_setDependency(PowerCC26XX_PERIPH_TRNG);
-	TRNGEnable();
-	/* Do not accept the same address as the concentrator, in that case get a new random value */
-	do
-	{
-		while (!(TRNGStatusGet() & TRNG_NUMBER_READY))
-		{
-			//wiat for randum number generator
-		}
-		nodeAddress = (uint8_t)TRNGNumberGet(TRNG_LOW_WORD);
-	} while (nodeAddress == RADIO_CONCENTRATOR_ADDRESS);
-	TRNGDisable();
-	Power_releaseDependency(PowerCC26XX_PERIPH_TRNG);
+	//	    Power_setDependency(PowerCC26XX_PERIPH_TRNG);
+	//	    TRNGEnable();
+	//	    /* Do not accept the same address as the concentrator, in that case get a new random value */
+	//	    do
+	//	    {
+	//	        while (!(TRNGStatusGet() & TRNG_NUMBER_READY))
+	//	        {
+	//	            //wiat for randum number generator
+	//	        }
+	//	        nodeAddress = (uint8_t)TRNGNumberGet(TRNG_LOW_WORD);
+	//	    } while (nodeAddress == RADIO_CONCENTRATOR_ADDRESS);
+	//	    TRNGDisable();
+	//	    Power_releaseDependency(PowerCC26XX_PERIPH_TRNG);
 
 	/* Set the filter to the generated random address */
 	if (EasyLink_enableRxAddrFilter(&nodeAddress, 1, 1) != EasyLink_Status_Success)
@@ -150,9 +151,6 @@ static void nodeRadioTaskFunction(UArg arg0, UArg arg1)
 		/* If we should send data */
 		if (events & RADIO_EVENT_SEND_DATA)
 		{
-			/*testing send*/
-			//sensorPacket.betadata.sensorData = i;
-			//i++;
 			sensorPacket.sampledata = sampledata;
 			sendBetaPacket(sensorPacket, NODERADIO_MAX_RETRIES, NORERADIO_ACK_TIMEOUT_TIME_MS);
 
@@ -226,11 +224,11 @@ static void returnRadioOperationStatus(enum NodeRadioOperationStatus result)
 
 static void sendBetaPacket(struct sensorPacket bp, uint8_t maxNumberOfRetries, uint32_t ackTimeoutMs){
 
-	currentRadioOperation.easyLinkTxPacket.dstAddr[0] = RADIO_CONCENTRATOR_ADDRESS;
+	currentRadioOperation.easyLinkTxPacket.dstAddr[0] = 0x01;
 
 	/* Copy packet to payload */
 	memcpy(currentRadioOperation.easyLinkTxPacket.payload, ((uint8_t*)&sensorPacket), sizeof(struct sensorPacket));
-	//memcpy(currentRadioOperation.easyLinkTxPacket.payload, ((uint8_t*)&bp), sizeof(struct sensorPacket));
+
 	currentRadioOperation.easyLinkTxPacket.len = sizeof(struct sensorPacket);
 
 	/* Setup retries */
@@ -271,6 +269,7 @@ static void resendPacket()
 	currentRadioOperation.retriesDone++;
 }
 
+/*callback for send: wait for ACK packet*/
 static void rxDoneCallback(EasyLink_RxPacket * rxPacket, EasyLink_Status status)
 {
 	struct PacketHeader* packetHeader;

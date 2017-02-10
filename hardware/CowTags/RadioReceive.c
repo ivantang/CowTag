@@ -61,6 +61,7 @@
 #define CONCENTRATORRADIO_MAX_RETRIES 2
 #define NORERADIO_ACK_TIMEOUT_TIME_MS (160)
 
+#define
 
 /***** Type declarations *****/
 
@@ -96,146 +97,152 @@ static void sendAck(uint8_t latestSourceAddress);
 /***** Function definitions *****/
 void radioReceive_init(void) {
 
-    /* Create event used internally for state changes */
-    Event_Params eventParam;
-    Event_Params_init(&eventParam);
-    Event_construct(&radioOperationEvent, &eventParam);
-    radioOperationEventHandle = Event_handle(&radioOperationEvent);
+	/* Create event used internally for state changes */
+	Event_Params eventParam;
+	Event_Params_init(&eventParam);
+	Event_construct(&radioOperationEvent, &eventParam);
+	radioOperationEventHandle = Event_handle(&radioOperationEvent);
 
-    /* Create the concentrator radio protocol task */
-    Task_Params_init(&concentratorRadioTaskParams);
-    concentratorRadioTaskParams.stackSize = CONCENTRATORRADIO_TASK_STACK_SIZE;
-    concentratorRadioTaskParams.priority = CONCENTRATORRADIO_TASK_PRIORITY;
-    concentratorRadioTaskParams.stack = &concentratorRadioTaskStack;
-    Task_construct(&concentratorRadioTask, concentratorRadioTaskFunction, &concentratorRadioTaskParams, NULL);
+	/* Create the concentrator radio protocol task */
+	Task_Params_init(&concentratorRadioTaskParams);
+	concentratorRadioTaskParams.stackSize = CONCENTRATORRADIO_TASK_STACK_SIZE;
+	concentratorRadioTaskParams.priority = CONCENTRATORRADIO_TASK_PRIORITY;
+	concentratorRadioTaskParams.stack = &concentratorRadioTaskStack;
+	Task_construct(&concentratorRadioTask, concentratorRadioTaskFunction, &concentratorRadioTaskParams, NULL);
 }
 
 void ConcentratorRadioTask_registerPacketReceivedCallback(ConcentratorRadio_PacketReceivedCallback callback) {
-    packetReceivedCallback = callback;
+	packetReceivedCallback = callback;
 }
 
 static void concentratorRadioTaskFunction(UArg arg0, UArg arg1)
 {
-    /* Initialize EasyLink */
-    if(EasyLink_init(RADIO_EASYLINK_MODULATION) != EasyLink_Status_Success) {
-        System_abort("EasyLink_init failed");
-    }
+	/* Initialize EasyLink */
+	if(EasyLink_init(RADIO_EASYLINK_MODULATION) != EasyLink_Status_Success) {
+		System_abort("EasyLink_init failed");
+	}
 
 
-    /* If you wich to use a frequency other than the default use
-     * the below API
-     * EasyLink_setFrequency(868000000);
-     */
+	/* If you wich to use a frequency other than the default use
+	 * the below API
+	 * EasyLink_setFrequency(868000000);
+	 */
 
-    /* Set concentrator address */;
-    concentratorAddress = RADIO_CONCENTRATOR_ADDRESS;
-    EasyLink_enableRxAddrFilter(&concentratorAddress, 1, 1);
+	/* Set src address of TX/ACK packet */;
+	concentratorAddress = ALPHA_ADDRESS; // (TODO) add set up address for gateway
 
-    /* Set up Ack packet */
-    ackPacket.header.sourceAddress = concentratorAddress;
-    ackPacket.header.packetType = RADIO_PACKET_TYPE_ACK_PACKET;
+	EasyLink_enableRxAddrFilter(null, 0, 0); // address filtering is disabled for A or G
 
-    /* Enter receive */
-    if(EasyLink_receiveAsync(rxDoneCallback, 0) != EasyLink_Status_Success) {
-        System_abort("EasyLink_receiveAsync failed");
-    }
 
-    while (1) {
-        uint32_t events = Event_pend(radioOperationEventHandle, 0, RADIO_EVENT_ALL, BIOS_WAIT_FOREVER);
+	/* Set up Ack packet */
+	ackPacket.header.sourceAddress = concentratorAddress;
+	ackPacket.header.packetType = RADIO_PACKET_TYPE_ACK_PACKET;
 
-        /* If valid packet received */
-        if(events & RADIO_EVENT_VALID_PACKET_RECEIVED) {
+	/* Wait for sensor packet (and save to memory) */
+	if(EasyLink_receiveAsync(rxDoneCallback, 0) != EasyLink_Status_Success) {
+		System_abort("EasyLink_receiveAsync failed");
+	}
 
-            /* Send ack packet */
-            sendAck(latestRxPacket.header.sourceAddress);
+	while (1) {
+		uint32_t events = Event_pend(radioOperationEventHandle, 0, RADIO_EVENT_ALL, BIOS_WAIT_FOREVER);
 
-            /* Call packet received callback */
-            notifyPacketReceived(&latestRxPacket);
+		/* If valid packet received */
+		if(events & RADIO_EVENT_VALID_PACKET_RECEIVED) {
 
-            /* Go back to RX */
-            if(EasyLink_receiveAsync(rxDoneCallback, 0) != EasyLink_Status_Success) {
-                System_abort("EasyLink_receiveAsync failed");
-            }
+			/* Send the ack packet */
+			sendAck(latestRxPacket.header.sourceAddress);
 
-            /* toggle Activity LED */
-            PIN_setOutputValue(ledPinHandle, CONCENTRATOR_ACTIVITY_LED,
-                    !PIN_getOutputValue(CONCENTRATOR_ACTIVITY_LED));
-        }
+			/* Call packet received callback */
+			notifyPacketReceived(&latestRxPacket);
 
-        /* If invalid packet received */
-        if(events & RADIO_EVENT_INVALID_PACKET_RECEIVED) {
-            /* Go back to RX */
-            if(EasyLink_receiveAsync(rxDoneCallback, 0) != EasyLink_Status_Success) {
-                System_abort("EasyLink_receiveAsync failed");
-            }
-        }
-    }
+			/* Go back to RX */
+			if(EasyLink_receiveAsync(rxDoneCallback, 0) != EasyLink_Status_Success) {
+				System_abort("EasyLink_receiveAsync failed");
+			}
+
+			/* toggle Activity LED */
+			PIN_setOutputValue(ledPinHandle, CONCENTRATOR_ACTIVITY_LED,
+					!PIN_getOutputValue(CONCENTRATOR_ACTIVITY_LED));
+		}
+
+		/* If invalid packet received */
+		if(events & RADIO_EVENT_INVALID_PACKET_RECEIVED) {
+			/* Go back to RX */
+			if(EasyLink_receiveAsync(rxDoneCallback, 0) != EasyLink_Status_Success) {
+				System_abort("EasyLink_receiveAsync failed");
+			}
+		}
+	}
 }
 
 static void sendAck(uint8_t latestSourceAddress) {
 
-    /* Set destinationAdress, but use EasyLink layers destination adress capability */
-    txPacket.dstAddr[0] = latestSourceAddress;
+	/* Set destinationAdress, but use EasyLink layers destination adress capability */
+	txPacket.dstAddr[0] = latestSourceAddress;
 
-    /* Copy ACK packet to payload, skipping the destination adress byte.
-     * Note that the EasyLink API will implcitily both add the length byte and the destination address byte. */
-    memcpy(txPacket.payload, &ackPacket.header, sizeof(ackPacket));
-    txPacket.len = sizeof(ackPacket);
+	/* Copy ACK packet to payload, skipping the destination adress byte.
+	 * Note that the EasyLink API will implcitily both add the length byte and the destination address byte. */
+	memcpy(txPacket.payload, &ackPacket.header, sizeof(ackPacket));
+	txPacket.len = sizeof(ackPacket);
 
-    /* Send packet  */
-    if (EasyLink_transmit(&txPacket) != EasyLink_Status_Success)
-    {
-        System_abort("EasyLink_transmit failed");
-    }
+	/* Send packet  */
+	if (EasyLink_transmit(&txPacket) != EasyLink_Status_Success)
+	{
+		System_abort("EasyLink_transmit failed");
+	}
 }
 
+/*the callback is shared; defined elsewhere*/
 static void notifyPacketReceived(union ConcentratorPacket* latestRxPacket)
 {
-    if (packetReceivedCallback)
-    {
-        packetReceivedCallback(latestRxPacket, latestRssi);
-    }
+	if (packetReceivedCallback)
+	{
+		packetReceivedCallback(latestRxPacket, latestRssi);
+	}
 }
 
+/*callback for receive: wait for sensor packet, and check for src address of packet (for Alphas only)*/
 static void rxDoneCallback(EasyLink_RxPacket * rxPacket, EasyLink_Status status)
 {
-    union ConcentratorPacket* tmpRxPacket;
+	union ConcentratorPacket* tmpRxPacket;
 
-    /* If we received a packet successfully */
-    if (status == EasyLink_Status_Success)
-    {
-        /* Save the latest RSSI, which is later sent to the receive callback */
-        latestRssi = (int8_t)rxPacket->rssi;
+	/* If we received a packet successfully */
+	if (status == EasyLink_Status_Success)
+	{
+		/* Save the latest RSSI, which is later sent to the receive callback */
+		latestRssi = (int8_t)rxPacket->rssi;
 
-        /* Check that this is a valid packet */
-        tmpRxPacket = (union ConcentratorPacket*)(rxPacket->payload);
+		/* Check that this is a valid packet */
+		tmpRxPacket = (union ConcentratorPacket*)(rxPacket->payload);
 
-        /* If this is a known packet */
-        if (tmpRxPacket->header.packetType == RADIO_PACKET_TYPE_SENSOR_PACKET)
-        {
-            /* Save packet */
-            memcpy((void*)&latestRxPacket, &rxPacket->payload, sizeof(struct sensorPacket));
+		/* If this is a known packet */
+		if (tmpRxPacket->header.packetType == RADIO_PACKET_TYPE_SENSOR_PACKET)
+		{
 
-            /* Signal packet received */
-            Event_post(radioOperationEventHandle, RADIO_EVENT_VALID_PACKET_RECEIVED);
-        }
-        else if (tmpRxPacket->header.packetType == RADIO_PACKET_TYPE_DM_SENSOR_PACKET)
-        {
-            /* Save packet */
-            memcpy((void*)&latestRxPacket, &rxPacket->payload, sizeof(struct sensorPacket));
+			// alpha check
+			if( (concentratorAddress & 0x3) == ALPHA_ADDRESS){ // IF I AM AN ALPHA
+				if((tmpRxPacket->header->sourceAddress & 0x1) & '1')){ // IF THE SOURCE IS ANOTHER CONCENTRATOR
+					// ignore the alpha packet
+					Event_post(radioOperationEventHandle, RADIO_EVENT_INVALID_PACKET_RECEIVED);
+				}
+			}
 
-            /* Signal packet received */
-            Event_post(radioOperationEventHandle, RADIO_EVENT_VALID_PACKET_RECEIVED);
-        }
-        else
-        {
-            /* Signal invalid packet received */
-            Event_post(radioOperationEventHandle, RADIO_EVENT_INVALID_PACKET_RECEIVED);
-        }
-    }
-    else
-    {
-        /* Signal invalid packet received */
-        Event_post(radioOperationEventHandle, RADIO_EVENT_INVALID_PACKET_RECEIVED);
-    }
+			// both alpha(passed check) and gateway do this
+
+			/* Save packet */
+			memcpy((void*)&latestRxPacket, &rxPacket->payload, sizeof(struct sensorPacket));
+			/* Signal packet received */
+			Event_post(radioOperationEventHandle, RADIO_EVENT_VALID_PACKET_RECEIVED);
+
+		} else{
+			// ignore unknown packet or ACK packet
+			Event_post(radioOperationEventHandle, RADIO_EVENT_INVALID_PACKET_RECEIVED);
+		}
+	}
+	// status= not rx'd successfully
+	else
+	{
+		/* Signal invalid packet received */
+		Event_post(radioOperationEventHandle, RADIO_EVENT_INVALID_PACKET_RECEIVED);
+	}
 }

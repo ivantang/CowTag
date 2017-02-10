@@ -16,10 +16,10 @@
 void serializePacket(struct sampleData *data, uint8_t *buffer) {
 	buffer[0] = data->cowID;
 	buffer[1] = data->packetType;
-	buffer[2] = data->tempData.timestamp >> 24 & 0xff;
-	buffer[3] = data->tempData.timestamp >> 16 & 0xff;
-	buffer[4] = data->tempData.timestamp >> 8 & 0xff;
-	buffer[5] = data->tempData.timestamp & 0xff;
+	buffer[2] = data->timestamp >> 24 & 0xff;
+	buffer[3] = data->timestamp >> 16 & 0xff;
+	buffer[4] = data->timestamp >> 8 & 0xff;
+	buffer[5] = data->timestamp & 0xff;
 
 	if (data->packetType == RADIO_PACKET_TYPE_SENSOR_PACKET) {
 		buffer[6] = data->tempData.temp_h >> 8 & 0xff;
@@ -53,7 +53,7 @@ void serializePacket(struct sampleData *data, uint8_t *buffer) {
 void unserializePacket(struct sampleData *data, uint8_t *buffer) {
 	data->cowID = buffer[0];
 	data->packetType = buffer[1];
-	data->tempData.timestamp =
+	data->timestamp =
 			(buffer[2] << 24) |
 			(buffer[3] << 16) |
 			(buffer[4] << 8) |

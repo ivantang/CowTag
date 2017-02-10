@@ -104,28 +104,34 @@ void testArduino(){
 	struct sampleData sampledata;
 	sampledata.cowID = 1;
 	sampledata.packetType = RADIO_PACKET_TYPE_SENSOR_PACKET;
-	sampledata.tempData.timestamp = 0x12345678;
-	sampledata.tempData.temp_h = 0x5678;
-	sampledata.tempData.temp_l = 0x8765;
-	sampledata.heartRateData.rate_h = 0x7890;
-	sampledata.heartRateData.rate_l = 0x0987;
-	sampledata.heartRateData.temp_h = 0x2345;
-	sampledata.heartRateData.temp_l = 0x5432;
+	sampledata.timestamp = 0x12345678;
+	sampledata.tempData.temp_h = 0x78;
+	sampledata.tempData.temp_l = 0x65;
+	sampledata.heartRateData.rate_h = 0x90;
+	sampledata.heartRateData.rate_l = 0x87;
+	sampledata.heartRateData.temp_h = 0x45;
+	sampledata.heartRateData.temp_l = 0x32;
+	sampledata.accelerometerData.x = 0x12;
+	sampledata.accelerometerData.y = 0x13;
+	sampledata.accelerometerData.z = 0x14;
 
-	serializePacket(&sampledata, buf);
+	while(1){
+		serializePacket(&sampledata, buf);
 
-	for(i = 0 ; i<SAMPLE_SIZE; i++){
-		System_printf("%x ", buf[i]);
+		for(i = 0 ; i<SAMPLE_SIZE; i++){
+			System_printf("%x ", buf[i]);
+		}
+		System_printf("\n");
+		System_flush();
+		writeI2CArduino(0x6, buf);
+
+
+		//writeI2CArray(ARDUINO_ADDR,Packet);
+		//writeI2CRegister(0x6,0x1,0x2);
+		//writeI2CRegister(ARDUINO_ADDR,0x3,0x4);
+		System_printf("testArduino finished\n");
+		System_flush();
+
+		Task_sleep(1000000);
 	}
-	System_printf("\n");
-	System_flush();
-	writeI2CArduino(0x6, buf);
-
-
-	//writeI2CArray(ARDUINO_ADDR,Packet);
-	//writeI2CRegister(0x6,0x1,0x2);
-	//writeI2CRegister(ARDUINO_ADDR,0x3,0x4);
-	System_printf("testArduino finished\n");
-	System_flush();
-
 }

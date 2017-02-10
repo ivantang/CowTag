@@ -19,7 +19,6 @@
 #include <Wire.h>
 //#include <SPI_Anything.h>
 #include <Ethernet2.h>
-#include <time.h>
 
 #define CC1310_SS_PIN 8
 #define GATEWAY_MAX_NODES 7
@@ -32,8 +31,12 @@ int serverPort = 80; // change to your server's port
 char json_string[] = "{\"body_temp\": 11.0, \"ext_temp\": 11.0, \"x\": 1.0, \"y\": 1.0, \"z\": 1.0, \"respire\": 100.0, \"cow_id\":1, \"timestamp\": 1455555555, \"error\": \"0\"}";
 const unsigned long BAUD_RATE = 9600;                 // serial connection speed
 const size_t MAX_CONTENT_SIZE = 512;       // max size of the HTTP response
+const unsigned PACKET_SIZE = 19;
 
 typedef enum {OK, LOWBATTERY, SENSORERROR} errCode;
+
+uint8_t buffer[PACKET_SIZE];
+
 
 //change
 struct TemperatureData {
@@ -56,11 +59,14 @@ struct HeartrateData {
 
 /* will be concat of data from all sensors */
 struct SampleData {
+  uint8_t cowID;
+  uint8_t packetType;
   struct TemperatureData tempData;
   struct AccelerationData accelerometerData;
   struct HeartrateData heartRateData;
+  uint32_t timestamp;
+
   errCode errorCode;
-  time_t timeStamp;
   char nodeAddress[8];
 };
 
@@ -94,7 +100,7 @@ void printSampleData(const struct SampleData* data) {
   Serial.println(data->nodeAddress);
 
   Serial.print("Timestamp= ");
-  Serial.println(data->timeStamp);
+  Serial.println(data->timestamp);
 
   Serial.print("Error code= ");
   Serial.println(data->errorCode);
@@ -102,16 +108,16 @@ void printSampleData(const struct SampleData* data) {
 
 void serializeSampleData(const struct SampleData* sampleData, char *data)
 {
-  sprintf(data, "{\"body_temp\": %s, \"ext_temp\": %s, \"x\": %s, \"y\": %s, \"z\": %s, \"respire\": %s, \"cow_id\": %s, \"timestamp\": %ld, \"error\": \" %i \"}\n",
-          sampleData->tempData.temp_l,
-          sampleData->heartRateData.temp_l,
-          sampleData->accelerometerData.x,
-          sampleData->accelerometerData.y,
-          sampleData->accelerometerData.z,
-          sampleData->heartRateData.rate_l,
-          sampleData->nodeAddress,
-          sampleData->timeStamp,
-          sampleData->errorCode);
+  sprintf(data, "{\cowID\": %s, \"packetType\": %s, \"timestamp\": %ld, \"otemp_h\": %s, \"otemp_l\": %s, \"hrate_h\": %s, \"hrate_l\": %s, \"atemp_h\": %s, \"atemp_l\": %s \"}\n",
+            sampleData->cowID,
+            sampleData->packetType,
+            sampleData->timestamp,
+            sampleData->tempData.temp_h,
+            sampleData->tempData.temp_l,
+            sampleData->heartRateData.rate_h,
+            sampleData->heartRateData.rate_l,
+            sampleData->heartRateData.temp_h,
+            sampleData->heartRateData.temp_l);
 }
 
 // Parse the JSON from the input string and extract the interesting values
@@ -154,7 +160,7 @@ bool parseSampleData(char* content, struct SampleData* sampleData) {
   strcpy(sampleData->heartRateData.rate_l, root["respire"]);
   strcpy(sampleData->nodeAddress, root["cow_id"]);
   strcpy(sampleData->nodeAddress, root["cow_id"]);
-  sampleData->timeStamp = root["timestamp"];
+  sampleData->timestamp = root["timestamp"];
   int errorcode =  root["error"];
   if (errorcode == 0) {
     sampleData->errorCode = OK;
@@ -306,9 +312,29 @@ void loop() {
 
 void receiveEvent(int howMany) {
   Serial.println("Receiving");
+  int i = 0;
+  
+  SampleData sampleData;
+  
+  //Get Data via I2C
   while (1 <= Wire.available()) { // loop through all but the last
     int c = Wire.read(); // receive byte as a character
     Serial.println(c);         // print the character
+    buffer[i] = c;
   }
+  
+  //Store in JSON object and post to gateway
+  sampleData.cowID = buffer[0];
+  sampleData.packetType = buffer[1];
+  sampleData.timestamp = buffer[2]<<24 & buffer[3]<<16 & buffer[4]<<8 & buffer[5];
+  sampleData.tempData.temp_h = buffer[6]<<8 & buffer[7];
+  sampleData.tempData.temp_l = buffer[8]<<8 & buffer[9]];
+  sampleData.heartRateData.rate_h = buffer[10]<<8 & buffer[11];
+  sampleData.heartRateData.rate_l = buffer[12]<<8 & buffer[13];
+  sampleData.heartRateData.temp_h = buffer[14]<<8 & buffer[15];
+  sampleData.heartRateData.temp_l = buffer[16]<<8 & buffer[17];
+  
+  
+  
   Serial.println("Done");
 }

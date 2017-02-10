@@ -11,7 +11,7 @@
 #include "radioProtocol.h"
 
 
-void serializePacket(struct sensorPacket *packet, uint8_t *buffer);
-void unserializePacket(struct sensorPacket *packet, uint8_t *buffer);
+void serializePacket(struct sampleData *data, uint8_t *buffer);
+void unserializePacket(struct sampleData *data, uint8_t *buffer);
 
 #endif /* SERIALIZE_H_ */

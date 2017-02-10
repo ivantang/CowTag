@@ -40,8 +40,7 @@ PIN_State ledPinState;
 PIN_Handle ledPinHandle;
 /*******************************************/
 
-int main(void)
-{
+int main(void) {
 	System_printf("Initializing tasks...\n");
 	System_flush();
 

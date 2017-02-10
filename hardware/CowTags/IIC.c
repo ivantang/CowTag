@@ -86,8 +86,7 @@ static void writeI2C(uint8_t board_address, uint8_t value){
  * @bytes[1..] data
  */
 static void writeI2Ceeprom(uint8_t slaveAddr, uint8_t bytes[]) {
-	int numBytes = 3;  // num bytes per eeprom request
-	uint8_t			txBuffer[numBytes];
+	uint8_t			txBuffer[3];
 	uint8_t         rxBuffer[1];
 
 	I2C_Transaction t_i2cTransaction;
@@ -109,7 +108,7 @@ static void writeI2Ceeprom(uint8_t slaveAddr, uint8_t bytes[]) {
     }
 
     t_i2cTransaction.writeBuf = txBuffer;
-    t_i2cTransaction.writeCount = numBytes;
+    t_i2cTransaction.writeCount = 3;
     t_i2cTransaction.readBuf = rxBuffer;
     t_i2cTransaction.readCount = 0;
     t_i2cTransaction.slaveAddress = slaveAddr;

@@ -38,7 +38,7 @@ bool eeprom_testStart() {
 	Task_Params_init(&taskParams);
 	taskParams.stackSize = TASKSTACKSIZE;
 	taskParams.stack = &task0Stack;
-	Task_construct(&task0Struct, (Task_FuncPtr)eeprom_testValidateMemory, &taskParams, NULL);
+	Task_construct(&task0Struct, (Task_FuncPtr)eeprom_testWriteReadNormal, &taskParams, NULL);
 
 	return true;
 }

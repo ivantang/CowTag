@@ -76,9 +76,10 @@ Task_Struct concentratorTask;    /* not static so you can see in ROV */
 static uint8_t concentratorTaskStack[CONCENTRATOR_TASK_STACK_SIZE];
 Event_Struct concentratorEvent;  /* not static so you can see in ROV */
 static Event_Handle concentratorEventHandle;
-static struct BetaSensorNode latestActiveSensorNode;
-struct BetaSensorNode knownSensorNodes[CONCENTRATOR_MAX_NODES];
-static struct BetaSensorNode* lastAddedSensorNode = knownSensorNodes;
+static struct sensorPacket latestActiveSensorNode;
+//struct BetaSensorNode knownSensorNodes[CONCENTRATOR_MAX_NODES];
+//static struct BetaSensorNode* lastAddedSensorNode = knownSensorNodes;
+static int i = 0;
 
 
 /***** Prototypes *****/
@@ -111,39 +112,46 @@ static void concentratorTaskFunction(UArg arg0, UArg arg1)
 	/* Register a packet received callback with the radio task */
 	ConcentratorRadioTask_registerPacketReceivedCallback(packetReceivedCallback);
 
+	System_printf("Starting radio test\n");
+
 	/* Enter main task loop */
 	while(1) {
 		/* Wait for event */
 		uint32_t events = Event_pend(concentratorEventHandle, 0, CONCENTRATOR_EVENT_ALL, BIOS_WAIT_FOREVER);
 
-		/* If we got a new ADC sensor value */
-		if(events & CONCENTRATOR_EVENT_NEW_SENSOR_VALUE) {
-			/* If we knew this node from before, update the value */
+		/* If we got a new sensor value */
+		/*if(events & CONCENTRATOR_EVENT_NEW_SENSOR_VALUE) {
+			// If we knew this node from before, update the value
 			if(isKnownNodeAddress(latestActiveSensorNode.address)) {
 				updateNode(&latestActiveSensorNode);
 			}
 			else {
-				/* Else add it */
+				// Else add it
 				addNewNode(&latestActiveSensorNode);
 			}
 
+		}*/
+
+		if(events & CONCENTRATOR_EVENT_NEW_SENSOR_VALUE) {
+			i++;
+			printNodes();
 		}
-		printNodes();
+
 	}
 }
 
 static void packetReceivedCallback(union ConcentratorPacket* packet, int8_t rssi)
 {
 		/* Save the values */
-		latestActiveSensorNode.valid=1;
-		latestActiveSensorNode.address = packet->header.sourceAddress;
+		//latestActiveSensorNode.valid=1;
+		latestActiveSensorNode.header.sourceAddress = packet->header.sourceAddress;
 		latestActiveSensorNode.sampledata = packet->sensorPacket.sampledata;
-		latestActiveSensorNode.latestRssi = rssi;
+		//latestActiveSensorNode.latestRssi = rssi;
 
 		Event_post(concentratorEventHandle, CONCENTRATOR_EVENT_NEW_SENSOR_VALUE);
 }
 
-static uint8_t isKnownNodeAddress(uint8_t address) {
+/*static uint8_t isKnownNodeAddress(uint8_t address) {
 	uint8_t found = 0;
 	uint8_t i;
 	for (i = 0; i < CONCENTRATOR_MAX_NODES; i++)
@@ -155,35 +163,32 @@ static uint8_t isKnownNodeAddress(uint8_t address) {
 		}
 	}
 	return found;
-}
+}*/
 
+/*print what you received*/
 void printNodes(void) {
-	int i;
-	for (i = 0; i < CONCENTRATOR_MAX_NODES; i++)
-	{
-		if(knownSensorNodes[i].valid){
-		System_printf("MemorySpot [%i], "
-						"alphaRadio: received packet from "
-						"address = %i, "
-						"latest Rssi = %i, "
-						"Temp_Data = %i.%i, "
-						"Acc_Data= x=%i y=%i z=%i, "
-						"IR_Data_H = %i, IR_Data_L = %i \n",
+		System_printf(	"%d th packet, "
+						"received packet from "
+						"src address = 0x%x, "
+						"Error code: 0x%x\n",
+						//"Temp_Data = %i.%i, "
+						//"Acc_Data= x=%i y=%i z=%i, "
+						//"IR_Data_H = %i, IR_Data_L = %i \n",
 						i,
-						knownSensorNodes[i].address,
-						knownSensorNodes[i].latestRssi,
-						knownSensorNodes[i].sampledata.tempData.temp_h,
-						knownSensorNodes[i].sampledata.tempData.temp_l,
-						knownSensorNodes[i].sampledata.accelerometerData.x,
-						knownSensorNodes[i].sampledata.accelerometerData.y,
-						knownSensorNodes[i].sampledata.accelerometerData.z,
-						knownSensorNodes[i].sampledata.heartRateData.rate_h,
-						knownSensorNodes[i].sampledata.heartRateData.rate_l);
-		}
-	}
+						latestActiveSensorNode.header.sourceAddress,
+						latestActiveSensorNode.sampledata.error);
+						//latestActiveSensorNode.sampledata.tempData.temp_h,
+						//latestActiveSensorNode.sampledata.tempData.temp_l,
+
+						//latestActiveSensorNode.sampledata.accelerometerData.x,
+						//latestActiveSensorNode.sampledata.accelerometerData.y,
+						//latestActiveSensorNode.sampledata.accelerometerData.z,
+
+						//latestActiveSensorNode.sampledata.heartRateData.rate_h,
+						//latestActiveSensorNode.sampledata.heartRateData.rate_l);
 }
 
-static void updateNode(struct BetaSensorNode* node) {
+/*static void updateNode(struct BetaSensorNode* node) {
 	uint8_t i;
 	for (i = 0; i < CONCENTRATOR_MAX_NODES; i++) {
 		if (knownSensorNodes[i].address == node->address)
@@ -193,17 +198,17 @@ static void updateNode(struct BetaSensorNode* node) {
 			break;
 		}
 	}
-}
+}*/
 
-static void addNewNode(struct BetaSensorNode* node) {
+/*static void addNewNode(struct BetaSensorNode* node) {
 	*lastAddedSensorNode = *node;
 
-	/* Increment and wrap */
+	// Increment and wrap
 	lastAddedSensorNode++;
 	if (lastAddedSensorNode > &knownSensorNodes[CONCENTRATOR_MAX_NODES-1])
 	{
 		lastAddedSensorNode = knownSensorNodes;
 	}
-}
+}*/
 
 

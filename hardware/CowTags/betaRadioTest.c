@@ -51,6 +51,7 @@
 #include "Board.h"
 #include "debug.h"
 #include "pinTable.h"
+#include "eeprom.h"
 
 
 /***** Defines *****/
@@ -83,7 +84,7 @@ static Event_Handle nodeEventHandle;
 //static Clock_Handle fastReportTimeoutClockHandle;
 
 /*constants*/
-static struct sampleData sampledata;
+//static struct sampleData sampledata;
 
 /***** Prototypes *****/
 static void nodeTaskFunction(UArg arg0, UArg arg1);
@@ -119,25 +120,41 @@ void betaRadioTest_init(void)
 
 static void nodeTaskFunction(UArg arg0, UArg arg1)
 {
-	/* setup timeout for fast report timeout */
-	//Clock_setTimeout(fastReportTimeoutClockHandle,
-	//		NODE_ADCTASK_REPORTINTERVAL_FAST_DURIATION_MS * 1000 / Clock_tickPeriod);
+	struct sampleData sampledata;
+		sampledata.cowID = 1;
+		sampledata.packetType = RADIO_PACKET_TYPE_SENSOR_PACKET;
+		sampledata.timestamp = 0x12345678;
+		sampledata.tempData.temp_h = 0x5678;
+		sampledata.tempData.temp_l = 0x8765;
+		sampledata.heartRateData.rate_h = 0x7890;
+		sampledata.heartRateData.rate_l = 0x0987;
+		sampledata.heartRateData.temp_h = 0x2345;
+		sampledata.heartRateData.temp_l = 0x5432;
 
-	/* start fast report and timeout */
-	//Clock_start(fastReportTimeoutClockHandle);
+		/*
+		eeprom_reset();
+		if(!eeprom_write(sampledata))
+			System_abort("failed to write sensor data to EEPROM\n");
+
+		struct sampleData sample2;
+		eeprom_getNext(&sample2);*/
+
+		// testing without writing to eeprom for now...
 
 	while(1) {
-		sampledata.tempData = getObjTemp();
-		sampledata.accelerometerData = getAcceleration();
-		sampledata.heartRateData = getHeartRate();
-		int delay = 10000;
-		CPUdelay(delay*1000);
+		///sampledata.tempData = getObjTemp();
+		//sampledata.accelerometerData = getAcceleration();
+		//sampledata.heartRateData = getHeartRate();
+		//int delay = 10000;
+		//CPUdelay(delay*1000);
 
 		/* Toggle activity LED */
 		PIN_setOutputValue(ledPinHandle, NODE_ACTIVITY_LED, !PIN_getOutputValue(NODE_ACTIVITY_LED) );
 
 		/* Send value to concentrator */
 		betaRadioSendData(sampledata);
+		//betaRadioSendData(sample2); // read from eeprom
+
 		if(verbose_antennas){
 						System_printf("BetaRadio: sent packet with Temp_Data = %i, "
 																  "Acc_Data= x=%i y=%i z=%i, "
@@ -164,8 +181,3 @@ static void nodeTaskFunction(UArg arg0, UArg arg1)
 //	Event_post(nodeEventHandle, NODE_EVENT_NEW_VALUE);
 //}
 
-/*void fastReportTimeoutCallback(UArg arg0)
-{
-	//stop fast report
-	SceAdc_setReportInterval(NODE_ADCTASK_REPORTINTERVAL_SLOW, NODE_ADCTASK_CHANGE_MASK);
-}*/

@@ -121,7 +121,7 @@ bool eeprom_getNext(struct sampleData *data) {
 		// convert bytes to sensorPacket struct
 		unserializePacket(data, buf);
 
-	// no wrapping: read samples from lastAddress to currentAddress
+		// no wrapping: read samples from lastAddress to currentAddress
 	} else {
 		if (eeprom_lastAddress < eeprom_currentAddress) {
 			eeprom_readAddress(eeprom_lastAddress >> 8, eeprom_lastAddress & 0xff, SAMPLE_SIZE, buf);

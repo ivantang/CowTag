@@ -10,7 +10,6 @@ CFG_SRCS += \
 ../cowtagOS.cfg 
 
 C_SRCS += \
-../Arduino.c \
 ../CC1310_LAUNCHXL.c \
 ../IIC.c \
 ../RadioReceive.c \
@@ -24,7 +23,6 @@ C_SRCS += \
 ../uArtEcho.c 
 
 OBJS += \
-./Arduino.obj \
 ./CC1310_LAUNCHXL.obj \
 ./IIC.obj \
 ./RadioReceive.obj \
@@ -38,7 +36,6 @@ OBJS += \
 ./uArtEcho.obj 
 
 C_DEPS += \
-./Arduino.d \
 ./CC1310_LAUNCHXL.d \
 ./IIC.d \
 ./RadioReceive.d \
@@ -65,14 +62,13 @@ GEN_FILES += \
 ./configPkg/compiler.opt 
 
 GEN_FILES__QUOTED += \
-"configPkg/linker.cmd" \
-"configPkg/compiler.opt" 
+"configPkg\linker.cmd" \
+"configPkg\compiler.opt" 
 
 GEN_MISC_DIRS__QUOTED += \
-"configPkg/" 
+"configPkg\" 
 
 C_DEPS__QUOTED += \
-"Arduino.d" \
 "CC1310_LAUNCHXL.d" \
 "IIC.d" \
 "RadioReceive.d" \
@@ -86,7 +82,6 @@ C_DEPS__QUOTED += \
 "uArtEcho.d" 
 
 OBJS__QUOTED += \
-"Arduino.obj" \
 "CC1310_LAUNCHXL.obj" \
 "IIC.obj" \
 "RadioReceive.obj" \
@@ -100,7 +95,6 @@ OBJS__QUOTED += \
 "uArtEcho.obj" 
 
 C_SRCS__QUOTED += \
-"../Arduino.c" \
 "../CC1310_LAUNCHXL.c" \
 "../IIC.c" \
 "../RadioReceive.c" \

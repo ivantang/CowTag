@@ -64,7 +64,7 @@ Semaphore_Struct radioResultSem;  /* not static so you can see in ROV */
 static Semaphore_Handle radioResultSemHandle;
 
 static struct RadioOperation currentRadioOperation;
-static uint8_t nodeAddress = 0x0; // ending in 0
+static uint8_t nodeAddress = 0; // ending in 0
 
 static struct sensorPacket sensorPacket;
 static struct sampleData sampledata;
@@ -116,7 +116,7 @@ static void nodeRadioTaskFunction(UArg arg0, UArg arg1)
 		System_abort("EasyLink_init failed");
 	}
 
-
+	System_printf("Starting Radio Send\n");
 	/* Use the True Random Number Generator to generate sensor node address randomly */;
 	//	    Power_setDependency(PowerCC26XX_PERIPH_TRNG);
 	//	    TRNGEnable();
@@ -131,6 +131,8 @@ static void nodeRadioTaskFunction(UArg arg0, UArg arg1)
 	//	    } while (nodeAddress == RADIO_CONCENTRATOR_ADDRESS);
 	//	    TRNGDisable();
 	//	    Power_releaseDependency(PowerCC26XX_PERIPH_TRNG);
+
+	nodeAddress = BETA_ADDRESS;
 
 	/* Set the filter to the generated random address */
 	if (EasyLink_enableRxAddrFilter(&nodeAddress, 1, 1) != EasyLink_Status_Success)
@@ -152,7 +154,9 @@ static void nodeRadioTaskFunction(UArg arg0, UArg arg1)
 		if (events & RADIO_EVENT_SEND_DATA)
 		{
 			sensorPacket.sampledata = sampledata;
+			System_printf("Sending data...\n");
 			sendBetaPacket(sensorPacket, NODERADIO_MAX_RETRIES, NORERADIO_ACK_TIMEOUT_TIME_MS);
+			System_printf("Data Sent!\n");
 
 		}
 
@@ -160,6 +164,7 @@ static void nodeRadioTaskFunction(UArg arg0, UArg arg1)
 		if (events & RADIO_EVENT_DATA_ACK_RECEIVED)
 		{
 			returnRadioOperationStatus(NodeRadioStatus_Success);
+			System_printf("ACK RECEIVED! Transmission successful.\n");
 		}
 
 		/* If we get an ACK timeout */
@@ -169,11 +174,13 @@ static void nodeRadioTaskFunction(UArg arg0, UArg arg1)
 			if (currentRadioOperation.retriesDone < currentRadioOperation.maxNumberOfRetries)
 			{
 				resendPacket();
+				System_printf("Timed out: resending for the %d th time\n", currentRadioOperation.retriesDone);
 			}
 			else
 			{
 				/* Else return send fail */
 				Event_post(radioOperationEventHandle, RADIO_EVENT_SEND_FAIL);
+				System_printf("Timed out: max tries exceeded\n");
 			}
 		}
 
@@ -181,6 +188,7 @@ static void nodeRadioTaskFunction(UArg arg0, UArg arg1)
 		if (events & RADIO_EVENT_SEND_FAIL)
 		{
 			returnRadioOperationStatus(NodeRadioStatus_Failed);
+			System_printf("Send Failed \n");
 		}
 
 	}
@@ -301,7 +309,7 @@ static void rxDoneCallback(EasyLink_RxPacket * rxPacket, EasyLink_Status status)
 	}
 	else
 	{
-		/* The Ack receiption may have been corrupted causing an error.
+		/* The Ack reception may have been corrupted causing an error.
 		 * Treat this as a timeout
 		 */
 		Event_post(radioOperationEventHandle, RADIO_EVENT_ACK_TIMEOUT);

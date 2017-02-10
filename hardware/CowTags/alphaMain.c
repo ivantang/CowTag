@@ -46,9 +46,9 @@ int main(void)
 	Board_initGeneral(); // init board
 	//Sensors_init(); // init i2C
 
-	//radioReceive_init();
-	//alphaRadioTest_init();
-	Arduino_init();
+	radioReceive_init();
+	alphaRadioTest_init();
+	//Arduino_init();
 
 	/* Open LED pins */
 	ledPinHandle = PIN_open(&ledPinState, ledPinTable);

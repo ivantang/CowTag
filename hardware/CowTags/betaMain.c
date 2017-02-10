@@ -47,9 +47,9 @@ int main(void) {
 	Board_initGeneral(); // init board
 	//Sensors_init(); // init i2C
 
-	//radioSend_init();	//
-	//betaRadioTest_init();	//
-	eeprom_testStart();
+	radioSend_init();	//
+	betaRadioTest_init();	//
+	//eeprom_testStart();
 //	serialize_testStart();
 
 	/* Open LED pins */

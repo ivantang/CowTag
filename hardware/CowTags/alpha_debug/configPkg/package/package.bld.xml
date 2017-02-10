@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="windows-1252"?>
 <!--  This file conforms to the DTD xdc/bld/build.dtd -->
 <package name="configPkg" version="" producerId="undefined">
     <units>
@@ -7,7 +7,7 @@
         <srcFile name="package/cfg/cowtagOS_pem3.c"/>
     </sources>
     <configscripts>
-        <srcFile name="/home/ivan/Documents/Github/72point5/hardware/CowTags/cowtagOS.cfg"/>
+        <srcFile name="C:/Users/annik/Desktop/COWS/72point5/hardware/CowTags/cowtagOS.cfg"/>
     </configscripts>
     <makefiles>
         <srcFile name="package.mak" src="package.bld"/>
@@ -25,7 +25,7 @@
             platform="ti.platforms.simCM3"
             isa="v7M"
             suffix="em3"
-            rootDir="/home/ivan/ti/ccsv6/tools/compiler/arm_15.12.3.LTS"
+            rootDir="C:/ti/ccsv6/tools/compiler/arm_15.12.3.LTS"
             os="undefined"
             rts="ti.targets.arm.rtsarm">
             <model endian="little"
@@ -44,7 +44,7 @@
         isPartial="false"
         xCfgScript="package/cfg/cowtagOS_pem3.cfg"
         xCfgPrefix="package/cfg/cowtagOS_pem3"
-        cfgScript="/home/ivan/Documents/Github/72point5/hardware/CowTags/cowtagOS.cfg"
+        cfgScript="C:/Users/annik/Desktop/COWS/72point5/hardware/CowTags/cowtagOS.cfg"
         cfgArgs="null"
         />
     </configurations>
@@ -56,7 +56,7 @@
         profile="release"
         xCfgScript="package/cfg/cowtagOS_pem3.cfg"
         xCfgPrefix="package/cfg/cowtagOS_pem3"
-        cfgScript="/home/ivan/Documents/Github/72point5/hardware/CowTags/cowtagOS.cfg"
+        cfgScript="C:/Users/annik/Desktop/COWS/72point5/hardware/CowTags/cowtagOS.cfg"
         cfgArgs="null"
         />
     </executables>

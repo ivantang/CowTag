@@ -9,14 +9,21 @@ CMD_SRCS += \
 CFG_SRCS += \
 ../cowtagOS.cfg 
 
+A_SRCS += \
+../libiniparser.a 
+
 C_SRCS += \
 ../CC1310_LAUNCHXL.c \
 ../IIC.c \
 ../RadioSend.c \
+../arduinoCom.c \
+../arduinoComTest.c \
 ../betaMain.c \
 ../betaRadioTest.c \
 ../ccfg.c \
+../config_parse.c \
 ../eeprom.c \
+../eepromTest.c \
 ../sensors.c \
 ../serialize.c \
 ../uArtEcho.c 
@@ -25,10 +32,14 @@ OBJS += \
 ./CC1310_LAUNCHXL.obj \
 ./IIC.obj \
 ./RadioSend.obj \
+./arduinoCom.obj \
+./arduinoComTest.obj \
 ./betaMain.obj \
 ./betaRadioTest.obj \
 ./ccfg.obj \
+./config_parse.obj \
 ./eeprom.obj \
+./eepromTest.obj \
 ./sensors.obj \
 ./serialize.obj \
 ./uArtEcho.obj 
@@ -37,10 +48,14 @@ C_DEPS += \
 ./CC1310_LAUNCHXL.d \
 ./IIC.d \
 ./RadioSend.d \
+./arduinoCom.d \
+./arduinoComTest.d \
 ./betaMain.d \
 ./betaRadioTest.d \
 ./ccfg.d \
+./config_parse.d \
 ./eeprom.d \
+./eepromTest.d \
 ./sensors.d \
 ./serialize.d \
 ./uArtEcho.d 
@@ -59,20 +74,24 @@ GEN_FILES += \
 ./configPkg/compiler.opt 
 
 GEN_FILES__QUOTED += \
-"configPkg\linker.cmd" \
-"configPkg\compiler.opt" 
+"configPkg/linker.cmd" \
+"configPkg/compiler.opt" 
 
 GEN_MISC_DIRS__QUOTED += \
-"configPkg\" 
+"configPkg/" 
 
 C_DEPS__QUOTED += \
 "CC1310_LAUNCHXL.d" \
 "IIC.d" \
 "RadioSend.d" \
+"arduinoCom.d" \
+"arduinoComTest.d" \
 "betaMain.d" \
 "betaRadioTest.d" \
 "ccfg.d" \
+"config_parse.d" \
 "eeprom.d" \
+"eepromTest.d" \
 "sensors.d" \
 "serialize.d" \
 "uArtEcho.d" 
@@ -81,10 +100,14 @@ OBJS__QUOTED += \
 "CC1310_LAUNCHXL.obj" \
 "IIC.obj" \
 "RadioSend.obj" \
+"arduinoCom.obj" \
+"arduinoComTest.obj" \
 "betaMain.obj" \
 "betaRadioTest.obj" \
 "ccfg.obj" \
+"config_parse.obj" \
 "eeprom.obj" \
+"eepromTest.obj" \
 "sensors.obj" \
 "serialize.obj" \
 "uArtEcho.obj" 
@@ -93,12 +116,19 @@ C_SRCS__QUOTED += \
 "../CC1310_LAUNCHXL.c" \
 "../IIC.c" \
 "../RadioSend.c" \
+"../arduinoCom.c" \
+"../arduinoComTest.c" \
 "../betaMain.c" \
 "../betaRadioTest.c" \
 "../ccfg.c" \
+"../config_parse.c" \
 "../eeprom.c" \
+"../eepromTest.c" \
 "../sensors.c" \
 "../serialize.c" \
 "../uArtEcho.c" 
+
+A_SRCS__QUOTED += \
+"../libiniparser.a" 
 
 

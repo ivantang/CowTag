@@ -143,8 +143,7 @@ struct temperatureData getObjTemp(){
 
 struct heartrateData getHeartRate(){
 	struct heartrateData heartratedata;
-	int write_reg, read_reg;
-	int i;
+//	int write_reg, read_reg;
 	bool internal_temp = false;
 	uint16_t numValues = 1;
 	//check if device is connected

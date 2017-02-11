@@ -31,27 +31,28 @@
  */
 
 /***** Includes *****/
-
+#include <debug.h>
 #include <alphaRadioTest.h>
 #include <radioProtocol.h>
+
+/* XDCtools Header files */
 #include <xdc/std.h>
 #include <xdc/runtime/System.h>
+
+/* BIOS Header files */
 #include <ti/sysbios/BIOS.h>
 #include <ti/sysbios/knl/Task.h>
 #include <ti/sysbios/knl/Semaphore.h>
 #include <ti/sysbios/knl/Event.h>
 
-/* Drivers */
+/***** Drivers *****/
 #include <ti/drivers/PIN.h>
-#include <ti/mw/display/Display.h>
-#include <ti/mw/display/DisplayExt.h>
+#include <RadioReceive.h>
+#include <sensors.h>
 
 /* Board Header files */
-#include "Board.h"
-#include "RadioReceive.h"
-#include "radioProtocol.h"
-#include "debug.h"
-
+#include <Board.h>
+#include <pinTable.h>
 
 /***** Defines *****/
 #define CONCENTRATOR_TASK_STACK_SIZE 1024
@@ -69,7 +70,6 @@ struct BetaSensorNode {
 	int8_t latestRssi;
 };
 
-
 /***** Variable declarations *****/
 static Task_Params concentratorTaskParams;
 Task_Struct concentratorTask;    /* not static so you can see in ROV */
@@ -80,7 +80,6 @@ static struct sensorPacket latestActiveSensorNode;
 //struct BetaSensorNode knownSensorNodes[CONCENTRATOR_MAX_NODES];
 //static struct BetaSensorNode* lastAddedSensorNode = knownSensorNodes;
 static int i = 0;
-
 
 /***** Prototypes *****/
 static void concentratorTaskFunction(UArg arg0, UArg arg1);
@@ -136,7 +135,7 @@ static void concentratorTaskFunction(UArg arg0, UArg arg1)
 			i++;
 			printNodes();
 		}
-
+		
 	}
 }
 
@@ -210,5 +209,3 @@ void printNodes(void) {
 		lastAddedSensorNode = knownSensorNodes;
 	}
 }*/
-
-

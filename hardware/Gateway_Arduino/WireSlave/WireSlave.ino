@@ -15,15 +15,16 @@ void loop() {
 // function that executes whenever data is received from master
 // this function is registered as an event, see setup()
 void receiveEvent(int howMany) {
-  Serial.print("First\n");
-  while (1 < Wire.available()) { // loop through all but the last
-    char c = Wire.read(); // receive byte as a character
-    Serial.print(c);         // print the character
-    Serial.print("SEcond\n");
+  Serial.println("Receiving");
+  while (1 <= Wire.available()) { // loop through all but the last
+    int c = Wire.read(); // receive byte as a character
+    Serial.println(c);         // print the character
   }
-  int x = Wire.read();    // receive byte as an integer
-  Serial.println(x);         // print the integer
-  Serial.print("Done\n");
+  Serial.println("Done");
+
+//  int x = Wire.read();    // receive byte as an integer
+//  Serial.println(x);         // print the integer
+//  Serial.print("Done\n");
 }
 
 // Initialize Serial port

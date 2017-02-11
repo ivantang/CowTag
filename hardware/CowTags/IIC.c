@@ -16,16 +16,14 @@
 #include <ti/drivers/UART.h> //i2c
 
 /* Example/Board Header files */
-#include "Board.h"
-#include "boolean.h"
+#include <Board.h>
 #include <debug.h>
 #include <stdint.h>
 #include <assert.h>
 
-
 //callback function for i2c callback mode, currently not using blocking mode so not using this
 //can implement this later when needed
-static void transferCallback(I2C_Handle handle, I2C_Transaction *transac, bool result)
+void transferCallback(I2C_Handle handle, I2C_Transaction *transac, bool result)
 {
     // Set length bytes
     if (result) {
@@ -39,7 +37,7 @@ static void transferCallback(I2C_Handle handle, I2C_Transaction *transac, bool r
 }
 
 //sends 8bit value to target i2c board address
-static void writeI2C(uint8_t board_address, uint8_t value){
+void writeI2C(uint8_t board_address, uint8_t value){
 	uint8_t			txBuffer[1];
 	uint8_t         rxBuffer[1];
 
@@ -85,8 +83,9 @@ static void writeI2C(uint8_t board_address, uint8_t value){
  * @bytes[0]   slave address
  * @bytes[1..] data
  */
-static void writeI2Ceeprom(uint8_t slaveAddr, uint8_t bytes[]) {
-	uint8_t			txBuffer[3];
+void writeI2Ceeprom(uint8_t slaveAddr, uint8_t bytes[]) {
+	int numBytes = 3;  // num bytes per eeprom request
+	uint8_t			txBuffer[numBytes];
 	uint8_t         rxBuffer[1];
 
 	I2C_Transaction t_i2cTransaction;
@@ -113,6 +112,7 @@ static void writeI2Ceeprom(uint8_t slaveAddr, uint8_t bytes[]) {
     t_i2cTransaction.readCount = 0;
     t_i2cTransaction.slaveAddress = slaveAddr;
 
+
 	t_handle = I2C_open(Board_I2C, &t_params);
 	if (t_handle == NULL) {
 		System_abort("Error Initializing I2C for Transmitting\n");
@@ -129,7 +129,7 @@ static void writeI2Ceeprom(uint8_t slaveAddr, uint8_t bytes[]) {
 //sends 8bit value to target address on target board address
 //first 8 bits in txbuffer is address on hardware we want to write to
 //seconds 8 bits in txbuffer is value we want to write
-static void writeI2CRegister(uint8_t board_address, uint8_t destination, uint8_t value){
+void writeI2CRegister(uint8_t board_address, uint8_t destination, uint8_t value){
 	uint8_t			txBuffer[2];
 	uint8_t         rxBuffer[1];
 
@@ -174,7 +174,7 @@ static void writeI2CRegister(uint8_t board_address, uint8_t destination, uint8_t
 }
 
 //similar to writeI2CRegister but instead takes arrays as arguments
-static void writeI2CRegisters(int8_t board_address, uint8_t destination[], uint8_t value[]){
+void writeI2CRegisters(int8_t board_address, uint8_t destination[], uint8_t value[]){
 	unsigned int 	i;
 	uint8_t			txBuffer[sizeof(destination)+sizeof(value) + 2];
 	uint8_t         rxBuffer[1];
@@ -230,7 +230,7 @@ static void writeI2CRegisters(int8_t board_address, uint8_t destination[], uint8
 }
 
 //reads 8bit * 3 from target address
-static uint32_t readI2CWord100kHz(uint8_t board_address, uint8_t address){
+uint32_t readI2CWord100kHz(uint8_t board_address, uint8_t address){
 	uint8_t			txBuffer[1] = {address};
 	uint8_t			rxBuffer[3];
 
@@ -277,7 +277,7 @@ static uint32_t readI2CWord100kHz(uint8_t board_address, uint8_t address){
 
 //input board address and address of register you want to read
 //returns 8bit value in the register
-static uint8_t readI2CRegister(uint8_t board_address, uint8_t address){
+uint8_t readI2CRegister(uint8_t board_address, uint8_t address){
 	uint8_t			txBuffer[1] = {address};
 	uint8_t			rxBuffer[1];
 
@@ -317,7 +317,7 @@ static uint8_t readI2CRegister(uint8_t board_address, uint8_t address){
 
 }
 
-static uint8_t readI2CRegister100kHz(uint8_t board_address, uint8_t address){
+uint8_t readI2CRegister100kHz(uint8_t board_address, uint8_t address){
 	uint8_t			txBuffer[1] = {address};
 	uint8_t			rxBuffer[1];
 
@@ -356,7 +356,7 @@ static uint8_t readI2CRegister100kHz(uint8_t board_address, uint8_t address){
     return rxBuffer[0];
 }
 
-static uint8_t readEEPROMaddress(uint8_t slaveaddr, uint8_t addrHigh, uint8_t addrLow) {
+uint8_t readEEPROMaddress(uint8_t slaveaddr, uint8_t addrHigh, uint8_t addrLow) {
 	uint8_t			txBuffer[2];
 	uint8_t			rxBuffer[1];
 

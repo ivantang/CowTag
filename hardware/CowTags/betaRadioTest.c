@@ -31,94 +31,71 @@
  */
 
 /***** Includes *****/
-
-#include <betaRadioTest.h>
-#include <radioProtocol.h>
-#include <RadioSend.h>
 #include <debug.h>
-#include <xdc/std.h>
+#include <radioProtocol.h>
+#include <betaRadioTest.h>
+
+/* XDCtools Header files */
 #include <xdc/runtime/System.h>
 
-#include <ti/sysbios/BIOS.h>
+/* BIOS Header files */
 #include <ti/sysbios/knl/Task.h>
-#include <ti/sysbios/knl/Semaphore.h>
-#include <ti/sysbios/knl/Event.h>
-#include <ti/sysbios/knl/Clock.h>
 
+/* Drivers */
 #include <ti/drivers/PIN.h>
+#include <RadioSend.h>
+#include <sensors.h>
+#include <eeprom.h>
 
 /* Board Header files */
-#include "Board.h"
-#include "debug.h"
-#include "pinTable.h"
-<<<<<<< HEAD
-#include "eeprom.h"
-=======
-#include "RadioSend.h"
->>>>>>> refs/remotes/origin/master
-
+#include <Board.h>
+#include <pinTable.h>
 
 /***** Defines *****/
-#define NODE_TASK_STACK_SIZE 1024
-#define NODE_TASK_PRIORITY   3
+#define BETARADIOTEST_TASK_STACK_SIZE 1024
+#define BETARADIOTEST_TASK_PRIORITY   3
 
-#define NODE_EVENT_ALL                  0xFFFFFFFF
-#define NODE_EVENT_NEW_VALUE    (uint32_t)(1 << 0)
-
-
-/***** Variable declarations *****/
-static Task_Params nodeTaskParams;
-Task_Struct nodeTask;    /* not static so you can see in ROV */
-static uint8_t nodeTaskStack[NODE_TASK_STACK_SIZE];
-Event_Struct nodeEvent;  /* not static so you can see in ROV */
-static Event_Handle nodeEventHandle;
-
-/*constants*/
-//static struct sampleData sampledata;
+/***** Variable Declarations *****/
+static Task_Params betaRadioTestTaskParams;
+Task_Struct betaRadioTestTask;    /* not static so you can see in ROV */
+static uint8_t betaRadioTestTaskStack[BETARADIOTEST_TASK_STACK_SIZE];
 
 /***** Prototypes *****/
-static void nodeTaskFunction(UArg arg0, UArg arg1);
-void fastReportTimeoutCallback(UArg arg0);
-void betaCallBack(struct sampleData newsampledata);
+static void betaRadioTestTaskFunction(UArg arg0, UArg arg1);
+void printSampleData(struct sampleData sampleData);
 
-
-/***** Function definitions *****/
+/***** Function Definitions *****/
 void betaRadioTest_init(void)
 {
-	/* Create event used internally for state changes */
-	Event_Params eventParam;
-	Event_Params_init(&eventParam);
-	Event_construct(&nodeEvent, &eventParam);
-	nodeEventHandle = Event_handle(&nodeEvent);
-
-	/* Create the node task */
-	Task_Params_init(&nodeTaskParams);
-	nodeTaskParams.stackSize = NODE_TASK_STACK_SIZE;
-	nodeTaskParams.priority = NODE_TASK_PRIORITY;
-	nodeTaskParams.stack = &nodeTaskStack;
-	Task_construct(&nodeTask, nodeTaskFunction, &nodeTaskParams, NULL);
+	/* Create the betaRadioTest task */
+	Task_Params_init(&betaRadioTestTaskParams);
+	betaRadioTestTaskParams.stackSize = BETARADIOTEST_TASK_STACK_SIZE;
+	betaRadioTestTaskParams.priority = BETARADIOTEST_TASK_PRIORITY;
+	betaRadioTestTaskParams.stack = &betaRadioTestTaskStack;
+	Task_construct(&betaRadioTestTask, betaRadioTestTaskFunction, &betaRadioTestTaskParams, NULL);
 }
 
-// write thrice and send thrice!
-static void nodeTaskFunction(UArg arg0, UArg arg1)
+static void betaRadioTestTaskFunction(UArg arg0, UArg arg1)
 {
-
-//		sampledata.tempData = getObjTemp();
-//		sampledata.accelerometerData = getAcceleration();
-//		sampledata.heartRateData = getHeartRate();
-//		int delay = 10000;
-//		CPUdelay(delay*1000);
-
-	// fake sensor data
+	if(verbose_betaRadioTest){System_printf("Initializing betaRadioTest...\n");}
+	struct sampleData sampledata;
 	sampledata.cowID = 1;
 	sampledata.packetType = RADIO_PACKET_TYPE_SENSOR_PACKET;
 	sampledata.timestamp = 0x12345678;
-	sampledata.tempData.temp_h = 0x5678;
-	sampledata.tempData.temp_l = 0x8765;
-	sampledata.heartRateData.rate_h = 0x7890;
-	sampledata.heartRateData.rate_l = 0x0987;
-	sampledata.heartRateData.temp_h = 0x2345;
-	sampledata.heartRateData.temp_l = 0x5432;
+
+	if(sampledata.packetType == RADIO_PACKET_TYPE_SENSOR_PACKET){
+		sampledata.tempData.temp_h = 0x78;
+		sampledata.tempData.temp_l = 0x65;
+		sampledata.heartRateData.rate_h = 0x90;
+		sampledata.heartRateData.rate_l = 0x87;
+		sampledata.heartRateData.temp_h = 0x45;
+		sampledata.heartRateData.temp_l = 0x32;
+	}
+	else{
+		sampledata.accelerometerData.x = 0x78;
+		sampledata.accelerometerData.y = 0x89;
+		sampledata.accelerometerData.z = 0x90;
+	}
 	sampledata.error = 0;
 
 	eeprom_reset();
@@ -127,29 +104,58 @@ static void nodeTaskFunction(UArg arg0, UArg arg1)
 	int i;
 	for (i = 0; i < 62; ++i) {
 		eeprom_write(&sampledata);
-
 	}
 
 	struct sampleData sample2;
-
 
 	bool none = eeprom_getNext(&sample2);
 	int receivedPackets = 1;
 	if (!none) {
 		do {
+			int delay = 10000;
+			CPUdelay(delay*1000);
 			enum NodeRadioOperationStatus results = betaRadioSendData(sample2);
 
-			System_printf("Error: %x @ packet: %d\n", sampledata.error, receivedPackets);
+			if(verbose_betaRadioTest){System_printf("Error: %x @ packet: %d\n", sampledata.error, receivedPackets);}
 			// catch a timeout
 			if (results == NodeRadioStatus_Failed) {
 				break;
 			}
 
-			PIN_setOutputValue(ledPinHandle, NODE_ACTIVITY_LED, !PIN_getOutputValue(NODE_ACTIVITY_LED) );
+			/* Toggle activity LED */
+			PIN_setOutputValue(ledPinHandle, BETARADIOTEST_ACTIVITY_LED, !PIN_getOutputValue(BETARADIOTEST_ACTIVITY_LED) );
 			++receivedPackets;
 		} while (!eeprom_getNext(&sample2));
 	}
 
-	System_printf("DONE: %d\n", receivedPackets);
+	if(verbose_betaRadioTest){System_printf("DONE: %d\n", receivedPackets);}
+	if(verbose_betaRadioTest){System_printf("finished betaRadioTest...\n");}
 }
 
+void printSampleData(struct sampleData sampledata){
+	System_printf("BetaRadio: sent packet with CowID = %i, "
+											"PacketType: %i, "
+											"Timestamp: %i, "
+											"Error: %i, ",
+											sampledata.cowID,
+											sampledata.packetType,
+											sampledata.timestamp,
+											sampledata.error);
+	if(sampledata.packetType == RADIO_PACKET_TYPE_SENSOR_PACKET){
+	System_printf(							"TemperatureCowData = %i.%i, "
+											"AmbientTemperatureData = %i.%i, "
+											"InfraredData = %i.%i\n ",
+											sampledata.tempData.temp_h,
+											sampledata.tempData.temp_l,
+											sampledata.heartRateData.temp_h,
+											sampledata.heartRateData.temp_l,
+											sampledata.heartRateData.rate_h,
+											sampledata.heartRateData.rate_l);
+	}
+	else{
+	System_printf(							"accelerometerData= x=%i, y=%i, z=%i\n",
+											sampledata.accelerometerData.x,
+											sampledata.accelerometerData.y,
+											sampledata.accelerometerData.z);
+	}
+}

@@ -9,7 +9,7 @@
 #define PINTABLE_H_
 
 /*leds*/
-#define NODE_ACTIVITY_LED Board_LED0 			// for beta
+#define BETARADIOTEST_ACTIVITY_LED Board_LED0 			// for beta
 #define CONCENTRATOR_ACTIVITY_LED Board_LED1 	// for alpha
 
 /* Global memory storage for a PIN_Config table */
@@ -28,7 +28,5 @@ static PIN_Config ledPinTable[] = {
 };
 
 /************************/
-
-
 
 #endif /* PINTABLE_H_ */

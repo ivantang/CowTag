@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-char* returnLine_str_explicit_filename(char const* filename,
+char* VarFromConfigStrExplicitFilename(char const* filename,
                                        char const* searchString,
                                        int* ret) {
   // Copy searchString to a mutable variable
@@ -48,12 +48,12 @@ char* returnLine_str_explicit_filename(char const* filename,
   return (char *)"";
 }
 
-char* returnLine_str(char const* searchString, int* ret) {
-  return returnLine_str_explicit_filename("../global.conf", searchString, ret);
+char* varFromConfigStr(char const* searchString, int* ret) {
+  return varFromConfigStrExplicitFilename("../global.conf", searchString, ret);
 }
 
-int returnLine_int(char const* searchString, int* ret) {
-  char *var = returnLine_str(searchString, ret);
+int varFromConfigInt(char const* searchString, int* ret) {
+  char *var = varFromConfigStr(searchString, ret);
 
   return atoi(var);
 }

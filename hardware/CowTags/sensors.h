@@ -99,7 +99,7 @@ void Sensors_init(void);
 
 //void echoFxn(UArg arg0, UArg arg1);
 struct accelerationData  getAcceleration();
-struct temperatureData getObjTemp();
+struct temperatureData getTemp();
 struct heartrateData  getHeartRate();
 void testSensors();
 

@@ -29,6 +29,8 @@
 #define ALPHA_ADDRESS 0X1
 #define GATEWAY_ADDRESS 0X3
 
+#define NUM_ACCELERATION_PACKETS				30
+
 struct PacketHeader {
     uint8_t sourceAddress;  // current hardware id
     uint8_t packetType;
@@ -64,6 +66,12 @@ struct sampleData {
 };
 
 /* our custom packet with sensor info */
+struct accelerationPacket{
+	struct PacketHeader header;
+	struct accelerationSample accelerationSample[NUM_ACCELERATION_PACKETS];
+};
+
+/* our custom beta packet with sensor info */
 struct sensorPacket{
 	struct PacketHeader header;
 	struct sampleData sampledata;

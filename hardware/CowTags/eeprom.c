@@ -5,43 +5,59 @@
  *      Author: Ivan
  */
 
+/***** Includes *****/
+#include <debug.h>
+#include <config.h>
+#include <radioProtocol.h>
+#include <eeprom.h>
+#include <serialize.h>
+
 /* XDCtools Header files */
 #include <xdc/std.h>
 #include <xdc/runtime/System.h>
-#include <xdc/runtime/Timestamp.h>
 
 /* BIOS Header files */
 #include <ti/sysbios/BIOS.h>
-#include <ti/sysbios/knl/Clock.h> //i2c
 #include <ti/sysbios/knl/Semaphore.h>
-#include <ti/sysbios/knl/Task.h>
 
 /* TI-RTOS Header files */
-#include <ti/drivers/PIN.h>
 #include <ti/drivers/I2C.h> //i2c library
-#include <ti/drivers/UART.h> //UART library
 
 /* Example/Board Header files */
-#include "Board.h"
+#include <Board.h>
 #include <debug.h>
 #include <stdint.h>
+#include <stdbool.h>
 #include <assert.h>
 
-#include "eeprom.h"
-#include "serialize.h"
-#include <IIC.c>
+/* Drivers */
+#include <ti/drivers/I2C.h> //i2c
 #include <IIC.h>
 
-bool eeprom_semaphoreInit = false;
-bool eeprom_hasWrapped = false;
+/***** Defines *****/
+#define BOARD_24LC256 0x50	//slave address for first eeprom (a1a2a3 = 000)
+
+/***** Variable Declarations *****/
 uint16_t eeprom_currentAddress = MIN_EEPROM_ADDRESS;
 uint16_t eeprom_lastAddress = MIN_EEPROM_ADDRESS;
-
-// sync primitive for eeprom
+bool eeprom_semaphoreInit = false;
+bool eeprom_hasWrapped = false;
 Semaphore_Struct eepromSem;
 Semaphore_Handle eepromSemHandle;
 
+/***** Prototypes *****/
+void eeprom_readAddress(uint8_t addrHigh, uint8_t addrLow, int numByte, uint8_t *buf);
+/* diagnostic */
+bool eeprom_isEmpty();
+bool eeprom_canFit();
+int eeprom_spaceLeft();  // number of samples that can fit
+/* assertions */
+void assertAddress(uint16_t address);
+void assertSemaphore();
+
+/***** Function Definition *****/
 bool eeprom_write(struct sampleData *data) {
+	if(verbose_eeprom){System_printf("Starting eepromWrite\n");System_flush();}
 	assertAddress(eeprom_currentAddress);
 	assertSemaphore();
 
@@ -89,6 +105,7 @@ bool eeprom_write(struct sampleData *data) {
 	/* return eeprom access semaphore */
 	Semaphore_post(eepromSemHandle);
 
+	if(verbose_eeprom){System_printf("Finsihed eepromWrite\n");System_flush();}
 	return true;
 }
 
@@ -108,6 +125,7 @@ void eeprom_readAddress(uint8_t addrHigh, uint8_t addrLow, int numBytes, uint8_t
 }
 
 bool eeprom_getNext(struct sampleData *data) {
+	if(verbose_eeprom){System_printf("Starting eepromGetNext\n");System_flush();}
 	uint8_t buf[SAMPLE_SIZE];
 
 	// has wrapped: start back from beginning to read ALL samples
@@ -132,10 +150,11 @@ bool eeprom_getNext(struct sampleData *data) {
 
 		} else {
 			eeprom_currentAddress = eeprom_lastAddress = MIN_EEPROM_ADDRESS;
+			if(verbose_eeprom){System_printf("Finished eepromGetNext\n");System_flush();}
 			return true;  // DONE
 		}
 	}
-
+	if(verbose_eeprom){System_printf("Finished eepromGetNext\n");System_flush();}
 	return false;  // NOT DONE
 }
 
@@ -143,7 +162,7 @@ bool eeprom_getNext(struct sampleData *data) {
  * Sets the address pointer on EEPROM to addrHigh and addrLow
  * Returns the value in addrHigh addrLow as well as the next readNum #'s of values in array
  * Increments address pointer to next entry after the last read
- * */
+ *
 static void eeprom_readPage(uint8_t addrHigh, uint8_t addrLow, uint8_t rxBuffer[]) {
 	uint8_t			txBuffer[2];
 
@@ -174,15 +193,16 @@ static void eeprom_readPage(uint8_t addrHigh, uint8_t addrLow, uint8_t rxBuffer[
 	}
 
 	I2C_close(handle);
-}
+}*/
 
 void eeprom_reset() {
+	if(verbose_eeprom){System_printf("Reseting EEPROM\n");System_flush();}
 	eeprom_currentAddress = MIN_EEPROM_ADDRESS;
 	eeprom_lastAddress = MIN_EEPROM_ADDRESS;
+	if(verbose_eeprom){System_printf("Reset COMPLETE\n");System_flush();}
 }
 
-/*** diagnostic ***/
-
+/* diagnostic */
 bool eeprom_isEmpty() {
 	if (eeprom_currentAddress == MIN_EEPROM_ADDRESS) {
 		return true;
@@ -204,13 +224,13 @@ int eeprom_spaceLeft() {
 	return remainingAddresses / SAMPLE_SIZE;
 }
 
-/*** assertions ***/
-
+/* assertions */
 void assertAddress(uint16_t address) {
 	assert(address <= MAX_EEPROM_ADDRESS);
 }
 
 void assertSemaphore() {
+	if(verbose_eeprom){System_printf("Asserting EEPROM SEMAPHORE\n");System_flush();}
 	if (!eeprom_semaphoreInit) {
 		eeprom_semaphoreInit = true;
 
@@ -219,4 +239,5 @@ void assertSemaphore() {
 		Semaphore_construct(&eepromSem, 1, &semParam);
 		eepromSemHandle = Semaphore_handle(&eepromSem);
 	}
+	if(verbose_eeprom){System_printf("finished asserting EEPROM SEMAPHORE\n");System_flush();}
 }

@@ -219,14 +219,6 @@ static void rxDoneCallback(EasyLink_RxPacket * rxPacket, EasyLink_Status status)
             /* Signal packet received */
             Event_post(radioOperationEventHandle, RADIO_EVENT_VALID_PACKET_RECEIVED);
         }
-        else if (tmpRxPacket->header.packetType == RADIO_PACKET_TYPE_DM_SENSOR_PACKET)
-        {
-            /* Save packet */
-            memcpy((void*)&latestRxPacket, &rxPacket->payload, sizeof(struct sensorPacket));
-
-            /* Signal packet received */
-            Event_post(radioOperationEventHandle, RADIO_EVENT_VALID_PACKET_RECEIVED);
-        }
         else
         {
             /* Signal invalid packet received */

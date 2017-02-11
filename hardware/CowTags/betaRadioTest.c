@@ -31,141 +31,113 @@
  */
 
 /***** Includes *****/
-
-#include <betaRadioTest.h>
-#include <radioProtocol.h>
-#include <RadioSend.h>
 #include <debug.h>
-#include <xdc/std.h>
+#include <radioProtocol.h>
+#include <betaRadioTest.h>
+
+/* XDCtools Header files */
 #include <xdc/runtime/System.h>
 
-#include <ti/sysbios/BIOS.h>
+/* BIOS Header files */
 #include <ti/sysbios/knl/Task.h>
-#include <ti/sysbios/knl/Semaphore.h>
-#include <ti/sysbios/knl/Event.h>
-#include <ti/sysbios/knl/Clock.h>
 
+/* Drivers */
 #include <ti/drivers/PIN.h>
+#include <RadioSend.h>
+#include <sensors.h>
 
 /* Board Header files */
-#include "Board.h"
-#include "debug.h"
-#include "pinTable.h"
-
+#include <Board.h>
+#include <pinTable.h>
 
 /***** Defines *****/
-#define NODE_TASK_STACK_SIZE 1024
-#define NODE_TASK_PRIORITY   3
+#define BETARADIOTEST_TASK_STACK_SIZE 1024
+#define BETARADIOTEST_TASK_PRIORITY   3
 
-#define NODE_EVENT_ALL                  0xFFFFFFFF
-#define NODE_EVENT_NEW_VALUE    (uint32_t)(1 << 0)
-
-/* A change mask of 0xFF0 means that changes in the lower 4 bits does not trigger a wakeup. */
-//#define NODE_ADCTASK_CHANGE_MASK                    0xFF0
-
-/* Minimum slow Report interval is 50s (in units of samplingTime)*/
-//#define NODE_ADCTASK_REPORTINTERVAL_SLOW                50
-/* Minimum fast Report interval is 1s (in units of samplingTime) for 30s*/
-//#define NODE_ADCTASK_REPORTINTERVAL_FAST                1
-//#define NODE_ADCTASK_REPORTINTERVAL_FAST_DURIATION_MS   30000
-
-
-
-/***** Variable declarations *****/
-static Task_Params nodeTaskParams;
-Task_Struct nodeTask;    /* not static so you can see in ROV */
-static uint8_t nodeTaskStack[NODE_TASK_STACK_SIZE];
-Event_Struct nodeEvent;  /* not static so you can see in ROV */
-static Event_Handle nodeEventHandle;
-
-/* Clock for the fast report timeout */
-//Clock_Struct fastReportTimeoutClock;     /* not static so you can see in ROV */
-//static Clock_Handle fastReportTimeoutClockHandle;
-
-/*constants*/
-static struct sampleData sampledata;
+/***** Variable Declarations *****/
+static Task_Params betaRadioTestTaskParams;
+Task_Struct betaRadioTestTask;    /* not static so you can see in ROV */
+static uint8_t betaRadioTestTaskStack[BETARADIOTEST_TASK_STACK_SIZE];
 
 /***** Prototypes *****/
-static void nodeTaskFunction(UArg arg0, UArg arg1);
-void fastReportTimeoutCallback(UArg arg0);
-void betaCallBack(struct sampleData newsampledata);
+static void betaRadioTestTaskFunction(UArg arg0, UArg arg1);
+void printSampleData(struct sampleData sampleData);
 
-
-/***** Function definitions *****/
+/***** Function Definitions *****/
 void betaRadioTest_init(void)
 {
-
-	/* Create event used internally for state changes */
-	Event_Params eventParam;
-	Event_Params_init(&eventParam);
-	Event_construct(&nodeEvent, &eventParam);
-	nodeEventHandle = Event_handle(&nodeEvent);
-
-	/* Create clock object which is used for fast report timeout */
-	/*Clock_Params clkParams;
-	clkParams.period = 0;
-	clkParams.startFlag = FALSE;
-	Clock_construct(&fastReportTimeoutClock, fastReportTimeoutCallback, 1, &clkParams);
-	fastReportTimeoutClockHandle = Clock_handle(&fastReportTimeoutClock);*/
-
-	/* Create the node task */
-	Task_Params_init(&nodeTaskParams);
-	nodeTaskParams.stackSize = NODE_TASK_STACK_SIZE;
-	nodeTaskParams.priority = NODE_TASK_PRIORITY;
-	nodeTaskParams.stack = &nodeTaskStack;
-	Task_construct(&nodeTask, nodeTaskFunction, &nodeTaskParams, NULL);
+	/* Create the betaRadioTest task */
+	Task_Params_init(&betaRadioTestTaskParams);
+	betaRadioTestTaskParams.stackSize = BETARADIOTEST_TASK_STACK_SIZE;
+	betaRadioTestTaskParams.priority = BETARADIOTEST_TASK_PRIORITY;
+	betaRadioTestTaskParams.stack = &betaRadioTestTaskStack;
+	Task_construct(&betaRadioTestTask, betaRadioTestTaskFunction, &betaRadioTestTaskParams, NULL);
 }
 
-
-static void nodeTaskFunction(UArg arg0, UArg arg1)
+static void betaRadioTestTaskFunction(UArg arg0, UArg arg1)
 {
-	/* setup timeout for fast report timeout */
-	//Clock_setTimeout(fastReportTimeoutClockHandle,
-	//		NODE_ADCTASK_REPORTINTERVAL_FAST_DURIATION_MS * 1000 / Clock_tickPeriod);
-
-	/* start fast report and timeout */
-	//Clock_start(fastReportTimeoutClockHandle);
-
+	if(verbose_betaRadioTest){System_printf("Initializing betaRadioTest...\n");}
 	while(1) {
-		sampledata.tempData = getObjTemp();
-		sampledata.accelerometerData = getAcceleration();
-		sampledata.heartRateData = getHeartRate();
+		struct sampleData sampledata;
+		sampledata.cowID = 1;
+		sampledata.packetType = RADIO_PACKET_TYPE_SENSOR_PACKET;
+		sampledata.timestamp = 0x12345678;
+
+		if(sampledata.packetType == RADIO_PACKET_TYPE_SENSOR_PACKET){
+		sampledata.tempData.temp_h = 0x78;
+		sampledata.tempData.temp_l = 0x65;
+		sampledata.heartRateData.rate_h = 0x90;
+		sampledata.heartRateData.rate_l = 0x87;
+		sampledata.heartRateData.temp_h = 0x45;
+		sampledata.heartRateData.temp_l = 0x32;
+		}
+		else{
+		sampledata.accelerometerData.x = 0x78;
+		sampledata.accelerometerData.y = 0x89;
+		sampledata.accelerometerData.z = 0x90;
+		}
+		sampledata.error = 0;
+
 		int delay = 10000;
 		CPUdelay(delay*1000);
 
 		/* Toggle activity LED */
-		PIN_setOutputValue(ledPinHandle, NODE_ACTIVITY_LED, !PIN_getOutputValue(NODE_ACTIVITY_LED) );
+		PIN_setOutputValue(ledPinHandle, BETARADIOTEST_ACTIVITY_LED, !PIN_getOutputValue(BETARADIOTEST_ACTIVITY_LED) );
 
 		/* Send value to concentrator */
 		betaRadioSendData(sampledata);
-		if(verbose_antennas){
-						System_printf("BetaRadio: sent packet with Temp_Data = %i, "
-																  "Acc_Data= x=%i y=%i z=%i, "
-								      	  	  	  	  	  	  	  "IR_Data_H = %i, IR_Data_L = %i \n",
-																  sampledata.tempData.temp_h,
-																  sampledata.accelerometerData.x,
-																  sampledata.accelerometerData.y,
-																  sampledata.accelerometerData.z,
-																  sampledata.heartRateData.rate_h,
-																  sampledata.heartRateData.rate_l);
-						System_printf("Timestamps for Temp_Data = %i, "
-														"Acc_Data = %i, "
-															"IR_Data_H = %i\n",
-															sampledata.tempData.timestamp,
-															sampledata.accelerometerData.timestamp,
-															sampledata.heartRateData.timestamp);
-						System_flush();
+		if(verbose_betaRadioTest){
+			printSampleData(sampledata);
+			System_flush();
 		}
+	if(verbose_betaRadioTest){System_printf("finished betaRadioTest...\n");}
 	}
 }
 
-//void betaCallBack(struct sampleData newsampledata){
-//	sampledata = newsampledata;
-//	Event_post(nodeEventHandle, NODE_EVENT_NEW_VALUE);
-//}
-
-/*void fastReportTimeoutCallback(UArg arg0)
-{
-	//stop fast report
-	SceAdc_setReportInterval(NODE_ADCTASK_REPORTINTERVAL_SLOW, NODE_ADCTASK_CHANGE_MASK);
-}*/
+void printSampleData(struct sampleData sampledata){
+	System_printf("BetaRadio: sent packet with CowID = %i, "
+											"PacketType: %i, "
+											"Timestamp: %i, "
+											"Error: %i, ",
+											sampledata.cowID,
+											sampledata.packetType,
+											sampledata.timestamp,
+											sampledata.error);
+	if(sampledata.packetType == RADIO_PACKET_TYPE_SENSOR_PACKET){
+	System_printf(							"TemperatureCowData = %i.%i, "
+											"AmbientTemperatureData = %i.%i, "
+											"InfraredData = %i.%i\n ",
+											sampledata.tempData.temp_h,
+											sampledata.tempData.temp_l,
+											sampledata.heartRateData.temp_h,
+											sampledata.heartRateData.temp_l,
+											sampledata.heartRateData.rate_h,
+											sampledata.heartRateData.rate_l);
+	}
+	else{
+	System_printf(							"accelerometerData= x=%i, y=%i, z=%i\n",
+											sampledata.accelerometerData.x,
+											sampledata.accelerometerData.y,
+											sampledata.accelerometerData.z);
+	}
+}

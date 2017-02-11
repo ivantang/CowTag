@@ -6,11 +6,10 @@
  *      Author: annik
  */
 
-#ifndef TASKS_BETARADIO_H_
-#define TASKS_BETARADIO_H_
+#ifndef RADIOSEND_H_
+#define RADIOSEND_H_
 
-#include "stdint.h"
-#include "radioProtocol.h"
+#include <radioProtocol.h>
 
 enum NodeRadioOperationStatus {
     NodeRadioStatus_Success,

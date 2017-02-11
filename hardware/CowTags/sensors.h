@@ -11,7 +11,7 @@
 /* TI-RTOS Header files */
 #include <ti/drivers/I2C.h> //i2c
 #include <ti/drivers/UART.h> //i2c
-
+#include <radioProtocol.h>
 /*initialize node task and create TI-RTOS objects*/
 void Sensors_init(void);
 
@@ -96,24 +96,6 @@ void Sensors_init(void);
 #define	MAX30100_SPC_PW_1600US_16BITS	0x03	//default LEDPulseWidth
 #define	MAX30100_LED_CURR_50MA			0x0f	//default LEDcurrent
 #define MAX30100_SPC_SPO2_HI_RES_EN     (1 << 6)
-
-struct temperatureData {
-	uint8_t temp_l;
-	uint8_t temp_h;
-};
-
-struct accelerationData {
-	uint8_t x;
-	uint8_t y;
-	uint8_t z;
-};
-
-struct heartrateData {
-	uint8_t temp_l;
-	uint8_t temp_h;
-	uint8_t rate_l;
-	uint8_t rate_h;
-};
 
 //void echoFxn(UArg arg0, UArg arg1);
 struct accelerationData  getAcceleration();

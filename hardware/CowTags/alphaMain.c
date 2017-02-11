@@ -5,51 +5,58 @@
  *      Author: annik
  */
 
+/***** Includes *****/
+#include <debug.h>
+
 /* XDCtools Header files */
-#include <alphaRadioTest.h>
-#include <betaRadioTest.h>
-#include <RadioSend.h>
-#include <sensors.h>
-#include <xdc/std.h>
 #include <xdc/runtime/System.h>
 
 /* BIOS Header files */
 #include <ti/sysbios/BIOS.h>
-#include <ti/sysbios/knl/Clock.h> //i2c
-#include <ti/sysbios/knl/Task.h>
-#include <ti/drivers/Power.h> //rf
-#include <ti/drivers/power/PowerCC26XX.h> //rf
 
-/* TI-RTOS Header files */
-#include <ti/drivers/PIN.h>
+/* Board Header files */
+#include <Board.h>
+#include <pinTable.h>
 
-/*standard libraries*/
-#include <stdint.h>
-
-/*custom headers*/
-#include "Board.h"
-#include "radioProtocol.h"
-#include "pinTable.h"
-#include "RadioReceive.h"
+/*test suites*/
+#include <alphaRadioTest.h>
+#include <betaRadioTest.h>
+#include <eepromTest.h>
+#include <serializeTest.h>
+#include <arduinoComTest.h>
 
 /* Global PIN_Config table */
 PIN_State ledPinState;
 PIN_Handle ledPinHandle;
 /*******************************************/
 
-int main(void)
-{
+int main(void){
+	if(verbose_main){System_printf("Initializing tasks...\n");}
 
-	System_printf("Initializing tasks...\n");
-	System_flush();
+	//if(verbose_main){System_printf("Initializing board...\n");}
+	//Board_initGeneral(); // init board
 
-	Board_initGeneral(); // init board
+	//if(verbose_main){System_printf("Initializing sensors...\n");}
 	//Sensors_init(); // init i2C
 
-	//radioReceive_init();
-	//alphaRadioTest_init();
-	Arduino_init();
+	//if(verbose_main){System_printf("Initializing EEPROM...\n");}
+	//eeprom_testStart();
 
+	//if(verbose_main){System_printf("Initializing serialization thread...\n");}
+	//serialize_testStart();
+
+	//if(verbose_main){System_printf("Initializing radio antenna...\n");}
+	//radioReceive_init();
+
+	//if(verbose_main){System_printf("Initializing Beta tasks...\n");}
+	//alphaRadioTest_init();
+
+	//if(verbose_main){System_printf("Initializing Arduino communication...\n");}
+	//arduinoTest_init();
+
+	System_flush();
+
+	if(verbose_main){
 	/* Open LED pins */
 	ledPinHandle = PIN_open(&ledPinState, ledPinTable);
 	if(!ledPinHandle) {
@@ -59,10 +66,13 @@ int main(void)
 		//(already allocated pin in a PinList or non-existent pin in aPinList)
 	}
 	PIN_setOutputValue(ledPinHandle, Board_LED1, 1); //signal init success
+	}
 
+	if(verbose_main){
+		System_printf("Starting BIOS:\n");
+		System_flush();
+	}
 
-	System_printf("Starting BIOS:\n");
-	System_flush();
 	BIOS_start();
 
 	return (0);

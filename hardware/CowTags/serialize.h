@@ -8,9 +8,6 @@
 #ifndef SERIALIZE_H_
 #define SERIALIZE_H_
 
-#include "radioProtocol.h"
-
-
 void serializePacket(struct sampleData *data, uint8_t *buffer);
 void unserializePacket(struct sampleData *data, uint8_t *buffer);
 

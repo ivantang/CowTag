@@ -8,23 +8,40 @@
 #ifndef RADIOPROTOCOL_H_
 #define RADIOPROTOCOL_H_
 
-#include "stdint.h"
-#include <sensors.h>
-#include "easylink/EasyLink.h"
+#include <stdint.h>
+#include <easylink/EasyLink.h>
 
 #define RADIO_CONCENTRATOR_ADDRESS    0x00
 #define RADIO_NODE_ADDRESS			  0x10
 #define RADIO_EASYLINK_MODULATION     EasyLink_Phy_Custom
 
 #define RADIO_PACKET_TYPE_ACK_PACKET             0
-#define RADIO_PACKET_TYPE_ADC_SENSOR_PACKET      1
-#define RADIO_PACKET_TYPE_DM_SENSOR_PACKET       2
-#define RADIO_PACKET_TYPE_SENSOR_PACKET    		 3
-#define RADIO_PACKET_TYPE_ACCEL_PACKET           4
+#define RADIO_PACKET_TYPE_SENSOR_PACKET    		 1
+#define RADIO_PACKET_TYPE_ACCEL_PACKET           2
+
+#define SAMPLE_SIZE 13
 
 struct PacketHeader {
     uint8_t sourceAddress;  // current hardware id
     uint8_t packetType;
+};
+
+struct temperatureData {
+	uint8_t temp_l;
+	uint8_t temp_h;
+};
+
+struct accelerationData {
+	uint8_t x;
+	uint8_t y;
+	uint8_t z;
+};
+
+struct heartrateData {
+	uint8_t temp_l;
+	uint8_t temp_h;
+	uint8_t rate_l;
+	uint8_t rate_h;
 };
 
 /* will be concat of data from all sensors */
@@ -38,7 +55,7 @@ struct sampleData {
     uint8_t error;
 };
 
-/* our custom beta packet with sensor info */
+/* our custom packet with sensor info */
 struct sensorPacket{
 	struct PacketHeader header;
 	struct sampleData sampledata;

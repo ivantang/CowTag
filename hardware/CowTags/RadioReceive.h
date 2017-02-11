@@ -8,18 +8,14 @@
 #ifndef RADIORECEIVE_H_
 #define RADIORECEIVE_H_
 
-// temporary
-// to be combined into beta radio
-
-#include "stdint.h"
-#include "radioProtocol.h"
+#include <stdint.h>
+#include <radioProtocol.h>
 
 enum ConcentratorRadioOperationStatus {
     ConcentratorRadioStatus_Success,
     ConcentratorRadioStatus_Failed,
     ConcentratorRadioStatus_FailedNotConnected,
 };
-
 
 union ConcentratorPacket {
     struct PacketHeader header;
@@ -33,6 +29,5 @@ void radioReceive_init(void);
 
 /* Register the packet received callback */
 void ConcentratorRadioTask_registerPacketReceivedCallback(ConcentratorRadio_PacketReceivedCallback callback);
-
 
 #endif /* RADIORECEIVE_H_ */

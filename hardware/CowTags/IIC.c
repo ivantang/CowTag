@@ -84,8 +84,8 @@ void writeI2C(uint8_t board_address, uint8_t value){
  * @bytes[1..] data
  */
 void writeI2Ceeprom(uint8_t slaveAddr, uint8_t bytes[]) {
-	int numBytes = 3;  // num bytes per eeprom request
-	uint8_t			txBuffer[numBytes];
+	// 3 bytes per request
+	uint8_t			txBuffer[3];
 	uint8_t         rxBuffer[1];
 
 	I2C_Transaction t_i2cTransaction;
@@ -112,15 +112,12 @@ void writeI2Ceeprom(uint8_t slaveAddr, uint8_t bytes[]) {
     t_i2cTransaction.readCount = 0;
     t_i2cTransaction.slaveAddress = slaveAddr;
 
-
 	t_handle = I2C_open(Board_I2C, &t_params);
 	if (t_handle == NULL) {
+		System_printf("ABORT\n");
 		System_abort("Error Initializing I2C for Transmitting\n");
 	}
 
-//	if(I2C_transfer(t_handle, &t_i2cTransaction) == NULL){
-//		System_abort("I2C Transfer Failed\n");
-//	}
 	while(I2C_transfer(t_handle, &t_i2cTransaction) == NULL);
 
 	I2C_close(t_handle);

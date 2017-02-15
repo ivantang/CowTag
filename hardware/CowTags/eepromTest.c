@@ -182,29 +182,35 @@ void eepromTestWriteReadAccelerometer() {
 	if(verbose_eepromTest){System_printf("[eepromTestWriteReadAccelerometer]\n");System_flush();}
 
 	// test packet
-	sampledata.cowID = 1;
-	sampledata.packetType = RADIO_PACKET_TYPE_ACCEL_PACKET;
-	sampledata.timestamp = 0x12345678;
-	sampledata.accelerometerData.x = 0x78;
-	sampledata.accelerometerData.y = 0x89;
-	sampledata.accelerometerData.z = 0x90;
-	sampledata.error = 0x0;
+	struct sampleData sample;
+	sample.cowID = 1;
+	sample.packetType = RADIO_PACKET_TYPE_ACCEL_PACKET;
+	sample.timestamp = 0x12345678;
+	sample.accelerometerData.x = 0x78;
+	sample.accelerometerData.y = 0x89;
+	sample.accelerometerData.z = 0x90;
+	sample.error = 0x0;
 
 	eeprom_reset();
-	eeprom_write(&sampledata);
+	eeprom_write(&sample);
 
 	// recreate packet from serialized bytes
 	struct sampleData sample2;
 	eeprom_getNext(&sample2);
 
+	System_printf("ID: %d\n", sample2.cowID);
+	System_printf("X: %x\n", sample2.accelerometerData.x);
+	System_printf("Y: %x\n", sample2.accelerometerData.y);
+	System_printf("Z: %x\n", sample2.accelerometerData.z);
+
 	// verify unserialized packet
 	bool success = (sampledata.cowID == sample2.cowID);
-	success = (sampledata.packetType == sample2.packetType);
-	success = (sampledata.timestamp == sample2.timestamp);
-	success = (sampledata.accelerometerData.x == sample2.accelerometerData.x);
-	success = (sampledata.accelerometerData.y == sample2.accelerometerData.y);
-	success = (sampledata.accelerometerData.z == sample2.accelerometerData.z);
-	success = (sampledata.error == sample2.error);
+	success = (sample.packetType == sample2.packetType);
+	success = (sample.timestamp == sample2.timestamp);
+	success = (sample.accelerometerData.x == sample2.accelerometerData.x);
+	success = (sample.accelerometerData.y == sample2.accelerometerData.y);
+	success = (sample.accelerometerData.z == sample2.accelerometerData.z);
+	success = (sample.error == sample2.error);
 
 	if (success) {
 		if(verbose_eepromTest){System_printf("eeprom sample successfully written/read\n");System_flush();}

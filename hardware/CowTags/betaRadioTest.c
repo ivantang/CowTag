@@ -78,32 +78,32 @@ void betaRadioTest_init(void)
 static void betaRadioTestTaskFunction(UArg arg0, UArg arg1)
 {
 	if(verbose_betaRadioTest){System_printf("Initializing betaRadioTest...\n");}
-	struct sampleData sampledata;
-	sampledata.cowID = 1;
-	sampledata.packetType = RADIO_PACKET_TYPE_SENSOR_PACKET;
-	sampledata.timestamp = 0x12345678;
+	struct sampleData sample;
+	sample.cowID = 1;
+	sample.packetType = RADIO_PACKET_TYPE_SENSOR_PACKET;
+	sample.timestamp = 0x12345678;
 
-	if(sampledata.packetType == RADIO_PACKET_TYPE_SENSOR_PACKET){
-		sampledata.tempData.temp_h = 0x78;
-		sampledata.tempData.temp_l = 0x65;
-		sampledata.heartRateData.rate_h = 0x90;
-		sampledata.heartRateData.rate_l = 0x87;
-		sampledata.heartRateData.temp_h = 0x45;
-		sampledata.heartRateData.temp_l = 0x32;
+	if(sample.packetType == RADIO_PACKET_TYPE_SENSOR_PACKET){
+		sample.tempData.temp_h = 0x78;
+		sample.tempData.temp_l = 0x65;
+		sample.heartRateData.rate_h = 0x90;
+		sample.heartRateData.rate_l = 0x87;
+		sample.heartRateData.temp_h = 0x45;
+		sample.heartRateData.temp_l = 0x32;
 	}
 	else{
-		sampledata.accelerometerData.x = 0x78;
-		sampledata.accelerometerData.y = 0x89;
-		sampledata.accelerometerData.z = 0x90;
+		sample.accelerometerData.x = 0x78;
+		sample.accelerometerData.y = 0x89;
+		sample.accelerometerData.z = 0x90;
 	}
-	sampledata.error = 0;
+	sample.error = 0;
 
 	eeprom_reset();
 
 	// 10
 	int i;
-	for (i = 0; i < 62; ++i) {
-		eeprom_write(&sampledata);
+	for (i = 0; i < 31; ++i) {
+		eeprom_write(&sample);
 	}
 
 	struct sampleData sample2;
@@ -116,16 +116,16 @@ static void betaRadioTestTaskFunction(UArg arg0, UArg arg1)
 			CPUdelay(delay*1000);
 			enum NodeRadioOperationStatus results = betaRadioSendData(sample2);
 
-			if(verbose_betaRadioTest){System_printf("Error: %x @ packet: %d\n", sampledata.error, receivedPackets);}
 			// catch a timeout
 			if (results == NodeRadioStatus_Failed) {
-				break;
+				if(verbose_betaRadioTest){System_printf("Error: %x @ packet: %d\n", sample2.error, receivedPackets);}
+//				break;
 			}
 
 			/* Toggle activity LED */
 			PIN_setOutputValue(ledPinHandle, BETARADIOTEST_ACTIVITY_LED, !PIN_getOutputValue(BETARADIOTEST_ACTIVITY_LED) );
 			++receivedPackets;
-		} while (!eeprom_getNext(&sample2));
+		} while (1); //(!eeprom_getNext(&sample2));
 	}
 
 	if(verbose_betaRadioTest){System_printf("DONE: %d\n", receivedPackets);}

@@ -11,7 +11,7 @@ var makeAssembly = false;
 var Executable = xdc.module('xdc.bld.Executable');
 
 var exeOpts = new Executable.Attrs({
-        cfgScript: '/home/ivan/Documents/Github/72point5/hardware/CowTags/cowtagOS.cfg',
+        cfgScript: '/home/champ/Git/72point5/hardware/CowTags/cowtagOS.cfg',
         profile: 'release',
         cfgHome: 'configPkg',
 });
@@ -41,7 +41,7 @@ else {
 
 var thisObj = {
     cfg:        '../cowtagOS.cfg',
-    outputPath: '/home/ivan/Documents/Github/72point5/hardware/CowTags/beta_debug/configPkg',
+    outputPath: '/home/champ/Git/72point5/hardware/CowTags/beta_debug/configPkg',
     exeName:    'cowtagOS' + suffix,
     exeIntName: 'cowtagOS' + suffix.replace('.', '_'),
     targ:       targ,

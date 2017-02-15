@@ -141,7 +141,7 @@ bool eeprom_getNext(struct sampleData *data) {
 
 		// no wrapping: read samples from lastAddress to currentAddress
 	} else {
-		if (eeprom_lastAddress + SAMPLE_SIZE < eeprom_currentAddress) {
+		if (eeprom_lastAddress + SAMPLE_SIZE <= eeprom_currentAddress) {
 			eeprom_readAddress(eeprom_lastAddress >> 8, eeprom_lastAddress & 0xff, SAMPLE_SIZE, buf);
 			eeprom_lastAddress += SAMPLE_SIZE;
 

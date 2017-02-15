@@ -44,11 +44,10 @@ int main(void){
 	//serializeTestStart();
 
 	//if(verbose_main){System_printf("Initializing radio antenna...\n");}
-	//radioSend_init();
+	radioSend_init();
 
 	//if(verbose_main){System_printf("Initializing Beta tasks...\n");}
-	//betaRadioTest_init();
-	//eepromTest_init();
+	betaRadioTest_init();
 
 	System_flush();
 

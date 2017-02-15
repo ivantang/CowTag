@@ -1,7 +1,7 @@
 ******************************************************************************
-                  TI ARM Linker PC v15.12.3                    
+                  TI ARM Linker Unix v15.12.3                  
 ******************************************************************************
->> Linked Wed Feb 15 11:22:50 2017
+>> Linked Wed Feb 15 12:18:38 2017
 
 OUTPUT FILE NAME:   <CowTag.out>
 ENTRY POINT SYMBOL: "ResetISR"  address: 00003989
@@ -182,34 +182,6 @@ section   page    origin      length       input sections
                   000000d8    00000004     cowtagOS_pem3.oem3 (.const:ti_sysbios_knl_Idle_funcList__A)
                   000000dc    00000004     cowtagOS_pem3.oem3 (.const:xdc_runtime_System_extendFxn__C)
 
-.cinit     0    000000e0    0000039c     
-                  000000e0    00000212     (.cinit..data.load) [load image, compression = rle]
-                  000002f2    00000006     --HOLE-- [fill = 0]
-                  000002f8    0000002c     (.cinit..data:ti_sysbios_family_arm_m3_Hwi_Module__state__V.load) [load image, compression = rle]
-                  00000324    00000004     --HOLE-- [fill = 0]
-                  00000328    0000002c     (.cinit..data:ti_sysbios_knl_Task_Module__state__V.load) [load image, compression = rle]
-                  00000354    00000004     --HOLE-- [fill = 0]
-                  00000358    00000021     (.cinit..data:ti_sysbios_knl_Clock_Module__state__V.load) [load image, compression = rle]
-                  00000379    00000007     --HOLE-- [fill = 0]
-                  00000380    0000001f     (.cinit..data:ti_sysbios_BIOS_Module__state__V.load) [load image, compression = rle]
-                  0000039f    00000001     --HOLE-- [fill = 0]
-                  000003a0    00000011     (.cinit..data:ti_sysbios_knl_Swi_Module__state__V.load) [load image, compression = rle]
-                  000003b1    00000007     --HOLE-- [fill = 0]
-                  000003b8    0000000d     (.cinit..data:ti_sysbios_family_arm_cc26xx_Timer_Module__state__V.load) [load image, compression = rle]
-                  000003c5    00000003     --HOLE-- [fill = 0]
-                  000003c8    0000000b     (.cinit..bss.load) [load image, compression = rle]
-                  000003d3    00000005     --HOLE-- [fill = 0]
-                  000003d8    0000000a     (.cinit..data:xdc_runtime_Memory_Module__state__V.load) [load image, compression = rle]
-                  000003e2    00000006     --HOLE-- [fill = 0]
-                  000003e8    00000009     (.cinit..data:ti_sysbios_family_arm_cc26xx_TimestampProvider_Module__state__V.load) [load image, compression = rle]
-                  000003f1    00000007     --HOLE-- [fill = 0]
-                  000003f8    00000009     (.cinit..data:xdc_runtime_Startup_Module__state__V.load) [load image, compression = rle]
-                  00000401    00000007     --HOLE-- [fill = 0]
-                  00000408    00000009     (.cinit..data:xdc_runtime_System_Module__state__V.load) [load image, compression = rle]
-                  00000411    00000003     --HOLE-- [fill = 0]
-                  00000414    00000008     (__TI_handler_table)
-                  0000041c    00000060     (__TI_cinit_table)
-
 .text      0    000014f0    00002e64     
                   000014f0    00000338     rom_sysbios.aem3 : rom_sysbios.obj (.text:xdc_runtime_System_doPrint__I)
                   00001828    00000324     rtsv7M3_T_le_eabi.lib : trgdrv.obj (.text)
@@ -369,14 +341,39 @@ section   page    origin      length       input sections
                   00004344    00000008     (.tramp.ti_sysbios_family_arm_m3_Hwi_restoreFxn__E.1)
                   0000434c    00000008     (.tramp.ti_sysbios_family_arm_m3_Hwi_disableFxn__E.1)
 
+.cinit     0    000000e0    0000039c     
+                  000000e0    00000212     (.cinit..data.load) [load image, compression = rle]
+                  000002f2    00000006     --HOLE-- [fill = 0]
+                  000002f8    0000002c     (.cinit..data:ti_sysbios_family_arm_m3_Hwi_Module__state__V.load) [load image, compression = rle]
+                  00000324    00000004     --HOLE-- [fill = 0]
+                  00000328    0000002c     (.cinit..data:ti_sysbios_knl_Task_Module__state__V.load) [load image, compression = rle]
+                  00000354    00000004     --HOLE-- [fill = 0]
+                  00000358    00000021     (.cinit..data:ti_sysbios_knl_Clock_Module__state__V.load) [load image, compression = rle]
+                  00000379    00000007     --HOLE-- [fill = 0]
+                  00000380    0000001f     (.cinit..data:ti_sysbios_BIOS_Module__state__V.load) [load image, compression = rle]
+                  0000039f    00000001     --HOLE-- [fill = 0]
+                  000003a0    00000011     (.cinit..data:ti_sysbios_knl_Swi_Module__state__V.load) [load image, compression = rle]
+                  000003b1    00000007     --HOLE-- [fill = 0]
+                  000003b8    0000000d     (.cinit..data:ti_sysbios_family_arm_cc26xx_Timer_Module__state__V.load) [load image, compression = rle]
+                  000003c5    00000003     --HOLE-- [fill = 0]
+                  000003c8    0000000b     (.cinit..bss.load) [load image, compression = rle]
+                  000003d3    00000005     --HOLE-- [fill = 0]
+                  000003d8    0000000a     (.cinit..data:xdc_runtime_Memory_Module__state__V.load) [load image, compression = rle]
+                  000003e2    00000006     --HOLE-- [fill = 0]
+                  000003e8    00000009     (.cinit..data:ti_sysbios_family_arm_cc26xx_TimestampProvider_Module__state__V.load) [load image, compression = rle]
+                  000003f1    00000007     --HOLE-- [fill = 0]
+                  000003f8    00000009     (.cinit..data:xdc_runtime_Startup_Module__state__V.load) [load image, compression = rle]
+                  00000401    00000007     --HOLE-- [fill = 0]
+                  00000408    00000009     (.cinit..data:xdc_runtime_System_Module__state__V.load) [load image, compression = rle]
+                  00000411    00000003     --HOLE-- [fill = 0]
+                  00000414    00000008     (__TI_handler_table)
+                  0000041c    00000060     (__TI_cinit_table)
+
 .init_array 
 *          0    00000000    00000000     UNINITIALIZED
 
-.resetVecs 
-*          0    00000000    0000003c     
-                  00000000    0000003c     cowtagOS_pem3.oem3 (.resetVecs)
-
-.binit     0    00000000    00000000     
+.ccfg      0    0001ffa8    00000058     
+                  0001ffa8    00000058     ccfg.obj (.ccfg:retain)
 
 .const:ti_sysbios_knl_Task_Object__PARAMS__C 
 *          0    00001000    0000003c     
@@ -762,10 +759,6 @@ section   page    origin      length       input sections
 *          0    0000148e    00000002     
                   0000148e    00000002     cowtagOS_pem3.oem3 (.const:xdc_runtime_Text_isLoaded__C)
 
-.const:xdc_runtime_Error_policy__C 
-*          0    00001490    00000001     
-                  00001490    00000001     cowtagOS_pem3.oem3 (.const:xdc_runtime_Error_policy__C)
-
 .const:ti_sysbios_rom_ROM_AONRTCChannelEnable 
 *          0    00001494    00000004     
                   00001494    00000004     cowtagOS_pem3.oem3 (.const:ti_sysbios_rom_ROM_AONRTCChannelEnable)
@@ -793,10 +786,6 @@ section   page    origin      length       input sections
 .const:ti_sysbios_rom_ROM_ti_sysbios_family_arm_cc26xx_Timer_getMaxTicks__E 
 *          0    000014ac    00000004     
                   000014ac    00000004     cowtagOS_pem3.oem3 (.const:ti_sysbios_rom_ROM_ti_sysbios_family_arm_cc26xx_Timer_getMaxTicks__E)
-
-.const:ti_sysbios_rom_ROM_ti_sysbios_family_arm_cc26xx_Timer_initDevice__I 
-*          0    000014b0    00000004     
-                  000014b0    00000004     cowtagOS_pem3.oem3 (.const:ti_sysbios_rom_ROM_ti_sysbios_family_arm_cc26xx_Timer_initDevice__I)
 
 .const:ti_sysbios_rom_ROM_ti_sysbios_family_arm_cc26xx_Timer_setNextTick__E 
 *          0    000014b4    00000004     
@@ -826,17 +815,9 @@ section   page    origin      length       input sections
 *          0    000014cc    00000004     
                   000014cc    00000004     cowtagOS_pem3.oem3 (.const:ti_sysbios_rom_ROM_xdc_runtime_System_SupportProxy_exit__E)
 
-.const:ti_sysbios_gates_GateMutex_Instance_State_sem__O 
-*          0    000014d0    00000004     
-                  000014d0    00000004     cowtagOS_pem3.oem3 (.const:ti_sysbios_gates_GateMutex_Instance_State_sem__O)
-
 .const:ti_sysbios_knl_Clock_Module_State_clockQ__O 
 *          0    000014d4    00000004     
                   000014d4    00000004     cowtagOS_pem3.oem3 (.const:ti_sysbios_knl_Clock_Module_State_clockQ__O)
-
-.const:ti_sysbios_knl_Mailbox_Instance_State_dataQue__O 
-*          0    000014d8    00000004     
-                  000014d8    00000004     cowtagOS_pem3.oem3 (.const:ti_sysbios_knl_Mailbox_Instance_State_dataQue__O)
 
 .const:ti_sysbios_knl_Mailbox_Instance_State_dataSem__O 
 *          0    000014dc    00000004     
@@ -854,16 +835,6 @@ section   page    origin      length       input sections
 *          0    000014e8    00000004     
                   000014e8    00000004     cowtagOS_pem3.oem3 (.const:ti_sysbios_knl_Semaphore_Instance_State_pendQ__O)
 
-.const:ti_sysbios_knl_Task_Module_State_inactiveQ__O 
-*          0    000014ec    00000004     
-                  000014ec    00000004     cowtagOS_pem3.oem3 (.const:ti_sysbios_knl_Task_Module_State_inactiveQ__O)
-
-.ccfg      0    0001ffa8    00000058     
-                  0001ffa8    00000058     ccfg.obj (.ccfg:retain)
-
-.vecs      0    20000000    000000c8     NOLOAD SECTION
-                  20000000    000000c8     cowtagOS_pem3.oem3 (.vecs)
-
 .data:ti_sysbios_knl_Task_Module__state__V 
 *          0    20000100    00000044     UNINITIALIZED
                   20000100    00000044     cowtagOS_pem3.oem3 (.data:ti_sysbios_knl_Task_Module__state__V)
@@ -871,10 +842,6 @@ section   page    origin      length       input sections
 .data:ti_sysbios_family_arm_m3_Hwi_Module__state__V 
 *          0    20000144    00000034     UNINITIALIZED
                   20000144    00000034     cowtagOS_pem3.oem3 (.data:ti_sysbios_family_arm_m3_Hwi_Module__state__V)
-
-.data:ti_sysbios_knl_Clock_Module__state__V 
-*          0    20000178    0000002c     UNINITIALIZED
-                  20000178    0000002c     cowtagOS_pem3.oem3 (.data:ti_sysbios_knl_Clock_Module__state__V)
 
 .data:ti_sysbios_BIOS_Module__state__V 
 *          0    200001a4    00000024     UNINITIALIZED
@@ -888,21 +855,9 @@ section   page    origin      length       input sections
 *          0    200001e4    00000008     UNINITIALIZED
                   200001e4    00000008     cowtagOS_pem3.oem3 (.data:ti_sysbios_family_arm_cc26xx_Timer_Module__state__V)
 
-.data:ti_sysbios_family_arm_cc26xx_TimestampProvider_Module__state__V 
-*          0    200001ec    00000004     UNINITIALIZED
-                  200001ec    00000004     cowtagOS_pem3.oem3 (.data:ti_sysbios_family_arm_cc26xx_TimestampProvider_Module__state__V)
-
-.data:xdc_runtime_Startup_Module__state__V 
-*          0    200001f0    00000008     UNINITIALIZED
-                  200001f0    00000008     cowtagOS_pem3.oem3 (.data:xdc_runtime_Startup_Module__state__V)
-
 .data:xdc_runtime_System_Module__state__V 
 *          0    200001f8    00000008     UNINITIALIZED
                   200001f8    00000008     cowtagOS_pem3.oem3 (.data:xdc_runtime_System_Module__state__V)
-
-.data:xdc_runtime_Memory_Module__state__V 
-*          0    20000200    00000004     UNINITIALIZED
-                  20000200    00000004     cowtagOS_pem3.oem3 (.data:xdc_runtime_Memory_Module__state__V)
 
 .bss       0    20000208    00000950     UNINITIALIZED
                   20000208    00000400     (.common:ti_sysbios_heaps_HeapMem_Instance_State_0_buf__A)
@@ -956,57 +911,83 @@ section   page    origin      length       input sections
 .stack     0    20004d00    00000300     UNINITIALIZED
                   20004d00    00000300     --HOLE--
 
+.const:xdc_runtime_Error_policy__C 
+*          0    00001490    00000001     
+                  00001490    00000001     cowtagOS_pem3.oem3 (.const:xdc_runtime_Error_policy__C)
+
+.const:ti_sysbios_rom_ROM_ti_sysbios_family_arm_cc26xx_Timer_initDevice__I 
+*          0    000014b0    00000004     
+                  000014b0    00000004     cowtagOS_pem3.oem3 (.const:ti_sysbios_rom_ROM_ti_sysbios_family_arm_cc26xx_Timer_initDevice__I)
+
+.const:ti_sysbios_gates_GateMutex_Instance_State_sem__O 
+*          0    000014d0    00000004     
+                  000014d0    00000004     cowtagOS_pem3.oem3 (.const:ti_sysbios_gates_GateMutex_Instance_State_sem__O)
+
+.const:ti_sysbios_knl_Mailbox_Instance_State_dataQue__O 
+*          0    000014d8    00000004     
+                  000014d8    00000004     cowtagOS_pem3.oem3 (.const:ti_sysbios_knl_Mailbox_Instance_State_dataQue__O)
+
+.const:ti_sysbios_knl_Task_Module_State_inactiveQ__O 
+*          0    000014ec    00000004     
+                  000014ec    00000004     cowtagOS_pem3.oem3 (.const:ti_sysbios_knl_Task_Module_State_inactiveQ__O)
+
+.data:ti_sysbios_knl_Clock_Module__state__V 
+*          0    20000178    0000002c     UNINITIALIZED
+                  20000178    0000002c     cowtagOS_pem3.oem3 (.data:ti_sysbios_knl_Clock_Module__state__V)
+
+.data:ti_sysbios_family_arm_cc26xx_TimestampProvider_Module__state__V 
+*          0    200001ec    00000004     UNINITIALIZED
+                  200001ec    00000004     cowtagOS_pem3.oem3 (.data:ti_sysbios_family_arm_cc26xx_TimestampProvider_Module__state__V)
+
+.data:xdc_runtime_Startup_Module__state__V 
+*          0    200001f0    00000008     UNINITIALIZED
+                  200001f0    00000008     cowtagOS_pem3.oem3 (.data:xdc_runtime_Startup_Module__state__V)
+
+.data:xdc_runtime_Memory_Module__state__V 
+*          0    20000200    00000004     UNINITIALIZED
+                  20000200    00000004     cowtagOS_pem3.oem3 (.data:xdc_runtime_Memory_Module__state__V)
+
 .bootVecs 
 *          0    00000000    00000008     DSECT
                   00000000    00000008     boot.aem3 : boot.oem3 (.bootVecs)
 
-xdc.meta   0    00000000    000000e8     COPY SECTION
-                  00000000    000000e8     cowtagOS_pem3.oem3 (xdc.meta)
+.resetVecs 
+*          0    00000000    0000003c     
+                  00000000    0000003c     cowtagOS_pem3.oem3 (.resetVecs)
+
+.vecs      0    20000000    000000c8     NOLOAD SECTION
+                  20000000    000000c8     cowtagOS_pem3.oem3 (.vecs)
+
+xdc.meta   0    00000000    000000fa     COPY SECTION
+                  00000000    000000fa     cowtagOS_pem3.oem3 (xdc.meta)
 
 xdc.noload 
 *          0    00000000    00000000     COPY SECTION
+
+.binit     0    00000000    00000000     
 
 MODULE SUMMARY
 
        Module                     code    ro data   rw data
        ------                     ----    -------   -------
-    .\
+    ./
        alphaMain.obj              224     8         32     
        ccfg.obj                   0       88        0      
     +--+--------------------------+-------+---------+---------+
        Total:                     224     96        32     
                                                            
-    D:\GitHub\72point5\hardware\CowTags\alpha_debug\configPkg\package\cfg\
+    /home/ivan/Documents/Github/72point5/hardware/CowTags/alpha_debug/configPkg/package/cfg/
        cowtagOS_pem3.oem3         846     1467      2710   
     +--+--------------------------+-------+---------+---------+
        Total:                     846     1467      2710   
                                                            
-    D:/ti/tirtos_cc13xx_cc26xx_2_21_00_06/products/cc13xxware_2_04_03_17272/driverlib/bin/ccs/driverlib.lib
-       setup_rom.obj              1472    0         0      
-       setup.obj                  360     0         0      
-       osc.obj                    216     0         20     
-       chipinfo.obj               206     0         0      
-       aon_rtc.obj                44      0         0      
-       ddi.obj                    44      0         0      
-       adi.obj                    40      0         0      
-       aon_batmon.obj             40      0         0      
-       cpu.obj                    24      0         0      
-    +--+--------------------------+-------+---------+---------+
-       Total:                     2446    0         20     
-                                                           
-    D:/ti/tirtos_cc13xx_cc26xx_2_21_00_06/products/tidrivers_cc13xx_cc26xx_2_21_00_04/packages/ti/drivers/lib/drivers_cc13xxware_instrumented.aem3
-       PINCC26XX.oem3             484     0         156    
-       PowerCC26XX.oem3           136     0         272    
-    +--+--------------------------+-------+---------+---------+
-       Total:                     620     0         428    
-                                                           
-    D:\GitHub\72point5\hardware\CowTags\src\sysbios\rom_sysbios.aem3
+    /home/ivan/Documents/Github/72point5/hardware/CowTags/src/sysbios/rom_sysbios.aem3
        rom_sysbios.obj            1671    0         0      
        rom_sysbios_config.obj     26      0         0      
     +--+--------------------------+-------+---------+---------+
        Total:                     1697    0         0      
                                                            
-    D:\ti\ccsv6\tools\compiler\arm_15.12.3.LTS\lib\rtsv7M3_T_le_eabi.lib
+    /home/ivan/ti/ccsv6/tools/compiler/arm_15.12.3.LTS/lib/rtsv7M3_T_le_eabi.lib
        lowlev.obj                 780     0         208    
        trgdrv.obj                 804     0         8      
        ull_div_t2.obj             500     0         0      
@@ -1046,15 +1027,34 @@ MODULE SUMMARY
     +--+--------------------------+-------+---------+---------+
        Total:                     5586    0         948    
                                                            
-    D:\ti\tirtos_cc13xx_cc26xx_2_21_00_06\products\bios_6_46_01_37\packages\ti\targets\arm\rtsarm\lib\auto_init.aem3
+    /home/ivan/ti/tirtos_cc13xx_cc26xx_2_21_00_06/products/bios_6_46_01_37/packages/ti/targets/arm/rtsarm/lib/auto_init.aem3
        auto_init.oem3             160     0         0      
     +--+--------------------------+-------+---------+---------+
        Total:                     160     0         0      
                                                            
-    D:\ti\tirtos_cc13xx_cc26xx_2_21_00_06\products\bios_6_46_01_37\packages\ti\targets\arm\rtsarm\lib\boot.aem3
+    /home/ivan/ti/tirtos_cc13xx_cc26xx_2_21_00_06/products/bios_6_46_01_37/packages/ti/targets/arm/rtsarm/lib/boot.aem3
        boot.oem3                  68      0         0      
     +--+--------------------------+-------+---------+---------+
        Total:                     68      0         0      
+                                                           
+    /home/ivan/ti/tirtos_cc13xx_cc26xx_2_21_00_06/products/cc13xxware_2_04_03_17272/driverlib/bin/ccs/driverlib.lib
+       setup_rom.obj              1472    0         0      
+       setup.obj                  360     0         0      
+       osc.obj                    216     0         20     
+       chipinfo.obj               206     0         0      
+       aon_rtc.obj                44      0         0      
+       ddi.obj                    44      0         0      
+       adi.obj                    40      0         0      
+       aon_batmon.obj             40      0         0      
+       cpu.obj                    24      0         0      
+    +--+--------------------------+-------+---------+---------+
+       Total:                     2446    0         20     
+                                                           
+    /home/ivan/ti/tirtos_cc13xx_cc26xx_2_21_00_06/products/tidrivers_cc13xx_cc26xx_2_21_00_04/packages/ti/drivers/lib/drivers_cc13xxware_instrumented.aem3
+       PINCC26XX.oem3             484     0         156    
+       PowerCC26XX.oem3           136     0         272    
+    +--+--------------------------+-------+---------+---------+
+       Total:                     620     0         428    
                                                            
        Stack:                     0       0         768    
        Linker Generated:          224     864       0      
@@ -1220,11 +1220,11 @@ UNDEFED   SHT$$INIT_ARRAY$$Limit
 00003ded  SafeHapiVoid                                                              
 00000000  __ASM__                                                                   
 20000808  __CIOBUF_                                                                 
-00000062  __ISA__                                                                   
-00000074  __PLAT__                                                                  
+00000074  __ISA__                                                                   
+00000086  __PLAT__                                                                  
 20005000  __STACK_END                                                               
 00000300  __STACK_SIZE                                                              
-0000009b  __TARG__                                                                  
+000000ad  __TARG__                                                                  
 0000041c  __TI_CINIT_Base                                                           
 0000047c  __TI_CINIT_Limit                                                          
 00000414  __TI_Handler_Table_Base                                                   
@@ -1248,7 +1248,7 @@ ffffffff  __TI_prof_data_start
 200009f0  __TI_tmpnams                                                              
 0000361d  __TI_writemsg                                                             
 00002c71  __TI_wrt_ok                                                               
-000000c0  __TRDR__                                                                  
+000000d2  __TRDR__                                                                  
 00003201  __aeabi_cdcmpeq                                                           
 00003201  __aeabi_cdcmple                                                           
 00003287  __aeabi_cdrcmple                                                          
@@ -1890,15 +1890,15 @@ address   name
 00000000  ti_sysbios_family_arm_m3_Hwi_resetVectors                                 
 00000001  xdc_runtime_Startup__EXECFXN__C                                           
 00000001  xdc_runtime_Startup__RESETFXN__C                                          
-00000062  __ISA__                                                                   
-00000074  __PLAT__                                                                  
+00000074  __ISA__                                                                   
 00000084  xdc_runtime_Startup_sfxnTab__A                                            
-0000009b  __TARG__                                                                  
+00000086  __PLAT__                                                                  
 000000a8  xdc_runtime_Startup_sfxnRts__A                                            
+000000ad  __TARG__                                                                  
 000000ba  xdc_runtime_Text_charTab__A                                               
 000000bc  xdc_runtime_Startup_firstFxns__A                                          
-000000c0  __TRDR__                                                                  
 000000d0  ti_sysbios_knl_Clock_tickPeriod__C                                        
+000000d2  __TRDR__                                                                  
 000000d4  ti_sysbios_knl_Clock_triggerClock__C                                      
 000000d8  ti_sysbios_knl_Idle_funcList__A                                           
 000000dc  xdc_runtime_System_extendFxn__C                                           

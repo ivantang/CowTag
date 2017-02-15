@@ -35,7 +35,7 @@ int main(void){
 	//Board_initGeneral(); // init board
 
 	//if(verbose_main){System_printf("Initializing sensors...\n");}
-	//Sensors_init(); // init i2C
+	Sensors_init(); // init i2C
 
 	//if(verbose_main){System_printf("Initializing EEPROM...\n");}
 	//eeprom_testStart();

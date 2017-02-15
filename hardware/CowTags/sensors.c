@@ -93,6 +93,18 @@ struct accelerationData getAcceleration(){
     return accelerationdata;
 }
 
+struct temperatureData getTemp(){
+	struct temperatureData temperaturedata;
+	uint16_t temp_obj;
+
+	 temp_obj =  readI2CWord100kHz(Board_MIKROE1362_ADDR,0x07)*0.02 - 273.15;
+	 temperaturedata.temp_l = temp_obj & 0xFF;
+	 temperaturedata.temp_h = temp_obj >> 8;
+
+
+	return temperaturedata;
+}
+
 struct temperatureData getObjTemp(){
 
 	const PIN_Config TempPinConfig[] = {
@@ -205,9 +217,10 @@ struct heartrateData getHeartRate(){
 
 
 void testSensors(){
-	getAcceleration();
+	//getAcceleration();
 	//getObjTemp();
-	getHeartRate();
+	getTemp();
+	//getHeartRate();
 	System_printf("Tests done\n");
 	System_flush();
 }

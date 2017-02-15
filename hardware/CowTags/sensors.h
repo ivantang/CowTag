@@ -98,9 +98,10 @@ void Sensors_init(void);
 #define MAX30100_SPC_SPO2_HI_RES_EN     (1 << 6)
 
 //void echoFxn(UArg arg0, UArg arg1);
-struct accelerationData  getAcceleration();
-struct temperatureData getObjTemp();
-struct heartrateData  getHeartRate();
+void getAcceleration(struct sampleData*);
+void getTemp(struct sampleData*);
+void getHeartRate(struct sampleData*);
+void getTimestamp(struct sampleData*);
 void testSensors();
 
 #endif /* SENSORS_H_ */

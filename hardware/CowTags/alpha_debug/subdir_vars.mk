@@ -17,7 +17,9 @@ C_SRCS += \
 ../alphaMain.c \
 ../alphaRadioTest.c \
 ../ccfg.c \
+../config_parse.c \
 ../eeprom.c \
+../eepromTest.c \
 ../sensors.c \
 ../serialize.c \
 ../uArtEcho.c 
@@ -30,7 +32,9 @@ OBJS += \
 ./alphaMain.obj \
 ./alphaRadioTest.obj \
 ./ccfg.obj \
+./config_parse.obj \
 ./eeprom.obj \
+./eepromTest.obj \
 ./sensors.obj \
 ./serialize.obj \
 ./uArtEcho.obj 
@@ -43,7 +47,9 @@ C_DEPS += \
 ./alphaMain.d \
 ./alphaRadioTest.d \
 ./ccfg.d \
+./config_parse.d \
 ./eeprom.d \
+./eepromTest.d \
 ./sensors.d \
 ./serialize.d \
 ./uArtEcho.d 
@@ -76,7 +82,9 @@ C_DEPS__QUOTED += \
 "alphaMain.d" \
 "alphaRadioTest.d" \
 "ccfg.d" \
+"config_parse.d" \
 "eeprom.d" \
+"eepromTest.d" \
 "sensors.d" \
 "serialize.d" \
 "uArtEcho.d" 
@@ -89,7 +97,9 @@ OBJS__QUOTED += \
 "alphaMain.obj" \
 "alphaRadioTest.obj" \
 "ccfg.obj" \
+"config_parse.obj" \
 "eeprom.obj" \
+"eepromTest.obj" \
 "sensors.obj" \
 "serialize.obj" \
 "uArtEcho.obj" 
@@ -102,7 +112,9 @@ C_SRCS__QUOTED += \
 "../alphaMain.c" \
 "../alphaRadioTest.c" \
 "../ccfg.c" \
+"../config_parse.c" \
 "../eeprom.c" \
+"../eepromTest.c" \
 "../sensors.c" \
 "../serialize.c" \
 "../uArtEcho.c" 

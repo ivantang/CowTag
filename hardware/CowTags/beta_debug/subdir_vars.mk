@@ -9,15 +9,10 @@ CMD_SRCS += \
 CFG_SRCS += \
 ../cowtagOS.cfg 
 
-A_SRCS += \
-../libiniparser.a 
-
 C_SRCS += \
 ../CC1310_LAUNCHXL.c \
 ../IIC.c \
 ../RadioSend.c \
-../arduinoCom.c \
-../arduinoComTest.c \
 ../betaMain.c \
 ../betaRadioTest.c \
 ../ccfg.c \
@@ -32,8 +27,6 @@ OBJS += \
 ./CC1310_LAUNCHXL.obj \
 ./IIC.obj \
 ./RadioSend.obj \
-./arduinoCom.obj \
-./arduinoComTest.obj \
 ./betaMain.obj \
 ./betaRadioTest.obj \
 ./ccfg.obj \
@@ -48,8 +41,6 @@ C_DEPS += \
 ./CC1310_LAUNCHXL.d \
 ./IIC.d \
 ./RadioSend.d \
-./arduinoCom.d \
-./arduinoComTest.d \
 ./betaMain.d \
 ./betaRadioTest.d \
 ./ccfg.d \
@@ -74,18 +65,16 @@ GEN_FILES += \
 ./configPkg/compiler.opt 
 
 GEN_FILES__QUOTED += \
-"configPkg/linker.cmd" \
-"configPkg/compiler.opt" 
+"configPkg\linker.cmd" \
+"configPkg\compiler.opt" 
 
 GEN_MISC_DIRS__QUOTED += \
-"configPkg/" 
+"configPkg\" 
 
 C_DEPS__QUOTED += \
 "CC1310_LAUNCHXL.d" \
 "IIC.d" \
 "RadioSend.d" \
-"arduinoCom.d" \
-"arduinoComTest.d" \
 "betaMain.d" \
 "betaRadioTest.d" \
 "ccfg.d" \
@@ -100,8 +89,6 @@ OBJS__QUOTED += \
 "CC1310_LAUNCHXL.obj" \
 "IIC.obj" \
 "RadioSend.obj" \
-"arduinoCom.obj" \
-"arduinoComTest.obj" \
 "betaMain.obj" \
 "betaRadioTest.obj" \
 "ccfg.obj" \
@@ -116,8 +103,6 @@ C_SRCS__QUOTED += \
 "../CC1310_LAUNCHXL.c" \
 "../IIC.c" \
 "../RadioSend.c" \
-"../arduinoCom.c" \
-"../arduinoComTest.c" \
 "../betaMain.c" \
 "../betaRadioTest.c" \
 "../ccfg.c" \
@@ -127,8 +112,5 @@ C_SRCS__QUOTED += \
 "../sensors.c" \
 "../serialize.c" \
 "../uArtEcho.c" 
-
-A_SRCS__QUOTED += \
-"../libiniparser.a" 
 
 

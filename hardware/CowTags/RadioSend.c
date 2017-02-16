@@ -239,7 +239,7 @@ static void sendBetaPacket(struct sensorPacket bp, uint8_t maxNumberOfRetries, u
 	}else{
 		currentRadioOperation.easyLinkTxPacket.dstAddr[0] = 0x02;
 	}*/
-		System_printf("sending to alpha's or gateway\n");
+	System_printf("sending to alpha's or gateway\n");
 	currentRadioOperation.easyLinkTxPacket.dstAddr[0] = GATEWAY_ADDRESS;
 
 	/* Copy packet to payload */

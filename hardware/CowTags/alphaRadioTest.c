@@ -48,6 +48,7 @@
 /***** Drivers *****/
 #include <ti/drivers/PIN.h>
 #include <RadioReceive.h>
+#include <RadioSend.h>
 #include <sensors.h>
 
 /* Board Header files */
@@ -55,39 +56,26 @@
 #include <pinTable.h>
 
 /***** Defines *****/
-#define CONCENTRATOR_TASK_STACK_SIZE 1024
-#define CONCENTRATOR_TASK_PRIORITY   3
-#define CONCENTRATOR_EVENT_ALL                         0xFFFFFFFF
-#define CONCENTRATOR_EVENT_NEW_SENSOR_VALUE    (uint32_t)(1 << 0)
-#define CONCENTRATOR_MAX_NODES 7
-#define CONCENTRATOR_DISPLAY_LINES 8
-
-/***** Type declarations *****/
-struct BetaSensorNode {
-	uint8_t valid;
-	uint8_t address;
-	struct sampleData sampledata;
-	int8_t latestRssi;
-};
+#define ALPHARADIOTEST_TASK_STACK_SIZE 1024
+#define ALPHARADIOTEST_TASK_PRIORITY   3
+#define ALPHARADIOTEST_EVENT_ALL                         0xFFFFFFFF
+#define ALPHARADIOTEST_EVENT_NEW_SENSOR_VALUE    (uint32_t)(1 << 0)
+#define ALPHARADIOTEST_MAX_NODES 7
+#define ALPHARADIOTEST_DISPLAY_LINES 8
 
 /***** Variable declarations *****/
-static Task_Params concentratorTaskParams;
-Task_Struct concentratorTask;    /* not static so you can see in ROV */
-static uint8_t concentratorTaskStack[CONCENTRATOR_TASK_STACK_SIZE];
-Event_Struct concentratorEvent;  /* not static so you can see in ROV */
-static Event_Handle concentratorEventHandle;
-static struct sensorPacket latestActiveSensorNode;
-//struct BetaSensorNode knownSensorNodes[CONCENTRATOR_MAX_NODES];
-//static struct BetaSensorNode* lastAddedSensorNode = knownSensorNodes;
-static int i = 0;
+static Task_Params alphaRadioTestTaskParams;
+Task_Struct alphaRadioTestTask;    /* not static so you can see in ROV */
+static uint8_t alphaRadioTestTaskStack[ALPHARADIOTEST_TASK_STACK_SIZE];
+Event_Struct alphaRadioTestEvent;  /* not static so you can see in ROV */
+static Event_Handle alphaRadioTestEventHandle;
+static struct sensorPacket latestActivePacket;
 
 /***** Prototypes *****/
-static void concentratorTaskFunction(UArg arg0, UArg arg1);
+static void alphaRadioTestTaskFunction(UArg arg0, UArg arg1);
 static void packetReceivedCallback(union ConcentratorPacket* packet, int8_t rssi);
-static void addNewNode(struct BetaSensorNode* node);
-static void updateNode(struct BetaSensorNode* node);
-static uint8_t isKnownNodeAddress(uint8_t address);
-static void printNodes(void);
+void printSampleData(struct sampleData sampledata);
+void sendToGateway(struct sampleData sampledata);
 
 /***** Function definitions *****/
 void alphaRadioTest_init(void) {
@@ -95,142 +83,132 @@ void alphaRadioTest_init(void) {
 	/* Create event used internally for state changes */
 	Event_Params eventParam;
 	Event_Params_init(&eventParam);
-	Event_construct(&concentratorEvent, &eventParam);
-	concentratorEventHandle = Event_handle(&concentratorEvent);
+	Event_construct(&alphaRadioTestEvent, &eventParam);
+	alphaRadioTestEventHandle = Event_handle(&alphaRadioTestEvent);
 
-	/* Create the concentrator radio protocol task */
-	Task_Params_init(&concentratorTaskParams);
-	concentratorTaskParams.stackSize = CONCENTRATOR_TASK_STACK_SIZE;
-	concentratorTaskParams.priority = CONCENTRATOR_TASK_PRIORITY;
-	concentratorTaskParams.stack = &concentratorTaskStack;
-	Task_construct(&concentratorTask, concentratorTaskFunction, &concentratorTaskParams, NULL);
+	/* Create the alphaRadioTest radio protocol task */
+	Task_Params_init(&alphaRadioTestTaskParams);
+	alphaRadioTestTaskParams.stackSize = ALPHARADIOTEST_TASK_STACK_SIZE;
+	alphaRadioTestTaskParams.priority = ALPHARADIOTEST_TASK_PRIORITY;
+	alphaRadioTestTaskParams.stack = &alphaRadioTestTaskStack;
+	Task_construct(&alphaRadioTestTask, alphaRadioTestTaskFunction, &alphaRadioTestTaskParams, NULL);
 }
 
-static void concentratorTaskFunction(UArg arg0, UArg arg1)
-{
+static void alphaRadioTestTaskFunction(UArg arg0, UArg arg1){
 	/* Register a packet received callback with the radio task */
 	ConcentratorRadioTask_registerPacketReceivedCallback(packetReceivedCallback);
 
-	System_printf("Starting radio test\n");
+	int delay = 10000;
+	struct sampleData sampledata;
+	enum NodeRadioOperationStatus results;
+
+	if(verbose_alphaRadioTest){System_printf("Initializing alphaRadioTest...\n");}
 
 	/* Enter main task loop */
 	while(1) {
 		/* Wait for event */
-		uint32_t events = Event_pend(concentratorEventHandle, 0, CONCENTRATOR_EVENT_ALL, BIOS_WAIT_FOREVER);
 
-		/* If we got a new sensor value */
-		/*if(events & CONCENTRATOR_EVENT_NEW_SENSOR_VALUE) {
-			// If we knew this node from before, update the value
-			if(isKnownNodeAddress(latestActiveSensorNode.address)) {
-				updateNode(&latestActiveSensorNode);
-			}
-			else {
-				// Else add it
-				addNewNode(&latestActiveSensorNode);
-			}
+		uint32_t events = Event_pend(alphaRadioTestEventHandle, 0, ALPHARADIOTEST_EVENT_ALL, BIOS_WAIT_FOREVER);
 
-		}*/
-
-		if(events & CONCENTRATOR_EVENT_NEW_SENSOR_VALUE) {
-			i++;
-			printNodesAndSendToGateway();
+		if(events & ALPHARADIOTEST_EVENT_NEW_SENSOR_VALUE) {
+			if(verbose_alphaRadioTest){System_printf("RECEIVED A PACKET\n");}
+			if(verbose_alphaRadioTest){printSampleData(latestActivePacket.sampledata);}
 		}
-		
+
+		CPUdelay(delay*5000);
+
+		sampledata.cowID = 1;
+		sampledata.packetType = RADIO_PACKET_TYPE_SENSOR_PACKET;
+		sampledata.timestamp = 0x12345678;
+
+		if(ignoreSensors){
+			if(verbose_betaRadioTest){System_printf("Ignoring sensors, making fake packets\n");System_flush();}
+			sampledata.tempData.temp_h = 0x78;
+			sampledata.tempData.temp_l = 0x65;
+			sampledata.heartRateData.rate_h = 0x90;
+			sampledata.heartRateData.rate_l = 0x87;
+			sampledata.heartRateData.temp_h = 0x45;
+			sampledata.heartRateData.temp_l = 0x32;
+			sampledata.error = 0x0;
+		} else {
+			if(verbose_betaRadioTest){System_printf("Creating Packet...\n");System_flush();}
+			makeSensorPacket(&sampledata);
+			if(verbose_betaRadioTest){System_printf("Packet Created\n");System_flush();}
+		}
+
+		if(verbose_betaRadioTest){printSampleData(sampledata);}
+		if(verbose_betaRadioTest){System_printf("sending packet...\n");System_flush();}
+		results = betaRadioSendData(sampledata);
+		if(verbose_betaRadioTest){System_printf("packet sent error: %i\n",results);System_flush();}
+
+		CPUdelay(delay*5000);
+
+		sampledata.cowID = 1;
+		sampledata.packetType = RADIO_PACKET_TYPE_ACCEL_PACKET;
+		sampledata.timestamp = 0x12345678;
+
+		if(ignoreSensors){
+			if(verbose_betaRadioTest){System_printf("Ignoring sensors, making fake packets\n");System_flush();}
+			sampledata.accelerometerData.x=0x12;
+			sampledata.accelerometerData.y=0x34;
+			sampledata.accelerometerData.z=0x56;
+			sampledata.error = 0x0;
+		} else {
+			if(verbose_betaRadioTest){System_printf("Creating Packet...\n");System_flush();}
+			makeSensorPacket(&sampledata);
+			if(verbose_betaRadioTest){System_printf("Packet Created\n");System_flush();}
+		}
+
+		if(verbose_betaRadioTest){printSampleData(sampledata);}
+		if(verbose_betaRadioTest){System_printf("sending packet...\n");System_flush();}
+		results = betaRadioSendData(sampledata);
+		if(verbose_betaRadioTest){System_printf("packet sent error: %i\n",results);System_flush();}
 	}
 }
 
-static void packetReceivedCallback(union ConcentratorPacket* packet, int8_t rssi)
-{
-		/* Save the values */
-		//latestActiveSensorNode.valid=1;
-		latestActiveSensorNode.header.sourceAddress = packet->header.sourceAddress;
-		latestActiveSensorNode.sampledata = packet->sensorPacket.sampledata;
-		//latestActiveSensorNode.latestRssi = rssi;
+static void packetReceivedCallback(union ConcentratorPacket* packet, int8_t rssi){
+		latestActivePacket.header = packet->header;
+		latestActivePacket.sampledata = packet->sensorPacket.sampledata;
 
-		Event_post(concentratorEventHandle, CONCENTRATOR_EVENT_NEW_SENSOR_VALUE);
+		Event_post(alphaRadioTestEventHandle, ALPHARADIOTEST_EVENT_NEW_SENSOR_VALUE);
 }
-
-/*static uint8_t isKnownNodeAddress(uint8_t address) {
-	uint8_t found = 0;
-	uint8_t i;
-	for (i = 0; i < CONCENTRATOR_MAX_NODES; i++)
-	{
-		if (knownSensorNodes[i].address == address)
-		{
-			found = 1;
-			break;
-		}
-	}
-	return found;
-}*/
 
 /*print what you received*/
-void printNodesAndSendToGateway(void) {
-	if(latestActiveSensorNode.sampledata.packetType == RADIO_PACKET_TYPE_SENSOR_PACKET){
-		System_printf(	"%dth packet, "
-						"received SENSOR packet from "
-						"src address = 0x%x, "
-						"Error code: 0x%x\n"
-						"Object Temperature = %i, "
-						"Ambient Temperature = %i, "
-						"Raw IR for Heart Rate = %i\n\n",
-						i,
-						latestActiveSensorNode.header.sourceAddress,
-						latestActiveSensorNode.sampledata.error,
-						latestActiveSensorNode.sampledata.tempData.temp_h << 8 |
-						latestActiveSensorNode.sampledata.tempData.temp_l,
-						latestActiveSensorNode.sampledata.heartRateData.temp_h << 8 |
-						latestActiveSensorNode.sampledata.heartRateData.temp_l,
-
-						latestActiveSensorNode.sampledata.heartRateData.rate_h << 8 |
-						latestActiveSensorNode.sampledata.heartRateData.rate_l);
-	}else if(latestActiveSensorNode.sampledata.packetType == RADIO_PACKET_TYPE_ACCEL_PACKET){
-		System_printf(	"%d th packet, "
-						"received ACCELERATION packet from "
-						"src address = 0x%x, "
-						"Error code: 0x%x\n"
-						"Acc_Data: x=%i y=%i z=%i\n\n",
-						i,
-						latestActiveSensorNode.header.sourceAddress,
-						latestActiveSensorNode.sampledata.error,
-
-						latestActiveSensorNode.sampledata.accelerometerData.x,
-						latestActiveSensorNode.sampledata.accelerometerData.y,
-						latestActiveSensorNode.sampledata.accelerometerData.z);
-	}
-
+void sendToGateway(struct sampleData sampledata){
 	//send to Gateway now
 //
 //	enum NodeRadioOperationStatus results = betaRadioSendData(latestActiveSensorNode.sample);
 //
 //	// catch a timeout
 //	if (results == NodeRadioStatus_Failed) {
-//		if(verbose_alphaRadioTest){System_printf("Error: %x @ packet: %d\n", latestActiveSensorNode.sample.error, receivedPackets);}
+//		if(verbose_alphaRadioTestRadioTest){System_printf("Error: %x @ packet: %d\n", latestActiveSensorNode.sample.error, receivedPackets);}
 //	}
-//
-//	/* Toggle activity LED */
-//	PIN_setOutputValue(ledPinHandle, BETARADIOTEST_ACTIVITY_LED, !PIN_getOutputValue(BETARADIOTEST_ACTIVITY_LED) );
 }
 
-/*static void updateNode(struct BetaSensorNode* node) {
-	uint8_t i;
-	for (i = 0; i < CONCENTRATOR_MAX_NODES; i++) {
-		if (knownSensorNodes[i].address == node->address)
-		{
-			knownSensorNodes[i].sampledata = node->sampledata;
-			knownSensorNodes[i].latestRssi = node->latestRssi;
-			break;
-		}
+void printSampleData(struct sampleData sampledata){
+	System_printf("BetaRadio: sent packet with CowID = %i, "
+											"PacketType: %i, "
+											"Timestamp: %i, "
+											"Error: %i, ",
+											sampledata.cowID,
+											sampledata.packetType,
+											sampledata.timestamp,
+											sampledata.error);
+	if(sampledata.packetType == RADIO_PACKET_TYPE_SENSOR_PACKET){
+	System_printf(							"TemperatureCowData = %i.%i, "
+											"AmbientTemperatureData = %i.%i, "
+											"InfraredData = %i.%i\n",
+											sampledata.tempData.temp_h,
+											sampledata.tempData.temp_l,
+											sampledata.heartRateData.temp_h,
+											sampledata.heartRateData.temp_l,
+											sampledata.heartRateData.rate_h,
+											sampledata.heartRateData.rate_l);
 	}
-}*/
-
-/*static void addNewNode(struct BetaSensorNode* node) {
-	*lastAddedSensorNode = *node;
-
-	// Increment and wrap
-	lastAddedSensorNode++;
-	if (lastAddedSensorNode > &knownSensorNodes[CONCENTRATOR_MAX_NODES-1])
-	{
-		lastAddedSensorNode = knownSensorNodes;
+	else{
+	System_printf(							"accelerometerData= x=%i, y=%i, z=%i\n",
+											sampledata.accelerometerData.x,
+											sampledata.accelerometerData.y,
+											sampledata.accelerometerData.z);
 	}
-}*/
+}

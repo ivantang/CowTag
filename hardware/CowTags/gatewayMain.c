@@ -4,10 +4,9 @@
  *  Created on: Nov 4, 2016
  *      Author: Erik-PC
  */
-
 /***** Includes *****/
 #include <debug.h>
-
+#include <radioReceive.h>
 /* XDCtools Header files */
 #include <xdc/runtime/System.h>
 #include <ti/sysbios/knl/Task.h>
@@ -39,7 +38,7 @@ int main(void){
 	//serialize_testStart();
 
 	//if(verbose_main){System_printf("Initializing radio antenna...\n");}
-	//radioReceive_init();
+	radioReceive_init();
 
 	//if(verbose_main){System_printf("Initializing gateway tasks...\n");}
 	gatewayRadioTest_init();

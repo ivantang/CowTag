@@ -77,62 +77,62 @@ void betaRadioTest_init(void)
 
 static void betaRadioTestTaskFunction(UArg arg0, UArg arg1)
 {
-	if(verbose_betaRadioTest){System_printf("Initializing betaRadioTest...\n");}
-	struct sampleData sample;
-	int receivedPackets = 1;
-	sample.cowID = 1;
-	sample.packetType = RADIO_PACKET_TYPE_SENSOR_PACKET;
-	//sample.timestamp = 0x12345678;
-	do {
-		if(sample.packetType == RADIO_PACKET_TYPE_SENSOR_PACKET){
-			System_printf("Creating Packet...\n");
-			System_flush();
-			makeSensorPacket(&sample);
-			System_printf("Packet Created\n");
-			System_flush();
-			sample.packetType = RADIO_PACKET_TYPE_ACCEL_PACKET;
-		}
-		else{
-	//		sample.accelerometerData.x = 0x78;
-	//		sample.accelerometerData.y = 0x89;
-	//		sample.accelerometerData.z = 0x90;
-			makeSensorPacket(&sample);
-			sample.packetType = RADIO_PACKET_TYPE_SENSOR_PACKET;
-		}
-		sample.error = 0;
+	if(verbose_betaRadioTest){System_printf("Initializing betaRadioTest...\n");System_flush();}
 
-	//eeprom_reset();
-
-	// 10
-//
-//	int i;
-//	for (i = 0; i < 31; ++i) {
-//		eeprom_write(&sample);
-//	}
-//
-//	struct sampleData sample2;
-//
-//	bool none = eeprom_getNext(&sample2);
-	//	if (!none) {
-
+	while(1){
 		int delay = 10000;
-		CPUdelay(delay*1000);
-		enum NodeRadioOperationStatus results = betaRadioSendData(sample);
+		struct sampleData sampledata;
+		enum NodeRadioOperationStatus results;
 
-		// catch a timeout
-		if (results == NodeRadioStatus_Failed) {
-			if(verbose_betaRadioTest){System_printf("Error: %x @ packet: %d\n", sample.error, receivedPackets);}
-//				break;
+		CPUdelay(delay*5000);
+
+		sampledata.cowID = 1;
+		sampledata.packetType = RADIO_PACKET_TYPE_SENSOR_PACKET;
+		sampledata.timestamp = 0x12345678;
+
+		if(ignoreSensors){
+			if(verbose_betaRadioTest){System_printf("Ignoring sensors, making fake packets\n");System_flush();}
+			sampledata.tempData.temp_h = 0x78;
+			sampledata.tempData.temp_l = 0x65;
+			sampledata.heartRateData.rate_h = 0x90;
+			sampledata.heartRateData.rate_l = 0x87;
+			sampledata.heartRateData.temp_h = 0x45;
+			sampledata.heartRateData.temp_l = 0x32;
+			sampledata.error = 0x0;
+		} else {
+			if(verbose_betaRadioTest){System_printf("Creating Packet...\n");System_flush();}
+			makeSensorPacket(&sampledata);
+			if(verbose_betaRadioTest){System_printf("Packet Created\n");System_flush();}
 		}
 
-		/* Toggle activity LED */
-		PIN_setOutputValue(ledPinHandle, BETARADIOTEST_ACTIVITY_LED, !PIN_getOutputValue(BETARADIOTEST_ACTIVITY_LED) );
-		++receivedPackets;
-	} while (1); //(!eeprom_getNext(&sample2));
-	//}
+		if(verbose_betaRadioTest){printSampleData(sampledata);}
+		if(verbose_betaRadioTest){System_printf("sending packet...\n");System_flush();}
+		results = betaRadioSendData(sampledata);
+		if(verbose_betaRadioTest){System_printf("packet sent error: %i\n",results);System_flush();}
 
-	if(verbose_betaRadioTest){System_printf("DONE: %d\n", receivedPackets);}
-	if(verbose_betaRadioTest){System_printf("finished betaRadioTest...\n");}
+		CPUdelay(delay*5000);
+
+		sampledata.cowID = 1;
+		sampledata.packetType = RADIO_PACKET_TYPE_ACCEL_PACKET;
+		sampledata.timestamp = 0x12345678;
+
+		if(ignoreSensors){
+			if(verbose_betaRadioTest){System_printf("Ignoring sensors, making fake packets\n");System_flush();}
+			sampledata.accelerometerData.x=0x12;
+			sampledata.accelerometerData.y=0x34;
+			sampledata.accelerometerData.z=0x56;
+			sampledata.error = 0x0;
+		} else {
+			if(verbose_betaRadioTest){System_printf("Creating Packet...\n");System_flush();}
+			makeSensorPacket(&sampledata);
+			if(verbose_betaRadioTest){System_printf("Packet Created\n");System_flush();}
+		}
+
+		if(verbose_betaRadioTest){printSampleData(sampledata);}
+		if(verbose_betaRadioTest){System_printf("sending packet...\n");System_flush();}
+		results = betaRadioSendData(sampledata);
+		if(verbose_betaRadioTest){System_printf("packet sent error: %i\n",results);System_flush();}
+	}
 }
 
 void printSampleData(struct sampleData sampledata){
@@ -147,7 +147,7 @@ void printSampleData(struct sampleData sampledata){
 	if(sampledata.packetType == RADIO_PACKET_TYPE_SENSOR_PACKET){
 	System_printf(							"TemperatureCowData = %i.%i, "
 											"AmbientTemperatureData = %i.%i, "
-											"InfraredData = %i.%i\n ",
+											"InfraredData = %i.%i\n",
 											sampledata.tempData.temp_h,
 											sampledata.tempData.temp_l,
 											sampledata.heartRateData.temp_h,

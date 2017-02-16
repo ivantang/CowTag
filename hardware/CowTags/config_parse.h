@@ -11,6 +11,6 @@ int varFromConfigStrExplicitFilename(char const*, char const*, char*);
 // args: variable to search for, returned value
 // Function returns return code
 int varFromConfigStr(char const*, char*);
-int   varFromConfigInt(char const*, int*);
+int varFromConfigInt(char const*, int*);
 
 #endif // CONFIG_PARSE_H

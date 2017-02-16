@@ -26,8 +26,8 @@
 #include "easylink/EasyLink.h"
 #include "radioProtocol.h"
 
-#include "debug.h"
-
+#include <debug.h>
+#include <config_parse.h>
 
 /***** Defines *****/
 #define NODERADIO_TASK_STACK_SIZE 1024
@@ -39,8 +39,8 @@
 #define RADIO_EVENT_ACK_TIMEOUT         (uint32_t)(1 << 2)
 #define RADIO_EVENT_SEND_FAIL           (uint32_t)(1 << 3)
 
-#define NODERADIO_MAX_RETRIES 3
-#define NORERADIO_ACK_TIMEOUT_TIME_MS (250)
+#define NODERADIO_MAX_RETRIES 6
+#define NORERADIO_ACK_TIMEOUT_TIME_MS (500)
 
 
 /***** Type declarations *****/
@@ -81,7 +81,6 @@ static void rxDoneCallback(EasyLink_RxPacket * rxPacket, EasyLink_Status status)
 
 static void sendBetaPacket(struct sensorPacket betaPacket, uint8_t maxNumberOfRetries, uint32_t ackTimeoutMs);
 
-
 /***** Function definitions *****/
 void radioSend_init(void) {
 
@@ -119,22 +118,22 @@ static void nodeRadioTaskFunction(UArg arg0, UArg arg1)
 
 	System_printf("Starting Radio Send\n");
 
-	/* Use the True Random Number Generator to generate sensor node address randomly */;
-//	Power_setDependency(PowerCC26XX_PERIPH_TRNG);
-//	TRNGEnable();
-//	/* Do not accept the same address as the concentrator, in that case get a new random value */
-//	do
-//	{
-//		while (!(TRNGStatusGet() & TRNG_NUMBER_READY))
-//		{
-//			//wiat for randum number generator
-//		}
-//		nodeAddress = (uint8_t)TRNGNumberGet(TRNG_LOW_WORD);
-//	} while (nodeAddress == RADIO_CONCENTRATOR_ADDRESS);
-//	TRNGDisable();
-//	Power_releaseDependency(PowerCC26XX_PERIPH_TRNG);
+	/*
+	int buildType;
+	int result = varFromConfigInt("tagType",&buildType);
+	System_printf("buildType = %i\n",buildType);
 
-	nodeAddress = BETA_ADDRESS;
+	if(buildType == 0){
+		nodeAddress = BETA_ADDRESS;
+	} else if ( buildType == 1 ){
+		nodeAddress = ALPHA_ADDRESS;
+	} else {
+		System_printf("buildType ERROR");
+		nodeAddress = BETA_ADDRESS;
+	}*/
+
+	nodeAddress = ALPHA_ADDRESS;
+	//nodeAddress = BETA_ADDRESS;
 
 	/* Set the filter to the generated random address */
 	if (EasyLink_enableRxAddrFilter(&nodeAddress, 1, 1) != EasyLink_Status_Success)
@@ -143,8 +142,7 @@ static void nodeRadioTaskFunction(UArg arg0, UArg arg1)
 	}
 
 	/* Setup header */
-	sensorPacket.header.sourceAddress = 0x0; // GATEWAY_ADDRESS
-	sensorPacket.header.packetType = RADIO_PACKET_TYPE_SENSOR_PACKET;
+	sensorPacket.header.sourceAddress = nodeAddress;
 
 	/* Enter main task loop */
 	while (1)
@@ -156,6 +154,7 @@ static void nodeRadioTaskFunction(UArg arg0, UArg arg1)
 		if (events & RADIO_EVENT_SEND_DATA)
 		{
 			sensorPacket.sampledata = sampledata;
+			sensorPacket.header.packetType = sampledata.packetType;
 			//System_printf("Sending data...\n");
 			sendBetaPacket(sensorPacket, NODERADIO_MAX_RETRIES, NORERADIO_ACK_TIMEOUT_TIME_MS);
 
@@ -189,9 +188,7 @@ static void nodeRadioTaskFunction(UArg arg0, UArg arg1)
 		/* If send fail */
 		if (events & RADIO_EVENT_SEND_FAIL)
 		{
-
 			returnRadioOperationStatus(NodeRadioStatus_FailedNotConnected);
-
 		}
 
 	}
@@ -201,7 +198,7 @@ static void nodeRadioTaskFunction(UArg arg0, UArg arg1)
 enum NodeRadioOperationStatus betaRadioSendData(struct sampleData data){
 	enum NodeRadioOperationStatus status;
 
-	/* Get radio access sempahore */
+	/* Get radio access semaphore */
 	Semaphore_pend(radioAccessSemHandle, BIOS_WAIT_FOREVER);
 
 	/* Save data to send */
@@ -236,11 +233,14 @@ static void returnRadioOperationStatus(enum NodeRadioOperationStatus result)
 static void sendBetaPacket(struct sensorPacket bp, uint8_t maxNumberOfRetries, uint32_t ackTimeoutMs){
 
 	//sends to alpha and gateway
+	/*
 	if( Timestamp_get32() % 2 ){
 		currentRadioOperation.easyLinkTxPacket.dstAddr[0] = 0x01;
 	}else{
 		currentRadioOperation.easyLinkTxPacket.dstAddr[0] = 0x02;
-	}
+	}*/
+		System_printf("sending to alpha's or gateway\n");
+	currentRadioOperation.easyLinkTxPacket.dstAddr[0] = GATEWAY_ADDRESS;
 
 	/* Copy packet to payload */
 	memcpy(currentRadioOperation.easyLinkTxPacket.payload, ((uint8_t*)&sensorPacket), sizeof(struct sensorPacket));

@@ -24,6 +24,8 @@
 #include <eepromTest.h>
 #include <serializeTest.h>
 #include <arduinoComTest.h>
+#include <RadioReceive.h>
+#include <RadioSend.h>
 
 /* Global PIN_Config table */
 PIN_State ledPinState;
@@ -33,7 +35,7 @@ PIN_Handle ledPinHandle;
 int main(void){
 	if(verbose_main){System_printf("Initializing tasks...\n");}
 
-	//if(verbose_main){System_printf("Initializing board...\n");}
+	if(verbose_main){System_printf("Initializing board...\n");}
 	Board_initGeneral(); // init board
 
 	//if(verbose_main){System_printf("Initializing sensors...\n");}
@@ -48,7 +50,10 @@ int main(void){
 	//if(verbose_main){System_printf("Initializing radio antenna...\n");}
 	radioReceive_init();
 
-	//if(verbose_main){System_printf("Initializing Beta tasks...\n");}
+	if(verbose_main){System_printf("Initializing radio antenna...\n");}
+	radioSend_init();
+
+	if(verbose_main){System_printf("Initializing alpha tasks...\n");}
 	alphaRadioTest_init();
 
 	//if(verbose_main){System_printf("Initializing Arduino communication...\n");}

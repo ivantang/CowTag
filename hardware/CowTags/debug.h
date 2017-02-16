@@ -26,10 +26,14 @@ static const int verbose_arduinoCom = 0;
 
 /* Tests suites */
 static const int verbose_serializeTest = 0;
-static const int verbose_betaRadioTest = 0;
-static const int verbose_alphaRadioTest = 0;
+static const int verbose_betaRadioTest = 1;
+static const int verbose_alphaRadioTest = 1;
 static const int verbose_gatewayRadioTest = 1;
 static const int verbose_arduinoComTest = 0;
 static const int verbose_eepromTest = 1;
+
+/*** ignore sensors ***/
+static const int ignoreSensors = 1 ;
+
 
 #endif /* DEBUG_H_ */

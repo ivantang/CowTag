@@ -49,6 +49,7 @@
 #include "RadioReceive.h"
 #include "debug.h"
 #include "pinTable.h"
+#include <config_parse.h>
 
 /***** Defines *****/
 #define CONCENTRATORRADIO_TASK_STACK_SIZE 1024
@@ -58,8 +59,8 @@
 #define RADIO_EVENT_VALID_PACKET_RECEIVED      (uint32_t)(1 << 0)
 #define RADIO_EVENT_INVALID_PACKET_RECEIVED (uint32_t)(1 << 1)
 
-#define CONCENTRATORRADIO_MAX_RETRIES 2
-#define NORERADIO_ACK_TIMEOUT_TIME_MS (160)
+#define CONCENTRATORRADIO_MAX_RETRIES 6
+#define NORERADIO_ACK_TIMEOUT_TIME_MS (500)
 
 /***** Variable declarations *****/
 static Task_Params concentratorRadioTaskParams;
@@ -117,9 +118,25 @@ static void concentratorRadioTaskFunction(UArg arg0, UArg arg1)
 	 * EasyLink_setFrequency(868000000);
 	 */
 
+	/* Set src address of ACK packet */
+
+	int buildType;
+	int result = varFromConfigInt("tagType",&buildType);
+	System_printf("buildType = %i\n",buildType);
+
+	if(buildType == 1){
+		concentratorAddress = ALPHA_ADDRESS;
+	} else if ( buildType == 3 ){
+		concentratorAddress = GATEWAY_ADDRESS;
+	} else {
+		System_printf("buildType ERROR");
+		concentratorAddress = GATEWAY_ADDRESS;
+	}
+
+
 	/* Set src address of ACK packet */;
-	//concentratorAddress = ALPHA_ADDRESS;
-	concentratorAddress = GATEWAY_ADDRESS;
+	concentratorAddress = ALPHA_ADDRESS;
+	//concentratorAddress = GATEWAY_ADDRESS;
 
 	EasyLink_enableRxAddrFilter(NULL, 0, 0); // address filtering is disabled for A and G
 
@@ -234,7 +251,27 @@ static void rxDoneCallback(EasyLink_RxPacket * rxPacket, EasyLink_Status status)
 			/* Signal packet received */
 			Event_post(radioOperationEventHandle, RADIO_EVENT_VALID_PACKET_RECEIVED);
 
-		} else{
+		}else if(tmpRxPacket->header.packetType == RADIO_PACKET_TYPE_ACCEL_PACKET){
+
+			//System_printf("my address 0x%x; ", concentratorAddress);
+						//System_printf("source address 0x%x\n", tmpRxPacket->header.sourceAddress);
+
+						// alpha check
+						if( (concentratorAddress & 0x3) == ALPHA_ADDRESS){ // IF I AM AN ALPHA
+							if((tmpRxPacket->header.sourceAddress & 0x1) == 1){ // IF THE SOURCE IS ANOTHER CONCENTRATOR
+								// ignore the alpha packet
+								Event_post(radioOperationEventHandle, RADIO_EVENT_INVALID_PACKET_RECEIVED);
+								return;
+							}
+						}
+
+						// both alpha(passed check) and gateway do this
+						/* Save packet */
+						memcpy((void*)&latestRxPacket, &rxPacket->payload, sizeof(struct sensorPacket));
+						/* Signal packet received */
+						Event_post(radioOperationEventHandle, RADIO_EVENT_VALID_PACKET_RECEIVED);
+		}
+		else{
 			// ignore unknown packet or ACK packet
 			Event_post(radioOperationEventHandle, RADIO_EVENT_INVALID_PACKET_RECEIVED);
 		}

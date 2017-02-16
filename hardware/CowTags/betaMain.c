@@ -6,7 +6,7 @@
 
 /***** Includes *****/
 #include <debug.h>
-
+#include <radioSend.h>
 /* XDCtools Header files */
 #include <xdc/runtime/System.h>
 
@@ -29,7 +29,7 @@ PIN_State ledPinState;
 PIN_Handle ledPinHandle;
 
 int main(void){
-	if(verbose_main){System_printf("Initializing tasks...\n");}
+	if(verbose_main){System_printf("Initializing tasks & debug file...\n");}
 
 	//if(verbose_main){System_printf("Initializing board...\n");}
 	Board_initGeneral(); // init board

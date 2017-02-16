@@ -1,7 +1,7 @@
 ******************************************************************************
                   TI ARM Linker PC v15.12.3                    
 ******************************************************************************
->> Linked Wed Feb 15 21:13:43 2017
+>> Linked Wed Feb 15 23:26:04 2017
 
 OUTPUT FILE NAME:   <CowTag.out>
 ENTRY POINT SYMBOL: "ResetISR"  address: 0000793d
@@ -210,7 +210,7 @@ section   page    origin      length       input sections
                   00002dc8    000001ec     drivers_cc13xxware_instrumented.aem3 : PowerCC26XX_calibrateRCOSC.oem3 (.text:calibrateRcoscHf1)
                   00002fb4    000001c4                                          : PINCC26XX.oem3 (.text:PIN_init)
                   00003178    000001c4     rtsv7M3_T_le_eabi.lib : fopen.obj (.text)
-                  0000333c    000001bc     alphaRadioTest.obj (.text:printNodes)
+                  0000333c    000001bc     alphaRadioTest.obj (.text:printNodesAndSendToGateway)
                   000034f8    000001b6     rtsv7M3_T_le_eabi.lib : fd_add_t2.obj (.text)
                   000036ae    00000002     rf_singleMode_cc13xxware_instrumented.aem3 : RFCC26XX_singleMode.oem3 (.text:defaultErrCb)
                   000036b0    000001a0     drivers_cc13xxware_instrumented.aem3 : PowerCC26XX_calibrateRCOSC.oem3 (.text:PowerCC26XX_doCalibrate)
@@ -1917,6 +1917,7 @@ ffffffff  binit
 20001e28  pOverrides_hsm                                                            
 20001e88  pOverrides_lrm                                                            
 20001ee4  pOverrides_ook                                                            
+0000333d  printNodesAndSendToGateway                                                
 000061e9  putc                                                                      
 0000626d  putchar                                                                   
 20001ab4  radioOperationEvent                                                       
@@ -2682,6 +2683,7 @@ address   name
 00003241  __TI_cleanup                                                              
 0000326d  freopen                                                                   
 00003297  fopen                                                                     
+0000333d  printNodesAndSendToGateway                                                
 000034f9  __aeabi_dsub                                                              
 00003503  __aeabi_dadd                                                              
 000036b1  PowerCC26XX_doCalibrate                                                   
@@ -3353,4 +3355,4 @@ UNDEFED   xdc_runtime_Timestamp_get32__E
 UNDEFED   xdc_runtime_Timestamp_get64__E                                            
 UNDEFED   xdc_runtime_Timestamp_getFreq__E                                          
 
-[835 symbols]
+[836 symbols]

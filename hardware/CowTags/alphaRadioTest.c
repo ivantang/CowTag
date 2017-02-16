@@ -133,7 +133,7 @@ static void concentratorTaskFunction(UArg arg0, UArg arg1)
 
 		if(events & CONCENTRATOR_EVENT_NEW_SENSOR_VALUE) {
 			i++;
-			printNodes();
+			printNodesAndSendToGateway();
 		}
 		
 	}
@@ -165,7 +165,7 @@ static void packetReceivedCallback(union ConcentratorPacket* packet, int8_t rssi
 }*/
 
 /*print what you received*/
-void printNodes(void) {
+void printNodesAndSendToGateway(void) {
 	if(latestActiveSensorNode.sampledata.packetType == RADIO_PACKET_TYPE_SENSOR_PACKET){
 		System_printf(	"%dth packet, "
 						"received SENSOR packet from "
@@ -189,7 +189,7 @@ void printNodes(void) {
 						"received ACCELERATION packet from "
 						"src address = 0x%x, "
 						"Error code: 0x%x\n"
-						"Acc_Data= x=%i y=%i z=%i\n\n",
+						"Acc_Data: x=%i y=%i z=%i\n\n",
 						i,
 						latestActiveSensorNode.header.sourceAddress,
 						latestActiveSensorNode.sampledata.error,
@@ -198,6 +198,18 @@ void printNodes(void) {
 						latestActiveSensorNode.sampledata.accelerometerData.y,
 						latestActiveSensorNode.sampledata.accelerometerData.z);
 	}
+
+	//send to Gateway now
+//
+//	enum NodeRadioOperationStatus results = betaRadioSendData(latestActiveSensorNode.sample);
+//
+//	// catch a timeout
+//	if (results == NodeRadioStatus_Failed) {
+//		if(verbose_alphaRadioTest){System_printf("Error: %x @ packet: %d\n", latestActiveSensorNode.sample.error, receivedPackets);}
+//	}
+//
+//	/* Toggle activity LED */
+//	PIN_setOutputValue(ledPinHandle, BETARADIOTEST_ACTIVITY_LED, !PIN_getOutputValue(BETARADIOTEST_ACTIVITY_LED) );
 }
 
 /*static void updateNode(struct BetaSensorNode* node) {

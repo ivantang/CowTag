@@ -8,6 +8,7 @@
 #include <ti/sysbios/knl/Semaphore.h>
 #include <ti/sysbios/knl/Event.h>
 #include <ti/sysbios/knl/Clock.h>
+#include <xdc/runtime/Timestamp.h>
 #include <ti/drivers/Power.h>
 #include <ti/drivers/power/PowerCC26XX.h>
 
@@ -234,7 +235,12 @@ static void returnRadioOperationStatus(enum NodeRadioOperationStatus result)
 
 static void sendBetaPacket(struct sensorPacket bp, uint8_t maxNumberOfRetries, uint32_t ackTimeoutMs){
 
-	currentRadioOperation.easyLinkTxPacket.dstAddr[0] = 0x01;
+	//sends to alpha and gateway
+	if( Timestamp_get32() % 2 ){
+		currentRadioOperation.easyLinkTxPacket.dstAddr[0] = 0x01;
+	}else{
+		currentRadioOperation.easyLinkTxPacket.dstAddr[0] = 0x02;
+	}
 
 	/* Copy packet to payload */
 	memcpy(currentRadioOperation.easyLinkTxPacket.payload, ((uint8_t*)&sensorPacket), sizeof(struct sensorPacket));

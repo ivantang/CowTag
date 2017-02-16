@@ -101,7 +101,7 @@ static void betaRadioTestTaskFunction(UArg arg0, UArg arg1)
 		}
 		sample.error = 0;
 
-		eeprom_reset();
+	//eeprom_reset();
 
 	// 10
 //
@@ -115,19 +115,19 @@ static void betaRadioTestTaskFunction(UArg arg0, UArg arg1)
 //	bool none = eeprom_getNext(&sample2);
 	//	if (!none) {
 
-				int delay = 10000;
-				CPUdelay(delay*1000);
-				enum NodeRadioOperationStatus results = betaRadioSendData(sample);
+		int delay = 10000;
+		CPUdelay(delay*1000);
+		enum NodeRadioOperationStatus results = betaRadioSendData(sample);
 
-				// catch a timeout
-				if (results == NodeRadioStatus_Failed) {
-					if(verbose_betaRadioTest){System_printf("Error: %x @ packet: %d\n", sample.error, receivedPackets);}
-	//				break;
-				}
+		// catch a timeout
+		if (results == NodeRadioStatus_Failed) {
+			if(verbose_betaRadioTest){System_printf("Error: %x @ packet: %d\n", sample.error, receivedPackets);}
+//				break;
+		}
 
-				/* Toggle activity LED */
-				PIN_setOutputValue(ledPinHandle, BETARADIOTEST_ACTIVITY_LED, !PIN_getOutputValue(BETARADIOTEST_ACTIVITY_LED) );
-				++receivedPackets;
+		/* Toggle activity LED */
+		PIN_setOutputValue(ledPinHandle, BETARADIOTEST_ACTIVITY_LED, !PIN_getOutputValue(BETARADIOTEST_ACTIVITY_LED) );
+		++receivedPackets;
 	} while (1); //(!eeprom_getNext(&sample2));
 	//}
 

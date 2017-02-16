@@ -8,6 +8,6 @@
 #ifndef ALPHARADIOTEST_H_
 #define ALPHARADIOTEST_H_
 
-void alphaRadioTest_init(void);
+void gatewayRadioTest_init(void);
 
 #endif /* ALPHARADIOTEST_H_ */

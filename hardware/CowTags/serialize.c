@@ -15,7 +15,7 @@ void serializePacket(struct sampleData *data, uint8_t *buffer) {
 	buffer[2] = data->timestamp >> 24 & 0xff;
 	buffer[3] = data->timestamp >> 16 & 0xff;
 	buffer[4] = data->timestamp >> 8 & 0xff;
-	buffer[5] = data->timestamp & 0xff;
+	buffer[5] = data->timestamp;
 
 	if (data->packetType == RADIO_PACKET_TYPE_SENSOR_PACKET) {
 		buffer[6] = data->tempData.temp_h;

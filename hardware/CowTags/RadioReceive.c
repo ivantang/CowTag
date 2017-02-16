@@ -112,7 +112,7 @@ static void concentratorRadioTaskFunction(UArg arg0, UArg arg1)
 	}
 
 	System_printf("Starting Radio Receive!\n");
-	/* If you wich to use a frequency other than the default use
+	/* If you wish to use a frequency other than the default use
 	 * the below API
 	 * EasyLink_setFrequency(868000000);
 	 */

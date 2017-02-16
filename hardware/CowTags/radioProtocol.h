@@ -18,8 +18,8 @@
 #define RADIO_EASYLINK_MODULATION     EasyLink_Phy_Custom
 
 #define RADIO_PACKET_TYPE_ACK_PACKET             0
-#define RADIO_PACKET_TYPE_SENSOR_PACKET    		 1
-#define RADIO_PACKET_TYPE_ACCEL_PACKET           2
+#define RADIO_PACKET_TYPE_SENSOR_PACKET    		 3
+#define RADIO_PACKET_TYPE_ACCEL_PACKET           4
 
 #define SAMPLE_SIZE 13
 

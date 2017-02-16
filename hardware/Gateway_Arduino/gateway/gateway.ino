@@ -37,33 +37,33 @@ const unsigned PACKET_SIZE = 13;
 int buffer[PACKET_SIZE];
 
 struct TemperatureData {
-  uint8_t objtemp_l;
-  uint8_t objtemp_h;
+  unsigned char objtemp_l;
+  unsigned char objtemp_h;
 };
 
 struct AccelerationData {
-  uint8_t x;
-  uint8_t y;
-  uint8_t z;
+  unsigned char x;
+  unsigned char y;
+  unsigned char z;
 };
 
 struct HeartrateData {
-  uint8_t ambtemp_l;
-  uint8_t ambtemp_h;
-  uint8_t rate_l;
-  uint8_t rate_h;
+  unsigned char ambtemp_l;
+  unsigned char ambtemp_h;
+  unsigned char rate_l;
+  unsigned char rate_h;
 };
 
 /* will be concat of data from all sensors */
 struct SampleData {
-  uint8_t cowID;
-  uint8_t packetType;
+  unsigned char cowID;
+  unsigned char packetType;
   struct TemperatureData tempData;
   struct AccelerationData accelerometerData;
   struct HeartrateData heartRateData;
-  uint32_t timestamp;
+  unsigned long timestamp;
 
-  uint8_t errorCode;
+  unsigned char errorCode;
 };
 
 // Print the data extracted from the JSON
@@ -73,28 +73,31 @@ void printSampleData(const struct SampleData* sampleData) {
   Serial.println(sampleData->cowID);
   Serial.print("Packet Type ");
   Serial.println(sampleData->packetType);
-  Serial.print("Object Temperature High ");
-  Serial.println(sampleData->tempData.objtemp_h);
-  Serial.print("Object Temperature Low ");
-  Serial.println(sampleData->tempData.objtemp_l);
-  Serial.print("Heart Rate High ");
-  Serial.println(sampleData->heartRateData.rate_h);
-  Serial.print("Heart Rate Low ");
-  Serial.println(sampleData->heartRateData.rate_l);
-  Serial.print("Ambient Temperature High ");
-  Serial.println(sampleData->heartRateData.ambtemp_h);
-  Serial.print("Ambient Temperature Low ");
-  Serial.println(sampleData->heartRateData.ambtemp_l);
-  Serial.print("Acceleration x-axis ");
-  Serial.println(sampleData->accelerometerData.x);
-  Serial.print("Acceleration y-axis ");
-  Serial.println(sampleData->accelerometerData.y);
-  Serial.print("Acceleration z-axis ");
-  Serial.println(sampleData->accelerometerData.z);
+  Serial.print("Timestamp: ");
+  Serial.println(sampleData->timestamp);
   Serial.print("Error Code ");
   Serial.println(sampleData->errorCode);
-  
-  
+  if(sampleData->packetType == RADIO_PACKET_TYPE_SENSOR_PACKET){
+    Serial.print("Object Temperature High ");
+    Serial.println(sampleData->tempData.objtemp_h);
+    Serial.print("Object Temperature Low ");
+    Serial.println(sampleData->tempData.objtemp_l);
+    Serial.print("Heart Rate High ");
+    Serial.println(sampleData->heartRateData.rate_h);
+    Serial.print("Heart Rate Low ");
+    Serial.println(sampleData->heartRateData.rate_l);
+    Serial.print("Ambient Temperature High ");
+    Serial.println(sampleData->heartRateData.ambtemp_h);
+    Serial.print("Ambient Temperature Low ");
+    Serial.println(sampleData->heartRateData.ambtemp_l);
+  } else if(sampleData->packetType == RADIO_PACKET_TYPE_ACCEL_PACKET){
+    Serial.print("Acceleration x-axis ");
+    Serial.println(sampleData->accelerometerData.x);
+    Serial.print("Acceleration y-axis ");
+    Serial.println(sampleData->accelerometerData.y);
+    Serial.print("Acceleration z-axis ");
+    Serial.println(sampleData->accelerometerData.z);
+  }
 }
 
 // Parse the JSON from the input string and extract the interesting values
@@ -124,7 +127,7 @@ void printSampleData(const struct SampleData* sampleData) {
 void serializeSampleData(const struct SampleData* sampleData, char *data)
 {
   if(sampleData->packetType == RADIO_PACKET_TYPE_SENSOR_PACKET){ 
-    sprintf(data, "{\cowID\": %d, \"packetType\": %d, \"timestamp\": %ld, \"objtemp_h\": %d, \"objtemp_l\": %d, \"hrate_h\": %d, \"hrate_l\": %d, \"ambtemp_h\": %d, \"ambtemp_l\": %d \ \"errcode\": %d}\n",
+    sprintf(data, "{\"cowID\": %i, \"packetType\": %i, \"timestamp\": %lu, \"objtemp_h\": %i, \"objtemp_l\": %i, \"hrate_high\": %i, \"hrate_low\": %i, \"ambtemp_h\": %i, \"ambtemp_l\": %i, \"errcode\": %i}\n",
               sampleData->cowID,
               sampleData->packetType,
               sampleData->timestamp,
@@ -136,7 +139,7 @@ void serializeSampleData(const struct SampleData* sampleData, char *data)
               sampleData->heartRateData.ambtemp_l,
               sampleData->errorCode);
   }else if(sampleData->packetType == RADIO_PACKET_TYPE_ACCEL_PACKET){
-    sprintf(data, "{\cowID\": %d, \"packetType\": %d, \"timestamp\": %ld, \"xaxis\": %d, \"yaxis\": %d, \"zaxis\": %d, \"errcode\": %d}\n",
+    sprintf(data, "{\"cowID\": %i, \"packetType\": %i, \"timestamp\": %lu, \"xaxis\": %i, \"yaxis\": %i, \"zaxis\": %i, \"errcode\": %i}\n",
               sampleData->cowID,
               sampleData->packetType,
               sampleData->timestamp,
@@ -236,7 +239,7 @@ void setup() {
   digitalWrite(4, HIGH);
   
   initSerial();
-  //initEthernet();
+  initEthernet();
 
   Wire.begin(6);
   Wire.onReceive(receiveEvent);
@@ -253,29 +256,22 @@ void receiveEvent(int howMany) {
   int i = 0;
   
   SampleData sampleData;
-  char data[MAX_CONTENT_SIZE];
+   char data[MAX_CONTENT_SIZE];
 
   //Get Data via I2C
   while (1 <= Wire.available()) { // loop through all
-    int c = Wire.read(); // receive byte as a int
-    Serial.println(c);         // print the character
+    unsigned char c = Wire.read(); // receive byte as a int
+    //Serial.println(c);         // print the character
     buffer[i] = c;
     i++;
   }
-  
-  Serial.println("Buffer");
-  for(i = 0 ; i < 18 ; i++){
-    Serial.println(buffer[i]);
-  }
-  
+
   //Store in JSON object and post to gateway
   sampleData.cowID = buffer[0];
   sampleData.packetType = buffer[1];
-  sampleData.timestamp = (buffer[2]<<24 | buffer[3]<<16 | buffer[4]<<8 | buffer[5]);
+  sampleData.timestamp = ((unsigned long)buffer[2]<<24 | (unsigned long)buffer[3]<<16 | (unsigned long)buffer[4]<<8 | (unsigned long)buffer[5]);
   
-  
-  
-  if(sampleData.timestamp == RADIO_PACKET_TYPE_SENSOR_PACKET){
+  if(sampleData.packetType == RADIO_PACKET_TYPE_SENSOR_PACKET){
     sampleData.tempData.objtemp_h = buffer[6];
     sampleData.tempData.objtemp_l = buffer[7];
     sampleData.heartRateData.rate_h = buffer[8];
@@ -283,28 +279,26 @@ void receiveEvent(int howMany) {
     sampleData.heartRateData.ambtemp_h = buffer[10];
     sampleData.heartRateData.ambtemp_l = buffer[11];
     sampleData.errorCode = buffer[12];
-  }else if(sampleData.timestamp == RADIO_PACKET_TYPE_ACCEL_PACKET){
+  }else if(sampleData.packetType == RADIO_PACKET_TYPE_ACCEL_PACKET){
     sampleData.accelerometerData.x = buffer[6];
     sampleData.accelerometerData.y = buffer[7];
     sampleData.accelerometerData.z = buffer[8];
     sampleData.errorCode = buffer[9];
   }
-    
-  printSampleData(&sampleData);
 
-  Serial.println("Creating JSON Object");
+  //printSampleData(&sampleData);
+
+  //Serial.println("Creating JSON Object");
   serializeSampleData(&sampleData,data);
   
-  Serial.print("\n\r");
+  //Serial.print("\n\r");
   Serial.println(data);
 
- /* 
   if (!postPage(serverName, serverPort, pageName, data)) {
     Serial.println(F("Fail "));
   }
   else {
     Serial.println(F("Pass "));
   }
-*/
   Serial.println("Done");
 }

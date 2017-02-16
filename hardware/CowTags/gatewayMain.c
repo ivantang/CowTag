@@ -10,7 +10,7 @@
 
 /* XDCtools Header files */
 #include <xdc/runtime/System.h>
-
+#include <ti/sysbios/knl/Task.h>
 /* BIOS Header files */
 #include <ti/sysbios/BIOS.h>
 
@@ -33,7 +33,7 @@ int main(void){
 	if(verbose_main){System_printf("Initializing tasks...\n");}
 
 	//if(verbose_main){System_printf("Initializing board...\n");}
-	//Board_initGeneral(); // init board
+	Board_initGeneral(); // init board
 
 	//if(verbose_main){System_printf("Initializing serialization thread...\n");}
 	//serialize_testStart();
@@ -42,10 +42,10 @@ int main(void){
 	//radioReceive_init();
 
 	//if(verbose_main){System_printf("Initializing gateway tasks...\n");}
-	//gatewayRadioTest_init();
+	gatewayRadioTest_init();
 
 	//if(verbose_main){System_printf("Initializing Arduino communication...\n");}
-	//arduinoTest_init();
+	//arduinoComTest_init();
 
 	System_flush();
 

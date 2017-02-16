@@ -34,6 +34,8 @@
 #include <debug.h>
 #include <gatewayRadioTest.h>
 #include <radioProtocol.h>
+#include <serialize.h>
+#include <arduinoCom.h>
 
 /* XDCtools Header files */
 #include <xdc/std.h>
@@ -42,118 +44,119 @@
 /* BIOS Header files */
 #include <ti/sysbios/BIOS.h>
 #include <ti/sysbios/knl/Task.h>
-#include <ti/sysbios/knl/Semaphore.h>
 #include <ti/sysbios/knl/Event.h>
 
 /***** Drivers *****/
-#include <ti/drivers/PIN.h>
 #include <RadioReceive.h>
 
-/* Board Header files */
-#include <Board.h>
-#include <pinTable.h>
-
 /***** Defines *****/
-#define CONCENTRATOR_TASK_STACK_SIZE 1024
-#define CONCENTRATOR_TASK_PRIORITY   3
-#define CONCENTRATOR_EVENT_ALL                         0xFFFFFFFF
-#define CONCENTRATOR_EVENT_NEW_SENSOR_VALUE    (uint32_t)(1 << 0)
-#define CONCENTRATOR_MAX_NODES 7
-#define CONCENTRATOR_DISPLAY_LINES 8
-
-/***** Type declarations *****/
-struct BetaSensorNode {
-	uint8_t valid;
-	uint8_t address;
-	struct sampleData sampledata;
-	int8_t latestRssi;
-};
+#define GATEWAYRADIOTEST_TASK_STACK_SIZE 1024
+#define GATEWAYRADIOTEST_TASK_PRIORITY   3
+#define GATEWAYRADIOTEST_EVENT_ALL                         0xFFFFFFFF
+#define GATEWAYRADIOTEST_EVENT_NEW_SENSOR_VALUE    (uint32_t)(1 << 0)
 
 /***** Variable declarations *****/
-static Task_Params concentratorTaskParams;
-Task_Struct concentratorTask;    /* not static so you can see in ROV */
-static uint8_t concentratorTaskStack[CONCENTRATOR_TASK_STACK_SIZE];
-Event_Struct concentratorEvent;  /* not static so you can see in ROV */
-static Event_Handle concentratorEventHandle;
-static struct sensorPacket latestActiveSensorNode;
-//struct BetaSensorNode knownSensorNodes[CONCENTRATOR_MAX_NODES];
-//static struct BetaSensorNode* lastAddedSensorNode = knownSensorNodes;
-static int i = 0;
+static Task_Params gatewayTaskParams;
+Task_Struct gatewayTask;    /* not static so you can see in ROV */
+static uint8_t gatewayTaskStack[GATEWAYRADIOTEST_TASK_STACK_SIZE];
+Event_Struct gatewayEvent;  /* not static so you can see in ROV */
+static Event_Handle gatewayEventHandle;
+static struct sensorPacket latestActivePacket;
 
 /***** Prototypes *****/
-static void concentratorTaskFunction(UArg arg0, UArg arg1);
+static void gatewayTaskFunction(UArg arg0, UArg arg1);
 static void packetReceivedCallback(union ConcentratorPacket* packet, int8_t rssi);
-static void addNewNode(struct BetaSensorNode* node);
-static void updateNode(struct BetaSensorNode* node);
-static uint8_t isKnownNodeAddress(uint8_t address);
-static void printNodes(void);
+static void printSampleData(struct sampleData sampledata);
 
 /***** Function definitions *****/
-void alphaRadioTest_init(void) {
+void gatewayRadioTest_init(void) {
 
 	/* Create event used internally for state changes */
 	Event_Params eventParam;
 	Event_Params_init(&eventParam);
-	Event_construct(&concentratorEvent, &eventParam);
-	concentratorEventHandle = Event_handle(&concentratorEvent);
+	Event_construct(&gatewayEvent, &eventParam);
+	gatewayEventHandle = Event_handle(&gatewayEvent);
 
-	/* Create the concentrator radio protocol task */
-	Task_Params_init(&concentratorTaskParams);
-	concentratorTaskParams.stackSize = CONCENTRATOR_TASK_STACK_SIZE;
-	concentratorTaskParams.priority = CONCENTRATOR_TASK_PRIORITY;
-	concentratorTaskParams.stack = &concentratorTaskStack;
-	Task_construct(&concentratorTask, concentratorTaskFunction, &concentratorTaskParams, NULL);
+	/* Create the gateway radio protocol task */
+	Task_Params_init(&gatewayTaskParams);
+	gatewayTaskParams.stackSize = GATEWAYRADIOTEST_TASK_STACK_SIZE;
+	gatewayTaskParams.priority = GATEWAYRADIOTEST_TASK_PRIORITY;
+	gatewayTaskParams.stack = &gatewayTaskStack;
+	Task_construct(&gatewayTask, gatewayTaskFunction, &gatewayTaskParams, NULL);
 }
 
-static void concentratorTaskFunction(UArg arg0, UArg arg1)
+static void gatewayTaskFunction(UArg arg0, UArg arg1)
 {
 	/* Register a packet received callback with the radio task */
 	ConcentratorRadioTask_registerPacketReceivedCallback(packetReceivedCallback);
 
-	System_printf("Starting radio test\n");
+	if(verbose_gatewayRadioTest){System_printf("Initializing gatewayRadioTest...\n");}
 
 	/* Enter main task loop */
 	while(1) {
 		/* Wait for event */
-		uint32_t events = Event_pend(concentratorEventHandle, 0, CONCENTRATOR_EVENT_ALL, BIOS_WAIT_FOREVER);
+		uint32_t events = Event_pend(gatewayEventHandle, 0, GATEWAYRADIOTEST_EVENT_ALL, BIOS_WAIT_FOREVER);
 
 		/* If we got a new sensor value */
-		if(events & CONCENTRATOR_EVENT_NEW_SENSOR_VALUE) {
+		if(events & GATEWAYRADIOTEST_EVENT_NEW_SENSOR_VALUE) {
+
+			uint8_t buf[SAMPLE_SIZE];
+			unsigned i;
+
+			if(verbose_gatewayRadioTest){printSampleData(latestActivePacket.sampledata);}
+
+			if(verbose_gatewayRadioTest){System_printf("serializing packet...\n");}
+			serializePacket(&latestActivePacket.sampledata, buf);
+
+			if(verbose_gatewayRadioTest){
+				for(i = 0 ; i<SAMPLE_SIZE; i++){
+					System_printf("%i ", buf[i]);
+				}
+				System_printf("\n");
+				System_flush();
+			}
+
+			if(verbose_gatewayRadioTest){System_printf("sending packet to ethernet shield...\n");}
+			writeI2CArduino(0x6, buf);
 		}
 	}
 }
 
-static void packetReceivedCallback(union ConcentratorPacket* packet, int8_t rssi)
-{
-		/* Save the values */
-		//latestActiveSensorNode.valid=1;
-		latestActiveSensorNode.header.sourceAddress = packet->header.sourceAddress;
-		latestActiveSensorNode.sampledata = packet->sensorPacket.sampledata;
-		//latestActiveSensorNode.latestRssi = rssi;
-
-		Event_post(concentratorEventHandle, CONCENTRATOR_EVENT_NEW_SENSOR_VALUE);
+void printSampleData(struct sampleData sampledata){
+	System_printf("gatewayRadio: received packet with CowID = %i, "
+											"PacketType: %i, "
+											"Timestamp: %i, "
+											"Error: %i, ",
+											sampledata.cowID,
+											sampledata.packetType,
+											sampledata.timestamp,
+											sampledata.error);
+	if(sampledata.packetType == RADIO_PACKET_TYPE_SENSOR_PACKET){
+	System_printf(							"TemperatureCowData = %i.%i, "
+											"AmbientTemperatureData = %i.%i, "
+											"InfraredData = %i.%i\n ",
+											sampledata.tempData.temp_h,
+											sampledata.tempData.temp_l,
+											sampledata.heartRateData.temp_h,
+											sampledata.heartRateData.temp_l,
+											sampledata.heartRateData.rate_h,
+											sampledata.heartRateData.rate_l);
+	}
+	else{
+	System_printf(							"accelerometerData= x=%i, y=%i, z=%i\n",
+											sampledata.accelerometerData.x,
+											sampledata.accelerometerData.y,
+											sampledata.accelerometerData.z);
+	}
 }
 
-/*print what you received*/
-void printNodes(void) {
-		System_printf(	"%d th packet, "
-						"received packet from "
-						"src address = 0x%x, "
-						"Error code: 0x%x\n",
-						//"Temp_Data = %i.%i, "
-						//"Acc_Data= x=%i y=%i z=%i, "
-						//"IR_Data_H = %i, IR_Data_L = %i \n",
-						i,
-						latestActiveSensorNode.header.sourceAddress,
-						latestActiveSensorNode.sampledata.error);
-						//latestActiveSensorNode.sampledata.tempData.temp_h,
-						//latestActiveSensorNode.sampledata.tempData.temp_l,
 
-						//latestActiveSensorNode.sampledata.accelerometerData.x,
-						//latestActiveSensorNode.sampledata.accelerometerData.y,
-						//latestActiveSensorNode.sampledata.accelerometerData.z,
+static void packetReceivedCallback(union ConcentratorPacket* packet, int8_t rssi)
+{
+	/* Save the values */
+	latestActivePacket.header = packet->header;
+	latestActivePacket.sampledata = packet->sensorPacket.sampledata;
 
-						//latestActiveSensorNode.sampledata.heartRateData.rate_h,
-						//latestActiveSensorNode.sampledata.heartRateData.rate_l);
+	Event_post(gatewayEventHandle, GATEWAYRADIOTEST_EVENT_NEW_SENSOR_VALUE);
 }
 

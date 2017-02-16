@@ -9,7 +9,7 @@
 #define DEBUG_H_
 
 /*** verbose for printing debug messages trough different threads/Functions ***/
-static const int verbose_main = 0;
+static const int verbose_main = 1;
 
 /* sensor blocks */
 static const int verbose_sensors = 0;
@@ -26,8 +26,9 @@ static const int verbose_arduinoCom = 0;
 
 /* Tests suites */
 static const int verbose_serializeTest = 0;
-static const int verbose_betaRadioTest = 1;
-static const int verbose_alphaRadioTest = 1;
+static const int verbose_betaRadioTest = 0;
+static const int verbose_alphaRadioTest = 0;
+static const int verbose_gatewayRadioTest = 1;
 static const int verbose_arduinoComTest = 0;
 static const int verbose_eepromTest = 1;
 

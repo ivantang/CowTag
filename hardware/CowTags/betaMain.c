@@ -38,7 +38,7 @@ int main(void){
 	//Sensors_init(); // init i2C
 
 	//if(verbose_main){System_printf("Initializing EEPROM...\n");}
-	//eeprom_testStart();
+	//eepromTest_init();
 
 	//if(verbose_main){System_printf("Initializing serialization thread...\n");}
 	//serializeTestStart();

@@ -166,25 +166,38 @@ static void packetReceivedCallback(union ConcentratorPacket* packet, int8_t rssi
 
 /*print what you received*/
 void printNodes(void) {
-		System_printf(	"%d th packet, "
-						"received packet from "
+	if(latestActiveSensorNode.sampledata.packetType == RADIO_PACKET_TYPE_SENSOR_PACKET){
+		System_printf(	"%dth packet, "
+						"received SENSOR packet from "
 						"src address = 0x%x, "
-						"Error code: 0x%x\n",
-						//"Temp_Data = %i.%i, "
-						//"Acc_Data= x=%i y=%i z=%i, "
-						//"IR_Data_H = %i, IR_Data_L = %i \n",
+						"Error code: 0x%x\n"
+						"Object Temperature = %i, "
+						"Ambient Temperature = %i, "
+						"Raw IR for Heart Rate = %i\n\n",
 						i,
 						latestActiveSensorNode.header.sourceAddress,
-						latestActiveSensorNode.sampledata.error);
-						//latestActiveSensorNode.sampledata.tempData.temp_h,
-						//latestActiveSensorNode.sampledata.tempData.temp_l,
+						latestActiveSensorNode.sampledata.error,
+						latestActiveSensorNode.sampledata.tempData.temp_h << 8 |
+						latestActiveSensorNode.sampledata.tempData.temp_l,
+						latestActiveSensorNode.sampledata.heartRateData.temp_h << 8 |
+						latestActiveSensorNode.sampledata.heartRateData.temp_l,
 
-						//latestActiveSensorNode.sampledata.accelerometerData.x,
-						//latestActiveSensorNode.sampledata.accelerometerData.y,
-						//latestActiveSensorNode.sampledata.accelerometerData.z,
+						latestActiveSensorNode.sampledata.heartRateData.rate_h << 8 |
+						latestActiveSensorNode.sampledata.heartRateData.rate_l);
+	}else if(latestActiveSensorNode.sampledata.packetType == RADIO_PACKET_TYPE_ACCEL_PACKET){
+		System_printf(	"%d th packet, "
+						"received ACCELERATION packet from "
+						"src address = 0x%x, "
+						"Error code: 0x%x\n"
+						"Acc_Data= x=%i y=%i z=%i\n\n",
+						i,
+						latestActiveSensorNode.header.sourceAddress,
+						latestActiveSensorNode.sampledata.error,
 
-						//latestActiveSensorNode.sampledata.heartRateData.rate_h,
-						//latestActiveSensorNode.sampledata.heartRateData.rate_l);
+						latestActiveSensorNode.sampledata.accelerometerData.x,
+						latestActiveSensorNode.sampledata.accelerometerData.y,
+						latestActiveSensorNode.sampledata.accelerometerData.z);
+	}
 }
 
 /*static void updateNode(struct BetaSensorNode* node) {

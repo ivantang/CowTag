@@ -35,7 +35,7 @@
 #include <IIC.h>
 
 /***** Defines *****/
-#define BOARD_24LC256 0x57	//slave address for first eeprom (a1a2a3 = 000)
+#define BOARD_24LC256 0x50	//slave address for first eeprom (a1a2a3 = 000)
 
 /***** Variable Declarations *****/
 uint16_t eeprom_currentAddress = MIN_EEPROM_ADDRESS;

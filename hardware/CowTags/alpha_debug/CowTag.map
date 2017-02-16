@@ -1,7 +1,7 @@
 ******************************************************************************
                   TI ARM Linker Unix v15.12.3                  
 ******************************************************************************
->> Linked Wed Feb 15 14:46:59 2017
+>> Linked Wed Feb 15 16:19:13 2017
 
 OUTPUT FILE NAME:   <CowTag.out>
 ENTRY POINT SYMBOL: "ResetISR"  address: 000077f1
@@ -1240,8 +1240,8 @@ section   page    origin      length       input sections
 .vecs      0    20000000    000000c8     NOLOAD SECTION
                   20000000    000000c8     cowtagOS_pem3.oem3 (.vecs)
 
-xdc.meta   0    00000000    000000ee     COPY SECTION
-                  00000000    000000ee     cowtagOS_pem3.oem3 (xdc.meta)
+xdc.meta   0    00000000    000000fa     COPY SECTION
+                  00000000    000000fa     cowtagOS_pem3.oem3 (xdc.meta)
 
 xdc.noload 
 *          0    00000000    00000000     COPY SECTION
@@ -1272,18 +1272,18 @@ MODULE SUMMARY
     +--+---------------------------------+-------+---------+---------+
        Total:                            2516    13600     1004   
                                                                   
-    /home/champ/Git/72point5/hardware/CowTags/alpha_debug/configPkg/package/cfg/
+    /home/ivan/Documents/Github/72point5/hardware/CowTags/alpha_debug/configPkg/package/cfg/
        cowtagOS_pem3.oem3                902     1527      2718   
     +--+---------------------------------+-------+---------+---------+
        Total:                            902     1527      2718   
                                                                   
-    /home/champ/Git/72point5/hardware/CowTags/src/sysbios/rom_sysbios.aem3
+    /home/ivan/Documents/Github/72point5/hardware/CowTags/src/sysbios/rom_sysbios.aem3
        rom_sysbios.obj                   2213    0         0      
        rom_sysbios_config.obj            26      0         0      
     +--+---------------------------------+-------+---------+---------+
        Total:                            2239    0         0      
                                                                   
-    /opt/ti/ccsv6/tools/compiler/arm_15.12.3.LTS/lib/rtsv7M3_T_le_eabi.lib
+    /home/ivan/ti/ccsv6/tools/compiler/arm_15.12.3.LTS/lib/rtsv7M3_T_le_eabi.lib
        lowlev.obj                        780     0         208    
        trgdrv.obj                        804     0         8      
        ull_div_t2.obj                    500     0         0      
@@ -1323,17 +1323,17 @@ MODULE SUMMARY
     +--+---------------------------------+-------+---------+---------+
        Total:                            5586    0         948    
                                                                   
-    /opt/ti/tirtos_cc13xx_cc26xx_2_21_00_06/products/bios_6_46_01_37/packages/ti/targets/arm/rtsarm/lib/auto_init.aem3
+    /home/ivan/ti/tirtos_cc13xx_cc26xx_2_21_00_06/products/bios_6_46_01_37/packages/ti/targets/arm/rtsarm/lib/auto_init.aem3
        auto_init.oem3                    160     0         0      
     +--+---------------------------------+-------+---------+---------+
        Total:                            160     0         0      
                                                                   
-    /opt/ti/tirtos_cc13xx_cc26xx_2_21_00_06/products/bios_6_46_01_37/packages/ti/targets/arm/rtsarm/lib/boot.aem3
+    /home/ivan/ti/tirtos_cc13xx_cc26xx_2_21_00_06/products/bios_6_46_01_37/packages/ti/targets/arm/rtsarm/lib/boot.aem3
        boot.oem3                         68      0         0      
     +--+---------------------------------+-------+---------+---------+
        Total:                            68      0         0      
                                                                   
-    /opt/ti/tirtos_cc13xx_cc26xx_2_21_00_06/products/cc13xxware_2_04_03_17272/driverlib/bin/ccs/driverlib.lib
+    /home/ivan/ti/tirtos_cc13xx_cc26xx_2_21_00_06/products/cc13xxware_2_04_03_17272/driverlib/bin/ccs/driverlib.lib
        setup_rom.obj                     1472    0         0      
        sys_ctrl.obj                      748     0         8      
        rfc.obj                           592     0         0      
@@ -1350,7 +1350,7 @@ MODULE SUMMARY
     +--+---------------------------------+-------+---------+---------+
        Total:                            4032    0         29     
                                                                   
-    /opt/ti/tirtos_cc13xx_cc26xx_2_21_00_06/products/tidrivers_cc13xx_cc26xx_2_21_00_04/packages/ti/drivers/lib/drivers_cc13xxware_instrumented.aem3
+    /home/ivan/ti/tirtos_cc13xx_cc26xx_2_21_00_06/products/tidrivers_cc13xx_cc26xx_2_21_00_04/packages/ti/drivers/lib/drivers_cc13xxware_instrumented.aem3
        PowerCC26XX.oem3                  2304    76        272    
        PowerCC26XX_calibrateRCOSC.oem3   1476    0         0      
        PINCC26XX.oem3                    1120    0         272    
@@ -1358,12 +1358,12 @@ MODULE SUMMARY
     +--+---------------------------------+-------+---------+---------+
        Total:                            4918    76        544    
                                                                   
-    /opt/ti/tirtos_cc13xx_cc26xx_2_21_00_06/products/tidrivers_cc13xx_cc26xx_2_21_00_04/packages/ti/drivers/lib/power_cc13xx_tirtos_instrumented.aem3
+    /home/ivan/ti/tirtos_cc13xx_cc26xx_2_21_00_06/products/tidrivers_cc13xx_cc26xx_2_21_00_04/packages/ti/drivers/lib/power_cc13xx_tirtos_instrumented.aem3
        PowerCC26XX_tirtos.oem3           212     0         0      
     +--+---------------------------------+-------+---------+---------+
        Total:                            212     0         0      
                                                                   
-    /opt/ti/tirtos_cc13xx_cc26xx_2_21_00_06/products/tidrivers_cc13xx_cc26xx_2_21_00_04/packages/ti/drivers/rf/lib/rf_singleMode_cc13xxware_instrumented.aem3
+    /home/ivan/ti/tirtos_cc13xx_cc26xx_2_21_00_06/products/tidrivers_cc13xx_cc26xx_2_21_00_04/packages/ti/drivers/rf/lib/rf_singleMode_cc13xxware_instrumented.aem3
        RFCC26XX_singleMode.oem3          4890    20        552    
     +--+---------------------------------+-------+---------+---------+
        Total:                            4890    20        552    
@@ -1820,11 +1820,11 @@ UNDEFED   SHT$$INIT_ARRAY$$Limit
 00007ee5  SafeHapiVoid                                                              
 00000000  __ASM__                                                                   
 20001008  __CIOBUF_                                                                 
-00000068  __ISA__                                                                   
-0000007a  __PLAT__                                                                  
+00000074  __ISA__                                                                   
+00000086  __PLAT__                                                                  
 20005000  __STACK_END                                                               
 00000300  __STACK_SIZE                                                              
-000000a1  __TARG__                                                                  
+000000ad  __TARG__                                                                  
 000006c4  __TI_CINIT_Base                                                           
 00000724  __TI_CINIT_Limit                                                          
 000006bc  __TI_Handler_Table_Base                                                   
@@ -1848,7 +1848,7 @@ ffffffff  __TI_prof_data_start
 200013b0  __TI_tmpnams                                                              
 00006d71  __TI_writemsg                                                             
 00005bc1  __TI_wrt_ok                                                               
-000000c6  __TRDR__                                                                  
+000000d2  __TRDR__                                                                  
 00006391  __aeabi_cdcmpeq                                                           
 00006391  __aeabi_cdcmple                                                           
 00006417  __aeabi_cdrcmple                                                          
@@ -2522,10 +2522,10 @@ address   name
 00000001  xdc_runtime_Startup__EXECFXN__C                                           
 00000001  xdc_runtime_Startup__RESETFXN__C                                          
 00000040  __TI_static_base__                                                        
-00000068  __ISA__                                                                   
-0000007a  __PLAT__                                                                  
-000000a1  __TARG__                                                                  
-000000c6  __TRDR__                                                                  
+00000074  __ISA__                                                                   
+00000086  __PLAT__                                                                  
+000000ad  __TARG__                                                                  
+000000d2  __TRDR__                                                                  
 00000300  __STACK_SIZE                                                              
 000006bc  __TI_Handler_Table_Base                                                   
 000006c4  __TI_CINIT_Base                                                           

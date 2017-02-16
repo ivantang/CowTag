@@ -102,6 +102,7 @@ void getAcceleration(struct sampleData*);
 void getTemp(struct sampleData*);
 void getHeartRate(struct sampleData*);
 void getTimestamp(struct sampleData*);
+void makeSensorPacket(struct sampleData*);
 void testSensors();
 
 #endif /* SENSORS_H_ */

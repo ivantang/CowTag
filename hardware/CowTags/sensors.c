@@ -50,8 +50,7 @@ Char task0Stack[TASKSTACKSIZE];
 
 /*function definition */
 void Sensors_init(void){
-	PIN_init(BoardGpioInitialTable);
-
+	//PIN_init(BoardGpioInitialTable);
 	Task_Params taskParams;
 
 	Task_Params_init(&taskParams);
@@ -99,13 +98,19 @@ void getTemp(struct sampleData *sampleData){
 	uint16_t temp_obj;
 	uint16_t temp_amb;
 
-	 temp_obj =  readI2CWord100kHz(Board_MIKROE1362_ADDR,0x07)*0.02 - 273.15;
-	 sampleData->tempData.temp_l = temp_obj & 0xFF;
-	 sampleData->tempData.temp_h = temp_obj >> 8;
+	System_printf("B\n");
+	System_flush();
 
-	 temp_amb =  readI2CWord100kHz(Board_MIKROE1362_ADDR,0x07)*0.02 - 273.15;
-	 sampleData->heartRateData.temp_l = temp_obj & 0xFF;
-	 sampleData->heartRateData.temp_h = temp_obj >> 8;
+	temp_obj =  readI2CWord100kHz(Board_MIKROE1362_ADDR,0x07)*0.02 - 273.15;
+	sampleData->tempData.temp_l = temp_obj & 0xFF;
+	sampleData->tempData.temp_h = temp_obj >> 8;
+
+	System_printf("B\n");
+	System_flush();
+
+	temp_amb =  readI2CWord100kHz(Board_MIKROE1362_ADDR,0x06)*0.02 - 273.15;
+	sampleData->heartRateData.temp_l = temp_amb & 0xFF;
+	sampleData->heartRateData.temp_h = temp_amb >> 8;
 
 	if(verbose_sensors){
 		System_printf("temp_obj %d\n", temp_obj);
@@ -114,9 +119,34 @@ void getTemp(struct sampleData *sampleData){
 	return;
 }
 
+void getTempNoPtr(){
+	uint16_t temp_obj;
+	uint16_t temp_amb;
+
+	System_printf("B\n");
+	System_flush();
+
+	temp_obj =  readI2CWord100kHz(Board_MIKROE1362_ADDR,0x07)*0.02 - 273.15;
+	//sampleData->tempData.temp_l = temp_obj & 0xFF;
+	//sampleData->tempData.temp_h = temp_obj >> 8;
+
+	System_printf("B\n");
+	System_flush();
+
+	temp_amb =  readI2CWord100kHz(Board_MIKROE1362_ADDR,0x06)*0.02 - 273.15;
+	//sampleData->heartRateData.temp_l = temp_amb & 0xFF;
+	//sampleData->heartRateData.temp_h = temp_amb >> 8;
+
+	if(verbose_sensors){
+		System_printf("temp_obj %d\n", temp_obj);
+		System_printf("temp_obj %d\n", temp_amb);
+		System_flush();
+	}
+
+	return;
+}
 
 void getHeartRate(struct sampleData *sampleData){
-	struct heartrateData heartrateData;
 	int i = 0;
 	uint16_t numValues = 10;
 	uint16_t HRData[10];
@@ -191,30 +221,42 @@ void getHeartRate(struct sampleData *sampleData){
 
 		System_flush();
 	}
+
+	return;
 }
 
 void getTimestamp(struct sampleData *sampleData){
 	sampleData->timestamp = Timestamp_get32();
+}
 
-	return sampleData;
+void makeSensorPacket(struct sampleData *sampleData){
+
+	getAcceleration(sampleData);
+	System_printf("A\n");
+	System_flush();
+	getTemp(sampleData);
+	System_printf("A\n");
+	System_flush();
+	getHeartRate(sampleData);
+	System_printf("A\n");
+	System_flush();
+	getTimestamp(sampleData);
+	System_printf("A\n");
+	System_flush();
+	System_printf("x:%d y:%d z:%d\n", sampleData->accelerometerData.x ,sampleData->accelerometerData.y, sampleData->accelerometerData.z);
+	System_printf("temp_obj low %x  high %x\n", sampleData->tempData.temp_l, sampleData->tempData.temp_h);
+	System_printf("temp_amb low %x  high %x\n", sampleData->heartRateData.temp_l, sampleData->heartRateData.temp_h);
+	System_printf("rate low %x  rate high %x\n", sampleData->heartRateData.rate_l, sampleData->heartRateData.rate_h);
+	System_printf("timestamp %x\n", sampleData->timestamp);
+	System_flush();
 }
 
 void testSensors(){
-	while(1){
-		struct sampleData sampleData;
+	struct sampleData sampleData;
+	makeSensorPacket(&sampleData);
+	//getTempNoPtr();
+	//getTemp(&sampleData);
 
-		//getObjTemp();
-		getAcceleration(&sampleData);
-		getTemp(&sampleData);
-		getHeartRate(&sampleData);
-		getTimestamp(&sampleData);
-		System_printf("x:%d y:%d z:%d\n", sampleData.accelerometerData.x ,sampleData.accelerometerData.y, sampleData.accelerometerData.z);
-		System_printf("temp_obj low %x  high %x\n", sampleData.tempData.temp_l, sampleData.tempData.temp_h);
-		System_printf("temp_amb low %x  high %x\n", sampleData.heartRateData.temp_l, sampleData.heartRateData.temp_h);
-		System_printf("rate low %x  rate high %x\n", sampleData.heartRateData.rate_l, sampleData.heartRateData.rate_h);
-		System_printf("timestamp %x\n", sampleData.timestamp);
-		System_flush();
-	}
 	System_printf("Tests done\n");
 	System_flush();
 }

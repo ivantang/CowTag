@@ -81,20 +81,26 @@ static void betaRadioTestTaskFunction(UArg arg0, UArg arg1)
 	struct sampleData sample;
 	sample.cowID = 1;
 	sample.packetType = RADIO_PACKET_TYPE_SENSOR_PACKET;
-	sample.timestamp = 0x12345678;
+	//sample.timestamp = 0x12345678;
 
 	if(sample.packetType == RADIO_PACKET_TYPE_SENSOR_PACKET){
-		sample.tempData.temp_h = 0x78;
+		System_printf("i didnt do it\n");
+		System_flush();
+		/*sample.tempData.temp_h = 0x78;
 		sample.tempData.temp_l = 0x65;
 		sample.heartRateData.rate_h = 0x90;
 		sample.heartRateData.rate_l = 0x87;
 		sample.heartRateData.temp_h = 0x45;
-		sample.heartRateData.temp_l = 0x32;
+		sample.heartRateData.temp_l = 0x32;*/
+		makeSensorPacket(&sample);
+		System_printf("i did it\n");
+		System_flush();
 	}
 	else{
-		sample.accelerometerData.x = 0x78;
-		sample.accelerometerData.y = 0x89;
-		sample.accelerometerData.z = 0x90;
+//		sample.accelerometerData.x = 0x78;
+//		sample.accelerometerData.y = 0x89;
+//		sample.accelerometerData.z = 0x90;
+		makeSensorPacket(&sample);
 	}
 	sample.error = 0;
 

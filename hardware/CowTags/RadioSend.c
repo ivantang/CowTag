@@ -164,7 +164,7 @@ static void nodeRadioTaskFunction(UArg arg0, UArg arg1)
 		if (events & RADIO_EVENT_DATA_ACK_RECEIVED)
 		{
 			returnRadioOperationStatus(NodeRadioStatus_Success);
-			//System_printf("ACK RECEIVED! Transmission successful.\n");
+			System_printf("ACK RECEIVED! Transmission successful.\n");
 		}
 
 		/* If we get an ACK timeout */

@@ -108,16 +108,16 @@ static void alphaRadioTestTaskFunction(UArg arg0, UArg arg1){
 	while(1) {
 		/* Wait for event */
 
-		uint32_t events = Event_pend(alphaRadioTestEventHandle, 0, ALPHARADIOTEST_EVENT_ALL, BIOS_WAIT_FOREVER);
+		/*uint32_t events = Event_pend(alphaRadioTestEventHandle, 0, ALPHARADIOTEST_EVENT_ALL, BIOS_WAIT_FOREVER);
 
 		if(events & ALPHARADIOTEST_EVENT_NEW_SENSOR_VALUE) {
 			if(verbose_alphaRadioTest){System_printf("RECEIVED A PACKET\n");}
 			if(verbose_alphaRadioTest){printSampleData(latestActivePacket.sampledata);}
 		}
-
+*/
 		CPUdelay(delay*5000);
 
-		sampledata.cowID = 1;
+		sampledata.cowID = 2;
 		sampledata.packetType = RADIO_PACKET_TYPE_SENSOR_PACKET;
 		sampledata.timestamp = 0x12345678;
 
@@ -143,7 +143,7 @@ static void alphaRadioTestTaskFunction(UArg arg0, UArg arg1){
 
 		CPUdelay(delay*5000);
 
-		sampledata.cowID = 1;
+		sampledata.cowID = 2;
 		sampledata.packetType = RADIO_PACKET_TYPE_ACCEL_PACKET;
 		sampledata.timestamp = 0x12345678;
 

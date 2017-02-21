@@ -82,7 +82,7 @@ bool eeprom_write(struct sampleData *data) {
 		// retry if read does not correlate with write
 		while (!writeSuccess) {
 			uint8_t writeByte[] = {(eeprom_currentAddress >> 8), eeprom_currentAddress & 0xFF, bytes[i]};
-			writeI2Ceeprom(BOARD_24LC256, writeByte);
+			writeI2CEEPROM(BOARD_24LC256, writeByte);
 
 			// validate write
 			uint8_t received[1];
@@ -119,7 +119,7 @@ void eeprom_readAddress(uint8_t addrHigh, uint8_t addrLow, int numBytes, uint8_t
 
 	unsigned i = 0;
 	while (i < numBytes) {
-		buf[i] = readEEPROMaddress(BOARD_24LC256, addrHigh + (i >> 8), addrLow + (i & 0xff));
+		buf[i] = readI2CEEPROM(BOARD_24LC256, addrHigh + (i >> 8), addrLow + (i & 0xff));
 		++i;
 	}
 }

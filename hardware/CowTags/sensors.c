@@ -229,20 +229,28 @@ void makeSensorPacket(struct sampleData *sampleData){
 
 	getTimestamp(sampleData);
 
-	System_printf("x:%d y:%d z:%d  ", sampleData->accelerometerData.x ,sampleData->accelerometerData.y, sampleData->accelerometerData.z);
-	System_printf("temp_obj low %x  high %x\n", sampleData->tempData.temp_l, sampleData->tempData.temp_h);
-	System_printf("temp_amb low %x  high %x  ", sampleData->heartRateData.temp_l, sampleData->heartRateData.temp_h);
-	System_printf("rate low %x  rate high %x  ", sampleData->heartRateData.rate_l, sampleData->heartRateData.rate_h);
-	System_printf("timestamp %x\n", sampleData->timestamp);
+	System_printf(							"TemperatureCowData = %i ,"
+											"AmbientTemperatureData = %i ,"
+											"InfraredData = %i\n"
+											"AccelerometerData= x=%i, y=%i, z=%i\n"
+											"Timestamp = %i\n",
+											sampleData->tempData.temp_h << 8 | sampleData->tempData.temp_l,
+											sampleData->heartRateData.temp_h << 8 | sampleData->heartRateData.temp_l,
+											sampleData->heartRateData.rate_h << 8 | sampleData->heartRateData.rate_l,
+											sampleData->accelerometerData.x,
+											sampleData->accelerometerData.y,
+											sampleData->accelerometerData.z,
+											sampleData->timestamp);
+
 	System_flush();
 }
 
 void testSensors(){
 	struct sampleData sampleData;
-	makeSensorPacket(&sampleData);
-	//getTempNoPtr();
-	//getTemp(&sampleData);
 
+	while(1){
+		makeSensorPacket(&sampleData);
+	}
 	System_printf("Tests done\n");
 	System_flush();
 }

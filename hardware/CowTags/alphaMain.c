@@ -48,7 +48,7 @@ int main(void){
 	//serialize_testStart();
 
 	//if(verbose_main){System_printf("Initializing radio antenna...\n");}
-	radioReceive_init();
+	//radioReceive_init();
 
 	if(verbose_main){System_printf("Initializing radio antenna...\n");}
 	radioSend_init();

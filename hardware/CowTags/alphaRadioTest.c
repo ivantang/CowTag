@@ -1,4 +1,11 @@
 /*
+ * alphaSendReceiveTest.c
+ *
+ *  Created on: Mar 2, 2017
+ *      Author: annik
+ */
+
+/*
  * Copyright (c) 2015-2016, Texas Instruments Incorporated
  * All rights reserved.
  *
@@ -47,8 +54,7 @@
 
 /***** Drivers *****/
 #include <ti/drivers/PIN.h>
-#include <RadioReceive.h>
-#include <RadioSend.h>
+#include <radioSendReceive.h>
 #include <sensors.h>
 
 /* Board Header files */
@@ -96,18 +102,17 @@ void alphaRadioTest_init(void) {
 
 static void alphaRadioTestTaskFunction(UArg arg0, UArg arg1){
 	/* Register a packet received callback with the radio task */
-	ConcentratorRadioTask_registerPacketReceivedCallback(packetReceivedCallback);
+	AlphaRadioTask_registerPacketReceivedCallback(packetReceivedCallback);
 
 	int delay = 10000;
 	struct sampleData sampledata;
-	enum NodeRadioOperationStatus results;
+	enum alphaRadioOperationStatus results;
 
 	if(verbose_alphaRadioTest){System_printf("Initializing alphaRadioTest...\n");}
 
 	/* Enter main task loop */
 	while(1) {
 		/* Wait for event */
-
 		uint32_t events = Event_pend(alphaRadioTestEventHandle, 0, ALPHARADIOTEST_EVENT_ALL, BIOS_WAIT_FOREVER);
 
 		if(events & ALPHARADIOTEST_EVENT_NEW_SENSOR_VALUE) {
@@ -122,7 +127,7 @@ static void alphaRadioTestTaskFunction(UArg arg0, UArg arg1){
 		sampledata.timestamp = 0x12345678;
 
 		if(ignoreSensors){
-			if(verbose_betaRadioTest){System_printf("Ignoring sensors, making fake packets\n");System_flush();}
+			if(verbose_alphaRadioTest){System_printf("Ignoring sensors, making fake packets\n");System_flush();}
 			sampledata.tempData.temp_h = 0x78;
 			sampledata.tempData.temp_l = 0x65;
 			sampledata.heartRateData.rate_h = 0x90;
@@ -131,15 +136,15 @@ static void alphaRadioTestTaskFunction(UArg arg0, UArg arg1){
 			sampledata.heartRateData.temp_l = 0x32;
 			sampledata.error = 0x0;
 		} else {
-			if(verbose_betaRadioTest){System_printf("Creating Packet...\n");System_flush();}
+			if(verbose_alphaRadioTest){System_printf("Creating Packet...\n");System_flush();}
 			makeSensorPacket(&sampledata);
-			if(verbose_betaRadioTest){System_printf("Packet Created\n");System_flush();}
+			if(verbose_alphaRadioTest){System_printf("Packet Created\n");System_flush();}
 		}
 
-		if(verbose_betaRadioTest){printSampleData(sampledata);}
-		if(verbose_betaRadioTest){System_printf("sending packet...\n");System_flush();}
-		results = betaRadioSendData(sampledata);
-		if(verbose_betaRadioTest){System_printf("packet sent error: %i\n",results);System_flush();}
+		if(verbose_alphaRadioTest){printSampleData(sampledata);}
+		if(verbose_alphaRadioTest){System_printf("sending packet...\n");System_flush();}
+		results = alphaRadioSendData(sampledata);
+		if(verbose_alphaRadioTest){System_printf("packet sent error: %i\n",results);System_flush();}
 
 		CPUdelay(delay*5000);
 
@@ -148,21 +153,21 @@ static void alphaRadioTestTaskFunction(UArg arg0, UArg arg1){
 		sampledata.timestamp = 0x12345678;
 
 		if(ignoreSensors){
-			if(verbose_betaRadioTest){System_printf("Ignoring sensors, making fake packets\n");System_flush();}
+			if(verbose_alphaRadioTest){System_printf("Ignoring sensors, making fake packets\n");System_flush();}
 			sampledata.accelerometerData.x=0x12;
 			sampledata.accelerometerData.y=0x34;
 			sampledata.accelerometerData.z=0x56;
 			sampledata.error = 0x0;
 		} else {
-			if(verbose_betaRadioTest){System_printf("Creating Packet...\n");System_flush();}
+			if(verbose_alphaRadioTest){System_printf("Creating Packet...\n");System_flush();}
 			makeSensorPacket(&sampledata);
-			if(verbose_betaRadioTest){System_printf("Packet Created\n");System_flush();}
+			if(verbose_alphaRadioTest){System_printf("Packet Created\n");System_flush();}
 		}
 
-		if(verbose_betaRadioTest){printSampleData(sampledata);}
-		if(verbose_betaRadioTest){System_printf("sending packet...\n");System_flush();}
-		results = betaRadioSendData(sampledata);
-		if(verbose_betaRadioTest){System_printf("packet sent error: %i\n",results);System_flush();}
+		if(verbose_alphaRadioTest){printSampleData(sampledata);}
+		if(verbose_alphaRadioTest){System_printf("sending packet...\n");System_flush();}
+		results = alphaRadioSendData(sampledata);
+		if(verbose_alphaRadioTest){System_printf("packet sent error: %i\n",results);System_flush();}
 	}
 }
 
@@ -212,3 +217,6 @@ void printSampleData(struct sampleData sampledata){
 											sampledata.accelerometerData.z);
 	}
 }
+
+
+

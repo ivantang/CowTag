@@ -148,16 +148,16 @@ static void alphaRadioTaskFunction(UArg arg0, UArg arg1)
 		System_abort("EasyLink_receiveAsync failed");
 	}
 
-	System_printf("done alpha Radio thread initilization\n");
 	/* Enter main task loop */
 	while (1)
 	{
-		uint32_t events = Event_pend(radioOperationEventHandle, 0, ALPHARADIO_EVENT_ALL, BIOS_WAIT_FOREVER);
+		//uint32_t events = Event_pend(radioOperationEventHandle, 0, ALPHARADIO_EVENT_ALL, BIOS_WAIT_FOREVER);
+		uint32_t events = Event_pend(radioOperationEventHandle, 0, ALPHARADIO_EVENT_ALL, 3);
 
 		/* If valid packet received */
 		if(events & ALPHARADIO_EVENT_VALID_PACKET_RECEIVED) {
 
-			//System_printf("Valid Packet, sending ACK...\n");
+			System_printf("Valid Packet, sending ACK...\n");
 
 			/* Send the ack packet */
 			sendAck(latestRxPacket.header.sourceAddress);
@@ -165,11 +165,11 @@ static void alphaRadioTaskFunction(UArg arg0, UArg arg1)
 			/* Call packet received callback */
 			notifyPacketReceived(&latestRxPacket);
 
-			//System_printf("ACK sent. Back to listening\n");
+			System_printf("RadioReceive: ACK sent. Back to listening\n");
 
 			/* Go back to RX (to wait to sensor packet) */
 			if(EasyLink_receiveAsync(rxDoneCallbackReceive, 0) != EasyLink_Status_Success) {
-				System_abort("EasyLink_receiveAsync failed: 1");
+				System_abort("EasyLink_receiveAsync failed: ALPHARADIO_EVENT_VALID_PACKET_RECEIVED");
 			}
 
 			/* toggle Activity LED */
@@ -180,10 +180,10 @@ static void alphaRadioTaskFunction(UArg arg0, UArg arg1)
 		/* If invalid packet received */
 		if(events & ALPHARADIO_EVENT_INVALID_PACKET_RECEIVED) {
 
-			System_printf("Invalid Packet. Back to listening.\n");
+			System_printf("RadioReceive: invalid Packet, back to listening.\n");
 			/* Go back to RX */
 			if(EasyLink_receiveAsync(rxDoneCallbackReceive, 0) != EasyLink_Status_Success) {
-				System_abort("EasyLink_receiveAsync failed: 2");
+				System_abort("EasyLink_receiveAsync failed: ALPHARADIO_EVENT_INVALID_PACKET_RECEIVED");
 			}
 		}
 
@@ -192,7 +192,7 @@ static void alphaRadioTaskFunction(UArg arg0, UArg arg1)
 		{
 			sensorPacket.sampledata = sampledata;
 			sensorPacket.header.packetType = sampledata.packetType;
-			//System_printf("Sending data...\n");
+			System_printf("RadioSend: sending data...\n");
 			sendBetaPacket(sensorPacket, ALPHARADIO_MAX_RETRIES, ALPHARADIO_ACK_TIMEOUT_TIME_MS);
 
 		}
@@ -201,7 +201,7 @@ static void alphaRadioTaskFunction(UArg arg0, UArg arg1)
 		if (events & ALPHARADIO_EVENT_DATA_ACK_RECEIVED)
 		{
 			returnRadioOperationStatus(AlphaRadioStatus_Success);
-			System_printf("ACK RECEIVED! Transmission successful.\n");
+			System_printf("RadioSend: ACK RECEIVED! Transmission successful.\n");
 		}
 
 		/* If we get an ACK timeout */
@@ -211,20 +211,19 @@ static void alphaRadioTaskFunction(UArg arg0, UArg arg1)
 			if (currentRadioOperation.retriesDone < currentRadioOperation.maxNumberOfRetries)
 			{
 				resendPacket();
-				System_printf("Timed out: resending for the %d th time\n", currentRadioOperation.retriesDone);
+				System_printf("RadioSend: Timed out! resending for the %d th time\n", currentRadioOperation.retriesDone);
 			}
 			else
 			{
 				/* Else return send fail */
-
 				returnRadioOperationStatus(AlphaRadioStatus_Failed);
-
 			}
 		}
 
 		/* If send fail */
 		if (events & ALPHARADIO_EVENT_SEND_FAIL)
 		{
+			System_printf("RadioSend: Send failed\n");
 			returnRadioOperationStatus(AlphaRadioStatus_FailedNotConnected);
 		}
 	}
@@ -273,7 +272,7 @@ static void sendBetaPacket(struct sensorPacket bp, uint8_t maxNumberOfRetries, u
 	}else{
 		currentRadioOperation.easyLinkTxPacket.dstAddr[0] = 0x02;
 	}*/
-	System_printf("sending to alpha's or gateway\n");
+	//System_printf("sending to alpha's or gateway\n");
 	currentRadioOperation.easyLinkTxPacket.dstAddr[0] = GATEWAY_ADDRESS;
 
 	/* Copy packet to payload */
@@ -290,13 +289,15 @@ static void sendBetaPacket(struct sensorPacket bp, uint8_t maxNumberOfRetries, u
 	/* Send packet  */
 	if (EasyLink_transmit(&currentRadioOperation.easyLinkTxPacket) != EasyLink_Status_Success)
 	{
-		System_abort("EasyLink_transmit failed");
+		//System_abort("EasyLink_transmit failed: failed to send packet");
+		System_printf("EasyLink_transmit failed: failed to send packet\n");
 	}
 
 	/* Enter RX */
 	if (EasyLink_receiveAsync(rxDoneCallbackSend, 0) != EasyLink_Status_Success)
 	{
-		System_abort("EasyLink_receiveAsync failed");
+		//System_abort("EasyLink_receiveAsync failed");
+		System_printf("EasyLink_receiveAsync failed: send\n");
 	}
 }
 
@@ -305,13 +306,16 @@ static void resendPacket()
 	/* Send packet  */
 	if (EasyLink_transmit(&currentRadioOperation.easyLinkTxPacket) != EasyLink_Status_Success)
 	{
-		System_abort("EasyLink_transmit failed");
+		//System_abort("EasyLink_transmit failed: failed to RESEND packet");
+		System_printf("EasyLink_transmit failed: failed to RESEND packet\n");
+
 	}
 
 	/* Enter RX and wait for ACK with timeout */
 	if (EasyLink_receiveAsync(rxDoneCallbackSend, 0) != EasyLink_Status_Success)
 	{
-		System_abort("EasyLink_receiveAsync failed");
+		//System_abort("EasyLink_receiveAsync failed");
+		System_printf("EasyLink_receiveAsync failed: resend\n");
 	}
 
 	/* Increase retries by one */
@@ -408,9 +412,6 @@ static void rxDoneCallbackReceive(EasyLink_RxPacket * rxPacket, EasyLink_Status 
 		if (tmpRxPacket->header.packetType == RADIO_PACKET_TYPE_SENSOR_PACKET)
 		{
 
-			//System_printf("my address 0x%x; ", concentratorAddress);
-			//System_printf("source address 0x%x\n", tmpRxPacket->header.sourceAddress);
-
 			// alpha check
 			if( (concentratorAddress & 0x3) == ALPHA_ADDRESS){ // IF I AM AN ALPHA
 				if((tmpRxPacket->header.sourceAddress & 0x1) == 1){ // IF THE SOURCE IS ANOTHER CONCENTRATOR
@@ -428,9 +429,6 @@ static void rxDoneCallbackReceive(EasyLink_RxPacket * rxPacket, EasyLink_Status 
 
 		}else if(tmpRxPacket->header.packetType == RADIO_PACKET_TYPE_ACCEL_PACKET){
 
-			//System_printf("my address 0x%x; ", concentratorAddress);
-						//System_printf("source address 0x%x\n", tmpRxPacket->header.sourceAddress);
-
 						// alpha check
 						if( (concentratorAddress & 0x3) == ALPHA_ADDRESS){ // IF I AM AN ALPHA
 							if((tmpRxPacket->header.sourceAddress & 0x1) == 1){ // IF THE SOURCE IS ANOTHER CONCENTRATOR
@@ -446,14 +444,18 @@ static void rxDoneCallbackReceive(EasyLink_RxPacket * rxPacket, EasyLink_Status 
 						/* Signal packet received */
 						Event_post(radioOperationEventHandle, ALPHARADIO_EVENT_VALID_PACKET_RECEIVED);
 		}
+		else if(tmpRxPacket->header.packetType == RADIO_PACKET_TYPE_ACK_PACKET){
+			//alpha sends now, so it needs ACK packets
+			Event_post(radioOperationEventHandle, ALPHARADIO_EVENT_DATA_ACK_RECEIVED);
+		}
 		else{
 			// ignore unknown packet or ACK packet
 			Event_post(radioOperationEventHandle, ALPHARADIO_EVENT_INVALID_PACKET_RECEIVED);
 		}
 	}	else // status = some error; packet not rx'd successfully
 	{
-		System_printf("Receive Error.\n");
+		//System_printf("Receive Error.\n");
 		/* Signal invalid packet received */
-		Event_post(radioOperationEventHandle, ALPHARADIO_EVENT_INVALID_PACKET_RECEIVED);
+		Event_post(radioOperationEventHandle, ALPHARADIO_EVENT_SEND_FAIL);
 	}
 }

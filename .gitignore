@@ -33,19 +33,8 @@
 *.d
 Debug/
 Release/
-src/
 .xdchelp
 .config/
 .launches/
 *.aem3
-hardware/betaTag/src/makefile.libs
-hardware/betaTag/src/sysbios/makefile
-hardware/betaTag/src/sysbios/rom_sysbios.aem3
 
-hardware/CowTags/beta_debug/*
-hardware/CowTags/alpha_debug/*
-hardware/CowTags/beta_debug/configPkg/*
-hardware/CowTags/alpha_debug/configPkg/*
-hardware/CowTags/.ccsproject
-hardware/CowTags/.cproject
-hardware/CowTags/.settings/*

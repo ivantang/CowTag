@@ -47,8 +47,8 @@
 #include <RadioSend.h>
 #include <sensors.h>
 #include <eeprom.h>
+#include <Sleep.h>
 #include <EventManager.h>
-#include <TaskManager.h>
 
 /* Board Header files */
 #include <Board.h>
@@ -63,7 +63,6 @@ static Task_Params betaRadioTestTaskParams;
 Task_Struct betaRadioTestTask;    /* not static so you can see in ROV */
 static uint8_t betaRadioTestTaskStack[BETARADIOTEST_TASK_STACK_SIZE];
 static Event_Handle * eventHandle;
-static Event_Handle taskHandle;
 
 /***** Prototypes *****/
 static void betaRadioTestTaskFunction(UArg arg0, UArg arg1);
@@ -81,10 +80,6 @@ void betaRadioTest_init(void)
 	betaRadioTestTaskParams.priority = BETARADIOTEST_TASK_PRIORITY;
 	betaRadioTestTaskParams.stack = &betaRadioTestTaskStack;
 	Task_construct(&betaRadioTestTask, betaRadioTestTaskFunction, &betaRadioTestTaskParams, NULL);
-
-	/* add task to list */
-	taskHandle = Task_self();
-	addTaskHandle(TASK_BETA, &taskHandle);
 }
 
 static void betaRadioTestTaskFunction(UArg arg0, UArg arg1)
@@ -96,33 +91,31 @@ static void betaRadioTestTaskFunction(UArg arg0, UArg arg1)
 		struct sampleData sampledata;
 		enum NodeRadioOperationStatus results;
 
-//		CPUdelay(delay*5000);
+		sampledata.cowID = 1;
+		sampledata.packetType = RADIO_PACKET_TYPE_SENSOR_PACKET;
+		sampledata.timestamp = 0x12345678;
 
-//		sampledata.cowID = 1;
-//		sampledata.packetType = RADIO_PACKET_TYPE_SENSOR_PACKET;
-//		sampledata.timestamp = 0x12345678;
-//
-//		if(ignoreSensors){
-//			if(verbose_betaRadioTest){System_printf("Ignoring sensors, making fake packets\n");System_flush();}
-//			sampledata.tempData.temp_h = 0x78;
-//			sampledata.tempData.temp_l = 0x65;
-//			sampledata.heartRateData.rate_h = 0x90;
-//			sampledata.heartRateData.rate_l = 0x87;
-//			sampledata.heartRateData.temp_h = 0x45;
-//			sampledata.heartRateData.temp_l = 0x32;
-//			sampledata.error = 0x0;
-//		} else {
-//			if(verbose_betaRadioTest){System_printf("Creating Packet...\n");System_flush();}
-//			makeSensorPacket(&sampledata);
-//			if(verbose_betaRadioTest){System_printf("Packet Created\n");System_flush();}
-//		}
-//
-//		if(verbose_betaRadioTest){printSampleData(sampledata);}
-//		if(verbose_betaRadioTest){System_printf("sending packet...\n");System_flush();}
-//		results = betaRadioSendData(sampledata);
-//		if(verbose_betaRadioTest){System_printf("packet sent error: %i\n",results);System_flush();}
+		if(ignoreSensors){
+			if(verbose_betaRadioTest){System_printf("Ignoring sensors, making fake packets\n");System_flush();}
+			sampledata.tempData.temp_h = 0x78;
+			sampledata.tempData.temp_l = 0x65;
+			sampledata.heartRateData.rate_h = 0x90;
+			sampledata.heartRateData.rate_l = 0x87;
+			sampledata.heartRateData.temp_h = 0x45;
+			sampledata.heartRateData.temp_l = 0x32;
+			sampledata.error = 0x0;
+		} else {
+			if(verbose_betaRadioTest){System_printf("Creating Packet...\n");System_flush();}
+			makeSensorPacket(&sampledata);
+			if(verbose_betaRadioTest){System_printf("Packet Created\n");System_flush();}
+		}
 
-//		CPUdelay(delay*5000);
+		if(verbose_betaRadioTest){printSampleData(sampledata);}
+		if(verbose_betaRadioTest){System_printf("sending packet...\n");System_flush();}
+		results = betaRadioSendData(sampledata);
+		if(verbose_betaRadioTest){System_printf("packet sent error: %i\n",results);System_flush();}
+
+		CPUdelay(delay*5000);
 //
 //		sampledata.cowID = 1;
 //		sampledata.packetType = RADIO_PACKET_TYPE_ACCEL_PACKET;
@@ -144,12 +137,11 @@ static void betaRadioTestTaskFunction(UArg arg0, UArg arg1)
 //		if(verbose_betaRadioTest){System_printf("sending packet...\n");System_flush();}
 //		results = betaRadioSendData(sampledata);
 //		if(verbose_betaRadioTest){System_printf("packet sent error: %i\n",results);System_flush();}
+//		Task_Handle *tsk = getTaskHandle(TASK_RADIO_SEND);
 
 		System_printf("betaRadioTest going to sleep!\n");
-		Event_post(*eventHandle, RADIO_EVENT_SLEEP);
 		Task_sleep(sleepASecond());
 		System_printf("betaRadioTest waking up :)\n");
-		Task_setPri(getTaskHandle(TASK_RADIO_SEND), TASK_DEFAULT_PRI);
 	}
 }
 

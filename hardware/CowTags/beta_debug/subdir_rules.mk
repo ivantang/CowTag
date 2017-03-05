@@ -38,13 +38,6 @@ Sleep.obj: ../Sleep.c $(GEN_OPTS) | $(GEN_HDRS)
 	@echo 'Finished building: $<'
 	@echo ' '
 
-TaskManager.obj: ../TaskManager.c $(GEN_OPTS) | $(GEN_HDRS)
-	@echo 'Building file: $<'
-	@echo 'Invoking: ARM Compiler'
-	"/opt/ti/ccsv6/tools/compiler/arm_15.12.3.LTS/bin/armcl" -mv7M3 --code_state=16 --float_support=vfplib -me --include_path="/home/champ/Git/72point5/hardware/CowTags" --include_path="/home/champ/Git/72point5/hardware/CowTags/easylink" --include_path="/home/champ/Git/72point5/hardware/CowTags/smartrf_settings" --include_path="/opt/ti/tirtos_cc13xx_cc26xx_2_21_00_06/products/cc13xxware_2_04_03_17272" --include_path="/opt/ti/ccsv6/tools/compiler/arm_15.12.3.LTS/include" --include_path="D:/TICLOUDAGENT" -g --define=ccs --display_error_number --diag_warning=225 --diag_warning=255 --diag_wrap=off --gen_func_subsections=on --abi=eabi --preproc_with_compile --preproc_dependency="TaskManager.d" $(GEN_OPTS__FLAG) "$(shell echo $<)"
-	@echo 'Finished building: $<'
-	@echo ' '
-
 betaMain.obj: ../betaMain.c $(GEN_OPTS) | $(GEN_HDRS)
 	@echo 'Building file: $<'
 	@echo 'Invoking: ARM Compiler'

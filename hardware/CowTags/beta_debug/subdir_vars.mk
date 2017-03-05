@@ -15,7 +15,6 @@ C_SRCS += \
 ../IIC.c \
 ../RadioSend.c \
 ../Sleep.c \
-../TaskManager.c \
 ../betaMain.c \
 ../betaRadioTest.c \
 ../ccfg.c \
@@ -32,7 +31,6 @@ OBJS += \
 ./IIC.obj \
 ./RadioSend.obj \
 ./Sleep.obj \
-./TaskManager.obj \
 ./betaMain.obj \
 ./betaRadioTest.obj \
 ./ccfg.obj \
@@ -49,7 +47,6 @@ C_DEPS += \
 ./IIC.d \
 ./RadioSend.d \
 ./Sleep.d \
-./TaskManager.d \
 ./betaMain.d \
 ./betaRadioTest.d \
 ./ccfg.d \
@@ -86,7 +83,6 @@ C_DEPS__QUOTED += \
 "IIC.d" \
 "RadioSend.d" \
 "Sleep.d" \
-"TaskManager.d" \
 "betaMain.d" \
 "betaRadioTest.d" \
 "ccfg.d" \
@@ -103,7 +99,6 @@ OBJS__QUOTED += \
 "IIC.obj" \
 "RadioSend.obj" \
 "Sleep.obj" \
-"TaskManager.obj" \
 "betaMain.obj" \
 "betaRadioTest.obj" \
 "ccfg.obj" \
@@ -120,7 +115,6 @@ C_SRCS__QUOTED += \
 "../IIC.c" \
 "../RadioSend.c" \
 "../Sleep.c" \
-"../TaskManager.c" \
 "../betaMain.c" \
 "../betaRadioTest.c" \
 "../ccfg.c" \

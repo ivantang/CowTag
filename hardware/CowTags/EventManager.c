@@ -5,7 +5,7 @@
  *      Author: champ
  */
 
-#include <ti/sysbios/knl/Event.h>
+#include <EventManager.h>
 
 static Event_Handle masterEventHandle;
 Event_Struct radioOperationEvent;

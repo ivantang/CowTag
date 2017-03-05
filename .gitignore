@@ -30,11 +30,24 @@
 
 # Code Composer Studio
 # http://processors.wiki.ti.com/index.php/Source_control_with_CCS
+*.d
 Debug/
 Release/
+src/
 .xdchelp
 .config/
 .launches/
-*/CowTags/src/
-*.d
 *.aem3
+
+hardware/CowTags/beta_debug/*
+hardware/CowTags/beta_debug/configPkg/*
+
+hardware/CowTags/alpha_debug/*
+hardware/CowTags/alpha_debug/configPkg/*
+
+hardware/CowTags/gateway_debug/*
+hardware/CowTags/gateway_debug/configPkg/*
+
+hardware/CowTags/.ccsproject
+hardware/CowTags/.cproject
+hardware/CowTags/.settings/*

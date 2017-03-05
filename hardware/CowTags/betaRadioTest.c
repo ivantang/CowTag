@@ -40,12 +40,14 @@
 
 /* BIOS Header files */
 #include <ti/sysbios/knl/Task.h>
+#include <ti/sysbios/knl/Event.h>
 
 /* Drivers */
 #include <ti/drivers/PIN.h>
 #include <RadioSend.h>
 #include <sensors.h>
 #include <eeprom.h>
+#include <EventManager.h>
 
 /* Board Header files */
 #include <Board.h>
@@ -59,6 +61,7 @@
 static Task_Params betaRadioTestTaskParams;
 Task_Struct betaRadioTestTask;    /* not static so you can see in ROV */
 static uint8_t betaRadioTestTaskStack[BETARADIOTEST_TASK_STACK_SIZE];
+static Event_Handle * eventHandle;
 
 /***** Prototypes *****/
 static void betaRadioTestTaskFunction(UArg arg0, UArg arg1);
@@ -67,6 +70,9 @@ void printSampleData(struct sampleData sampleData);
 /***** Function Definitions *****/
 void betaRadioTest_init(void)
 {
+	/* Get master event handle for internal state changes */
+	eventHandle = getEventHandle();
+
 	/* Create the betaRadioTest task */
 	Task_Params_init(&betaRadioTestTaskParams);
 	betaRadioTestTaskParams.stackSize = BETARADIOTEST_TASK_STACK_SIZE;
@@ -132,6 +138,12 @@ static void betaRadioTestTaskFunction(UArg arg0, UArg arg1)
 		if(verbose_betaRadioTest){System_printf("sending packet...\n");System_flush();}
 		results = betaRadioSendData(sampledata);
 		if(verbose_betaRadioTest){System_printf("packet sent error: %i\n",results);System_flush();}
+
+
+		System_printf("betaRadioTest going to sleep!\n");
+		Event_post(*eventHandle, RADIO_EVENT_SLEEP);
+		Task_sleep(sleepAMinute());
+		System_printf("betaRadioTest waking up :)\n");
 	}
 }
 

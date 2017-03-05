@@ -33,7 +33,7 @@ static const int verbose_arduinoComTest = 0;
 static const int verbose_eepromTest = 1;
 
 /*** ignore sensors ***/
-static const int ignoreSensors = 0 ;
+static const int ignoreSensors = 1 ;
 
 
 #endif /* DEBUG_H_ */

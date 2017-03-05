@@ -11,8 +11,10 @@ CFG_SRCS += \
 
 C_SRCS += \
 ../CC1310_LAUNCHXL.c \
+../EventManager.c \
 ../IIC.c \
 ../RadioSend.c \
+../Sleep.c \
 ../betaMain.c \
 ../betaRadioTest.c \
 ../ccfg.c \
@@ -25,8 +27,10 @@ C_SRCS += \
 
 OBJS += \
 ./CC1310_LAUNCHXL.obj \
+./EventManager.obj \
 ./IIC.obj \
 ./RadioSend.obj \
+./Sleep.obj \
 ./betaMain.obj \
 ./betaRadioTest.obj \
 ./ccfg.obj \
@@ -39,8 +43,10 @@ OBJS += \
 
 C_DEPS += \
 ./CC1310_LAUNCHXL.d \
+./EventManager.d \
 ./IIC.d \
 ./RadioSend.d \
+./Sleep.d \
 ./betaMain.d \
 ./betaRadioTest.d \
 ./ccfg.d \
@@ -73,8 +79,10 @@ GEN_MISC_DIRS__QUOTED += \
 
 C_DEPS__QUOTED += \
 "CC1310_LAUNCHXL.d" \
+"EventManager.d" \
 "IIC.d" \
 "RadioSend.d" \
+"Sleep.d" \
 "betaMain.d" \
 "betaRadioTest.d" \
 "ccfg.d" \
@@ -87,8 +95,10 @@ C_DEPS__QUOTED += \
 
 OBJS__QUOTED += \
 "CC1310_LAUNCHXL.obj" \
+"EventManager.obj" \
 "IIC.obj" \
 "RadioSend.obj" \
+"Sleep.obj" \
 "betaMain.obj" \
 "betaRadioTest.obj" \
 "ccfg.obj" \
@@ -101,8 +111,10 @@ OBJS__QUOTED += \
 
 C_SRCS__QUOTED += \
 "../CC1310_LAUNCHXL.c" \
+"../EventManager.c" \
 "../IIC.c" \
 "../RadioSend.c" \
+"../Sleep.c" \
 "../betaMain.c" \
 "../betaRadioTest.c" \
 "../ccfg.c" \

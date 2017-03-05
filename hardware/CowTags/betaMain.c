@@ -23,6 +23,7 @@
 #include <eepromTest.h>
 #include <serializeTest.h>
 #include <arduinoComTest.h>
+#include <EventManager.h>
 
 /* Global PIN_Config table */
 PIN_State ledPinState;
@@ -33,6 +34,9 @@ int main(void){
 
 	//if(verbose_main){System_printf("Initializing board...\n");}
 	Board_initGeneral(); // init board
+
+	//if(verbose_main){System_printf("Initializing shared event manager...\n");}
+	eventManager_init();
 
 	//if(verbose_main){System_printf("Initializing sensors...\n");}
 	//Sensors_init(); // init i2C

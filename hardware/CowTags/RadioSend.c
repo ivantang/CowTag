@@ -23,6 +23,8 @@
 #include <driverlib/trng.h>
 #include <driverlib/aon_batmon.h>
 #include <RadioSend.h>
+#include <Sleep.h>
+#include <EventManager.h>
 #include "easylink/EasyLink.h"
 #include "radioProtocol.h"
 
@@ -32,12 +34,6 @@
 /***** Defines *****/
 #define NODERADIO_TASK_STACK_SIZE 1024
 #define NODERADIO_TASK_PRIORITY   3
-
-#define RADIO_EVENT_ALL                 0xFFFFFFFF
-#define RADIO_EVENT_SEND_DATA      		(uint32_t)(1 << 0)
-#define RADIO_EVENT_DATA_ACK_RECEIVED   (uint32_t)(1 << 1)
-#define RADIO_EVENT_ACK_TIMEOUT         (uint32_t)(1 << 2)
-#define RADIO_EVENT_SEND_FAIL           (uint32_t)(1 << 3)
 
 #define NODERADIO_MAX_RETRIES 6
 #define NORERADIO_ACK_TIMEOUT_TIME_MS (500)
@@ -59,10 +55,9 @@ Task_Struct nodeRadioTask;        /* not static so you can see in ROV */
 static uint8_t nodeRadioTaskStack[NODERADIO_TASK_STACK_SIZE];
 Semaphore_Struct radioAccessSem;  /* not static so you can see in ROV */
 static Semaphore_Handle radioAccessSemHandle;
-Event_Struct radioOperationEvent; /* not static so you can see in ROV */
-static Event_Handle radioOperationEventHandle;
 Semaphore_Struct radioResultSem;  /* not static so you can see in ROV */
 static Semaphore_Handle radioResultSemHandle;
+static Event_Handle * eventHandle;
 
 static struct RadioOperation currentRadioOperation;
 static uint8_t nodeAddress = 0; // ending in 0
@@ -82,7 +77,7 @@ static void rxDoneCallback(EasyLink_RxPacket * rxPacket, EasyLink_Status status)
 static void sendBetaPacket(struct sensorPacket betaPacket, uint8_t maxNumberOfRetries, uint32_t ackTimeoutMs);
 
 /***** Function definitions *****/
-void radioSend_init(void) {
+void radioSend_init() {
 
 	/* Create semaphore used for exclusive radio access */
 	Semaphore_Params semParam;
@@ -94,11 +89,8 @@ void radioSend_init(void) {
 	Semaphore_construct(&radioResultSem, 0, &semParam);
 	radioResultSemHandle = Semaphore_handle(&radioResultSem);
 
-	/* Create event used internally for state changes */
-	Event_Params eventParam;
-	Event_Params_init(&eventParam);
-	Event_construct(&radioOperationEvent, &eventParam);
-	radioOperationEventHandle = Event_handle(&radioOperationEvent);
+	/* Get master event handle for internal state changes */
+	eventHandle = getEventHandle();
 
 	/* Create the radio protocol task */
 	Task_Params_init(&nodeRadioTaskParams);
@@ -148,7 +140,7 @@ static void nodeRadioTaskFunction(UArg arg0, UArg arg1)
 	while (1)
 	{
 		/* Wait for an event */
-		uint32_t events = Event_pend(radioOperationEventHandle, 0, RADIO_EVENT_ALL, BIOS_WAIT_FOREVER);
+		uint32_t events = Event_pend(*eventHandle, 0, RADIO_EVENT_ALL, BIOS_WAIT_FOREVER);
 
 		/* If we should send data */
 		if (events & RADIO_EVENT_SEND_DATA)
@@ -191,6 +183,13 @@ static void nodeRadioTaskFunction(UArg arg0, UArg arg1)
 			returnRadioOperationStatus(NodeRadioStatus_FailedNotConnected);
 		}
 
+		/* if time to go to sleep */
+		if (events & RADIO_EVENT_SLEEP)
+		{
+			System_printf("...Radio going to sleep...\n");
+			Task_sleep(sleepAMinute());
+			System_printf("...Radio waking up!\n");
+		}
 	}
 }
 
@@ -205,7 +204,7 @@ enum NodeRadioOperationStatus betaRadioSendData(struct sampleData data){
 	sampledata = data;
 
 	/* Raise RADIO_EVENT_SEND_DATA event */
-	Event_post(radioOperationEventHandle, RADIO_EVENT_SEND_DATA);
+	Event_post(*eventHandle, RADIO_EVENT_SEND_DATA);
 
 	/* Wait for result */
 	Semaphore_pend(radioResultSemHandle, BIOS_WAIT_FOREVER);
@@ -300,26 +299,26 @@ static void rxDoneCallback(EasyLink_RxPacket * rxPacket, EasyLink_Status status)
 		if (packetHeader->packetType == RADIO_PACKET_TYPE_ACK_PACKET)
 		{
 			/* Signal ACK packet received */
-			Event_post(radioOperationEventHandle, RADIO_EVENT_DATA_ACK_RECEIVED);
+			Event_post(*eventHandle, RADIO_EVENT_DATA_ACK_RECEIVED);
 		}
 		else
 		{
 			/* Packet Error, treat as a Timeout and Post a RADIO_EVENT_ACK_TIMEOUT
                event */
-			Event_post(radioOperationEventHandle, RADIO_EVENT_ACK_TIMEOUT);
+			Event_post(*eventHandle, RADIO_EVENT_ACK_TIMEOUT);
 		}
 	}
 	/* did the Rx timeout */
 	else if(status == EasyLink_Status_Rx_Timeout)
 	{
 		/* Post a RADIO_EVENT_ACK_TIMEOUT event */
-		Event_post(radioOperationEventHandle, RADIO_EVENT_ACK_TIMEOUT);
+		Event_post(*eventHandle, RADIO_EVENT_ACK_TIMEOUT);
 	}
 	else
 	{
 		/* The Ack reception may have been corrupted causing an error.
 		 * Treat this as a timeout
 		 */
-		Event_post(radioOperationEventHandle, RADIO_EVENT_SEND_FAIL);
+		Event_post(*eventHandle, RADIO_EVENT_SEND_FAIL);
 	}
 }

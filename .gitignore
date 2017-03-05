@@ -43,14 +43,9 @@ hardware/betaTag/src/sysbios/makefile
 hardware/betaTag/src/sysbios/rom_sysbios.aem3
 
 hardware/CowTags/beta_debug/*
-hardware/CowTags/beta_debug/configPkg/*
-
 hardware/CowTags/alpha_debug/*
+hardware/CowTags/beta_debug/configPkg/*
 hardware/CowTags/alpha_debug/configPkg/*
-
-hardware/CowTags/gateway_debug/*
-hardware/CowTags/gateway_debug/configPkg/*
-
 hardware/CowTags/.ccsproject
 hardware/CowTags/.cproject
 hardware/CowTags/.settings/*

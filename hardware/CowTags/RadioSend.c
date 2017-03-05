@@ -25,6 +25,7 @@
 #include <RadioSend.h>
 #include <Sleep.h>
 #include <EventManager.h>
+#include <TaskManager.h>
 #include "easylink/EasyLink.h"
 #include "radioProtocol.h"
 
@@ -58,6 +59,7 @@ static Semaphore_Handle radioAccessSemHandle;
 Semaphore_Struct radioResultSem;  /* not static so you can see in ROV */
 static Semaphore_Handle radioResultSemHandle;
 static Event_Handle * eventHandle;
+static Event_Handle taskHandle;
 
 static struct RadioOperation currentRadioOperation;
 static uint8_t nodeAddress = 0; // ending in 0
@@ -109,6 +111,11 @@ static void nodeRadioTaskFunction(UArg arg0, UArg arg1)
 	}
 
 	System_printf("Starting Radio Send\n");
+
+	/* add task to list */
+	taskHandle = Task_self();
+	System_printf("RS tskthandle: %d\n", taskHandle);
+	addTaskHandle(TASK_RADIO_SEND, &taskHandle);
 
 	/*
 	int buildType;
@@ -183,13 +190,14 @@ static void nodeRadioTaskFunction(UArg arg0, UArg arg1)
 			returnRadioOperationStatus(NodeRadioStatus_FailedNotConnected);
 		}
 
-		/* if time to go to sleep */
+		/* time to go to sleep */
 		if (events & RADIO_EVENT_SLEEP)
 		{
-			System_printf("...Radio going to sleep...\n");
-			Task_sleep(sleepAMinute());
-			System_printf("...Radio waking up!\n");
+			System_printf("RadioSend going low prior!\n");
+			Task_setPri(taskHandle, TASK_INACTIVE_PRI);
+			System_printf("RadioSend retuning\n");
 		}
+		System_printf("Bloopin\n");
 	}
 }
 

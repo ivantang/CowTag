@@ -140,9 +140,7 @@ static void nodeRadioTaskFunction(UArg arg0, UArg arg1)
 	while (1)
 	{
 		/* Wait for an event */
-		System_printf("Wait event\n");
 		uint32_t events = Event_pend(*eventHandle, 0, RADIO_EVENT_ALL, BIOS_WAIT_FOREVER);
-		System_printf("Got event!\n");
 
 		/* If we should send data */
 		if (events & RADIO_EVENT_SEND_DATA)

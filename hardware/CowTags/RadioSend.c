@@ -140,16 +140,16 @@ static void nodeRadioTaskFunction(UArg arg0, UArg arg1)
 	while (1)
 	{
 		/* Wait for an event */
+		System_printf("Wait event\n");
 		uint32_t events = Event_pend(*eventHandle, 0, RADIO_EVENT_ALL, BIOS_WAIT_FOREVER);
+		System_printf("Got event!\n");
 
 		/* If we should send data */
 		if (events & RADIO_EVENT_SEND_DATA)
 		{
 			sensorPacket.sampledata = sampledata;
 			sensorPacket.header.packetType = sampledata.packetType;
-			//System_printf("Sending data...\n");
 			sendBetaPacket(sensorPacket, NODERADIO_MAX_RETRIES, NORERADIO_ACK_TIMEOUT_TIME_MS);
-
 		}
 
 		/* If we get an ACK from the concentrator */
@@ -171,9 +171,7 @@ static void nodeRadioTaskFunction(UArg arg0, UArg arg1)
 			else
 			{
 				/* Else return send fail */
-
 				returnRadioOperationStatus(NodeRadioStatus_Failed);
-
 			}
 		}
 

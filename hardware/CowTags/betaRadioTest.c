@@ -114,8 +114,8 @@ static void betaRadioTestTaskFunction(UArg arg0, UArg arg1)
 		if(verbose_betaRadioTest){System_printf("sending packet...\n");System_flush();}
 		results = betaRadioSendData(sampledata);
 		if(verbose_betaRadioTest){System_printf("packet sent error: %i\n",results);System_flush();}
-
-		CPUdelay(delay*5000);
+//
+//		CPUdelay(delay*5000);
 //
 //		sampledata.cowID = 1;
 //		sampledata.packetType = RADIO_PACKET_TYPE_ACCEL_PACKET;
@@ -140,7 +140,7 @@ static void betaRadioTestTaskFunction(UArg arg0, UArg arg1)
 //		Task_Handle *tsk = getTaskHandle(TASK_RADIO_SEND);
 
 		System_printf("betaRadioTest going to sleep!\n");
-		Task_sleep(sleepASecond());
+		Task_sleep(sleepAMinute());
 		System_printf("betaRadioTest waking up :)\n");
 	}
 }

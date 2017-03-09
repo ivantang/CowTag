@@ -40,12 +40,15 @@
 
 /* BIOS Header files */
 #include <ti/sysbios/knl/Task.h>
+#include <ti/sysbios/knl/Event.h>
 
 /* Drivers */
 #include <ti/drivers/PIN.h>
 #include <RadioSend.h>
 #include <sensors.h>
 #include <eeprom.h>
+#include <Sleep.h>
+#include <EventManager.h>
 
 /* Board Header files */
 #include <Board.h>
@@ -59,6 +62,7 @@
 static Task_Params betaRadioTestTaskParams;
 Task_Struct betaRadioTestTask;    /* not static so you can see in ROV */
 static uint8_t betaRadioTestTaskStack[BETARADIOTEST_TASK_STACK_SIZE];
+static Event_Handle * eventHandle;
 
 /***** Prototypes *****/
 static void betaRadioTestTaskFunction(UArg arg0, UArg arg1);
@@ -67,6 +71,9 @@ void printSampleData(struct sampleData sampleData);
 /***** Function Definitions *****/
 void betaRadioTest_init(void)
 {
+	/* Get master event handle for internal state changes */
+	eventHandle = getEventHandle();
+
 	/* Create the betaRadioTest task */
 	Task_Params_init(&betaRadioTestTaskParams);
 	betaRadioTestTaskParams.stackSize = BETARADIOTEST_TASK_STACK_SIZE;
@@ -84,11 +91,10 @@ static void betaRadioTestTaskFunction(UArg arg0, UArg arg1)
 		struct sampleData sampledata;
 		enum NodeRadioOperationStatus results;
 
-		CPUdelay(delay*5000);
-
 		sampledata.cowID = 1;
 		sampledata.packetType = RADIO_PACKET_TYPE_SENSOR_PACKET;
 		sampledata.timestamp = 0x12345678;
+		sampledata.error = 0x0;
 
 		if(ignoreSensors){
 			if(verbose_betaRadioTest){System_printf("Ignoring sensors, making fake packets\n");System_flush();}
@@ -98,7 +104,6 @@ static void betaRadioTestTaskFunction(UArg arg0, UArg arg1)
 			sampledata.heartRateData.rate_l = 0x87;
 			sampledata.heartRateData.temp_h = 0x45;
 			sampledata.heartRateData.temp_l = 0x32;
-			sampledata.error = 0x0;
 		} else {
 			if(verbose_betaRadioTest){System_printf("Creating Packet...\n");System_flush();}
 			makeSensorPacket(&sampledata);
@@ -109,29 +114,34 @@ static void betaRadioTestTaskFunction(UArg arg0, UArg arg1)
 		if(verbose_betaRadioTest){System_printf("sending packet...\n");System_flush();}
 		results = betaRadioSendData(sampledata);
 		if(verbose_betaRadioTest){System_printf("packet sent error: %i\n",results);System_flush();}
+//
+//		CPUdelay(delay*5000);
+//
+//		sampledata.cowID = 1;
+//		sampledata.packetType = RADIO_PACKET_TYPE_ACCEL_PACKET;
+//		sampledata.timestamp = 0x12345678;
+//
+//		if(ignoreSensors){
+//			if(verbose_betaRadioTest){System_printf("Ignoring sensors, making fake packets\n");System_flush();}
+//			sampledata.accelerometerData.x=0x12;
+//			sampledata.accelerometerData.y=0x34;
+//			sampledata.accelerometerData.z=0x56;
+//			sampledata.error = 0x0;
+//		} else {
+//			if(verbose_betaRadioTest){System_printf("Creating Packet...\n");System_flush();}
+//			makeSensorPacket(&sampledata);
+//			if(verbose_betaRadioTest){System_printf("Packet Created\n");System_flush();}
+//		}
+//
+//		if(verbose_betaRadioTest){printSampleData(sampledata);}
+//		if(verbose_betaRadioTest){System_printf("sending packet...\n");System_flush();}
+//		results = betaRadioSendData(sampledata);
+//		if(verbose_betaRadioTest){System_printf("packet sent error: %i\n",results);System_flush();}
+//		Task_Handle *tsk = getTaskHandle(TASK_RADIO_SEND);
 
-		CPUdelay(delay*5000);
-
-		sampledata.cowID = 1;
-		sampledata.packetType = RADIO_PACKET_TYPE_ACCEL_PACKET;
-		sampledata.timestamp = 0x12345678;
-
-		if(ignoreSensors){
-			if(verbose_betaRadioTest){System_printf("Ignoring sensors, making fake packets\n");System_flush();}
-			sampledata.accelerometerData.x=0x12;
-			sampledata.accelerometerData.y=0x34;
-			sampledata.accelerometerData.z=0x56;
-			sampledata.error = 0x0;
-		} else {
-			if(verbose_betaRadioTest){System_printf("Creating Packet...\n");System_flush();}
-			makeSensorPacket(&sampledata);
-			if(verbose_betaRadioTest){System_printf("Packet Created\n");System_flush();}
-		}
-
-		if(verbose_betaRadioTest){printSampleData(sampledata);}
-		if(verbose_betaRadioTest){System_printf("sending packet...\n");System_flush();}
-		results = betaRadioSendData(sampledata);
-		if(verbose_betaRadioTest){System_printf("packet sent error: %i\n",results);System_flush();}
+		System_printf("betaRadioTest going to sleep!\n");
+		Task_sleep(sleepFiveSeconds());
+		System_printf("betaRadioTest waking up :)\n");
 	}
 }
 

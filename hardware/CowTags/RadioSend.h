@@ -23,5 +23,4 @@ void radioSend_init(void);
 /* Sends an ADC value to the concentrator */
 enum NodeRadioOperationStatus betaRadioSendData(struct sampleData data);
 
-
 #endif /* TASKS_BETARADIO_H_ */

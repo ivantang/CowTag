@@ -138,8 +138,10 @@ void getTempNoPtr(){
 
 void getHeartRate(struct sampleData *sampleData){
 	int i = 0;
-	uint16_t numValues = 10;
-	uint16_t HRData[10];
+	uint16_t numValues = 50;
+	uint16_t HRData[50];
+	uint16_t RedData[50];
+	uint16_t Derivative[50];
 	uint32_t start_timestamp;
 	uint32_t end_timestamp;
 	uint32_t start_clock;
@@ -156,28 +158,48 @@ void getHeartRate(struct sampleData *sampleData){
 //	}
 
 	writeI2CRegister(Board_MAX30100_ADDR, MAX30100_REG_MODE_CONFIGURATION, 0x02);	//enable HR only
+	writeI2CRegister(Board_MAX30100_ADDR, MAX30100_REG_SPO2_CONFIGURATION, 0x07);	//enable HR only
 	writeI2CRegister(Board_MAX30100_ADDR, MAX30100_REG_LED_CONFIGURATION, MAX30100_LED_CURR_50MA);	//set LED 50mA
-	writeI2CRegister(Board_MAX30100_ADDR, 0x01, 0xE0);	//turn on interrupts
+	writeI2CRegister(Board_MAX30100_ADDR, MAX30100_REG_INTERRUPT_CONFIGURATION, 0xA0);	//turn on interrupts
 
 	//clearing FIFO write pointer, overflow counter and read pointer
-//	writeI2CRegister(Board_MAX30100_ADDR, MAX30100_REG_FIFO_WRITE_POINTER, 0x00);
 //	writeI2CRegister(Board_MAX30100_ADDR, MAX30100_REG_FIFO_OVERFLOW_COUNTER, 0x00);
+//	writeI2CRegister(Board_MAX30100_ADDR, MAX30100_REG_FIFO_WRITE_POINTER, 0x00);
 //	writeI2CRegister(Board_MAX30100_ADDR, MAX30100_REG_FIFO_READ_POINTER, 0x00);
 
 	start_clock = Clock_getTicks();
 	end_clock = Clock_getTicks();
-	while(i < numValues){
-	//while((end_clock-start_clock)/100000 < 5){
-		while((readI2CRegister(Board_MAX30100_ADDR, 0x00) & 0x20) != 0x20){
+
+	uint32_t tempval;
+
+	//while(i < numValues){
+	while((end_clock-start_clock)/100000 < 5){
+
+		//clear FIFO PTR
+		writeI2CRegister(Board_MAX30100_ADDR, MAX30100_REG_FIFO_WRITE_POINTER, 0x00);
+		writeI2CRegister(Board_MAX30100_ADDR, MAX30100_REG_FIFO_READ_POINTER, 0x00);
+
+		/*while((readI2CRegister(Board_MAX30100_ADDR, MAX30100_REG_INTERRUPT_STATUS) & MAX30100_HRDATA_READY) != MAX30100_HRDATA_READY){
 			//check if hr data is ready
+		}*/
+
+		while(!tempval){
+			tempval = readI2CRegister(Board_MAX30100_ADDR, MAX30100_REG_INTERRUPT_STATUS);
+			tempval &= MAX30100_HRDATA_READY;
 		}
+
 		//fifo data is 16 bits so 4 reads is needed
 		//first 16 bits is IR data, in our case, HR data
-		//HRData[i] = readI2CRegister(Board_MAX30100_ADDR,MAX30100_REG_FIFO_DATA);
 		HRData[i] = readI2CRegister(Board_MAX30100_ADDR,MAX30100_REG_FIFO_DATA)<<8 + readI2CRegister(Board_MAX30100_ADDR,MAX30100_REG_FIFO_DATA);
-		while(HRData[i] == 0){
-			HRData[i] = readI2CRegister(Board_MAX30100_ADDR,MAX30100_REG_FIFO_DATA)<<8 + readI2CRegister(Board_MAX30100_ADDR,MAX30100_REG_FIFO_DATA);
+		while(HRData[i] < 15000 || HRData[i] > 50000){
+			if(i == 0) HRData[i] = 44444;
+			HRData[i] = HRData[i-1];
 		}
+
+		if(i!=0) Derivative[i] = HRData[i] - HRData[i-1];
+
+		//next 16 bits is useless data red led data
+		RedData[i] = readI2CRegister(Board_MAX30100_ADDR,MAX30100_REG_FIFO_DATA)<<8 + readI2CRegister(Board_MAX30100_ADDR,MAX30100_REG_FIFO_DATA);
 
 		Timestamp_getFreq(&frequency);
 
@@ -185,15 +207,20 @@ void getHeartRate(struct sampleData *sampleData){
 			start_timestamp = Timestamp_get32();
 		}
 
-		Task_sleep(10000 / Clock_tickPeriod);						//adding this to extend measurement to 10 seconds
+		//Task_sleep(10000 / Clock_tickPeriod);						//adding this to extend measurement to 10 seconds
+		Task_sleep(100000 / Clock_tickPeriod);						//adding this to extend measurement to 10 seconds
+
 
 		end_timestamp = Timestamp_get32();
 		end_clock = Clock_getTicks();
+		if(!verbose_sensors) System_printf("%5d" , HRData[i]);
+		if(!verbose_sensors) System_printf("     %d\n" , RedData[i]);
+		if(!verbose_sensors) System_printf("     %d\n" , Derivative[i]);
 
-		//System_printf("%d\n" , HRData[i]);
 		i++;
 	}
 
+	//split data into 8 bit low and high
 	sampleData->heartRateData.rate_l = HRData[0] & 0xFF;
 	sampleData->heartRateData.rate_h = HRData[0] >> 8;
 
@@ -247,10 +274,12 @@ void makeSensorPacket(struct sampleData *sampleData){
 
 void testSensors(){
 	struct sampleData sampleData;
-
+	/*
 	while(1){
 		makeSensorPacket(&sampleData);
 	}
 	System_printf("Tests done\n");
 	System_flush();
+	*/
+	getHeartRate(&sampleData);
 }

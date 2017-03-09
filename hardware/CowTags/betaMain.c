@@ -35,7 +35,7 @@ int main(void){
 	Board_initGeneral(); // init board
 
 	//if(verbose_main){System_printf("Initializing sensors...\n");}
-	//Sensors_init(); // init i2C
+	Sensors_init(); // init i2C
 
 	//if(verbose_main){System_printf("Initializing EEPROM...\n");}
 	//eepromTest_init();
@@ -44,10 +44,10 @@ int main(void){
 	//serializeTestStart();
 
 	//if(verbose_main){System_printf("Initializing radio antenna...\n");}
-	radioSend_init();
+	//radioSend_init();
 
 	//if(verbose_main){System_printf("Initializing Beta tasks...\n");}
-	betaRadioTest_init();
+	//betaRadioTest_init();
 
 	System_flush();
 

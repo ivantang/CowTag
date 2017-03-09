@@ -120,7 +120,7 @@ static void concentratorRadioTaskFunction(UArg arg0, UArg arg1)
 
 	/* Set src address of ACK packet */
 
-	int buildType;
+	/*int buildType;
 	int result = varFromConfigInt("tagType",&buildType);
 	System_printf("buildType = %i\n",buildType);
 
@@ -131,12 +131,12 @@ static void concentratorRadioTaskFunction(UArg arg0, UArg arg1)
 	} else {
 		System_printf("buildType ERROR");
 		concentratorAddress = GATEWAY_ADDRESS;
-	}
+	}*/
 
 
 	/* Set src address of ACK packet */;
-	concentratorAddress = ALPHA_ADDRESS;
-	//concentratorAddress = GATEWAY_ADDRESS;
+	//concentratorAddress = ALPHA_ADDRESS;
+	concentratorAddress = GATEWAY_ADDRESS;
 
 	EasyLink_enableRxAddrFilter(NULL, 0, 0); // address filtering is disabled for A and G
 

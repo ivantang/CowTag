@@ -29,6 +29,9 @@
 #include <debug.h>
 #include <config_parse.h>
 
+// config file
+#include "global_cfg.h"
+
 /***** Defines *****/
 #define NODERADIO_TASK_STACK_SIZE 1024
 #define NODERADIO_TASK_PRIORITY   3
@@ -38,9 +41,6 @@
 #define RADIO_EVENT_DATA_ACK_RECEIVED   (uint32_t)(1 << 1)
 #define RADIO_EVENT_ACK_TIMEOUT         (uint32_t)(1 << 2)
 #define RADIO_EVENT_SEND_FAIL           (uint32_t)(1 << 3)
-
-#define NODERADIO_MAX_RETRIES 6
-#define NORERADIO_ACK_TIMEOUT_TIME_MS (500)
 
 
 /***** Type declarations *****/
@@ -121,6 +121,10 @@ static void nodeRadioTaskFunction(UArg arg0, UArg arg1)
 	/*
 	int buildType;
 	int result = varFromConfigInt("tagType",&buildType);
+
+	//tmp
+	buildType = TAG_TYPE;
+
 	System_printf("buildType = %i\n",buildType);
 
 	if(buildType == 0){
@@ -156,7 +160,7 @@ static void nodeRadioTaskFunction(UArg arg0, UArg arg1)
 			sensorPacket.sampledata = sampledata;
 			sensorPacket.header.packetType = sampledata.packetType;
 			//System_printf("Sending data...\n");
-			sendBetaPacket(sensorPacket, NODERADIO_MAX_RETRIES, NORERADIO_ACK_TIMEOUT_TIME_MS);
+			sendBetaPacket(sensorPacket, RADIO_SEND_MAX_RETRIES, RADIO_SEND_ACK_TIMEOUT_TIME_MS);
 
 		}
 

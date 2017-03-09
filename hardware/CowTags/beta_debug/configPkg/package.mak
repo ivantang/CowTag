@@ -15,90 +15,90 @@ XDCCFGDIR = package/cfg/
 # in the event that some included BOM script changes.
 #
 ifneq (clean,$(MAKECMDGOALS))
-/home/ivan/ti/xdctools_3_32_00_06_core/packages/xdc/utils.js:
-package.mak: /home/ivan/ti/xdctools_3_32_00_06_core/packages/xdc/utils.js
-/home/ivan/ti/xdctools_3_32_00_06_core/packages/xdc/xdc.tci:
-package.mak: /home/ivan/ti/xdctools_3_32_00_06_core/packages/xdc/xdc.tci
-/home/ivan/ti/xdctools_3_32_00_06_core/packages/xdc/template.xs:
-package.mak: /home/ivan/ti/xdctools_3_32_00_06_core/packages/xdc/template.xs
-/home/ivan/ti/xdctools_3_32_00_06_core/packages/xdc/om2.xs:
-package.mak: /home/ivan/ti/xdctools_3_32_00_06_core/packages/xdc/om2.xs
-/home/ivan/ti/xdctools_3_32_00_06_core/packages/xdc/xmlgen.xs:
-package.mak: /home/ivan/ti/xdctools_3_32_00_06_core/packages/xdc/xmlgen.xs
-/home/ivan/ti/xdctools_3_32_00_06_core/packages/xdc/xmlgen2.xs:
-package.mak: /home/ivan/ti/xdctools_3_32_00_06_core/packages/xdc/xmlgen2.xs
-/home/ivan/ti/xdctools_3_32_00_06_core/packages/xdc/Warnings.xs:
-package.mak: /home/ivan/ti/xdctools_3_32_00_06_core/packages/xdc/Warnings.xs
-/home/ivan/ti/xdctools_3_32_00_06_core/packages/xdc/IPackage.xs:
-package.mak: /home/ivan/ti/xdctools_3_32_00_06_core/packages/xdc/IPackage.xs
-/home/ivan/ti/xdctools_3_32_00_06_core/packages/xdc/package.xs:
-package.mak: /home/ivan/ti/xdctools_3_32_00_06_core/packages/xdc/package.xs
-/home/ivan/ti/xdctools_3_32_00_06_core/packages/xdc/services/global/Clock.xs:
-package.mak: /home/ivan/ti/xdctools_3_32_00_06_core/packages/xdc/services/global/Clock.xs
-/home/ivan/ti/xdctools_3_32_00_06_core/packages/xdc/services/global/Trace.xs:
-package.mak: /home/ivan/ti/xdctools_3_32_00_06_core/packages/xdc/services/global/Trace.xs
-/home/ivan/ti/xdctools_3_32_00_06_core/packages/xdc/bld/bld.js:
-package.mak: /home/ivan/ti/xdctools_3_32_00_06_core/packages/xdc/bld/bld.js
-/home/ivan/ti/xdctools_3_32_00_06_core/packages/xdc/bld/BuildEnvironment.xs:
-package.mak: /home/ivan/ti/xdctools_3_32_00_06_core/packages/xdc/bld/BuildEnvironment.xs
-/home/ivan/ti/xdctools_3_32_00_06_core/packages/xdc/bld/PackageContents.xs:
-package.mak: /home/ivan/ti/xdctools_3_32_00_06_core/packages/xdc/bld/PackageContents.xs
-/home/ivan/ti/xdctools_3_32_00_06_core/packages/xdc/bld/_gen.xs:
-package.mak: /home/ivan/ti/xdctools_3_32_00_06_core/packages/xdc/bld/_gen.xs
-/home/ivan/ti/xdctools_3_32_00_06_core/packages/xdc/bld/Library.xs:
-package.mak: /home/ivan/ti/xdctools_3_32_00_06_core/packages/xdc/bld/Library.xs
-/home/ivan/ti/xdctools_3_32_00_06_core/packages/xdc/bld/Executable.xs:
-package.mak: /home/ivan/ti/xdctools_3_32_00_06_core/packages/xdc/bld/Executable.xs
-/home/ivan/ti/xdctools_3_32_00_06_core/packages/xdc/bld/Repository.xs:
-package.mak: /home/ivan/ti/xdctools_3_32_00_06_core/packages/xdc/bld/Repository.xs
-/home/ivan/ti/xdctools_3_32_00_06_core/packages/xdc/bld/Configuration.xs:
-package.mak: /home/ivan/ti/xdctools_3_32_00_06_core/packages/xdc/bld/Configuration.xs
-/home/ivan/ti/xdctools_3_32_00_06_core/packages/xdc/bld/Script.xs:
-package.mak: /home/ivan/ti/xdctools_3_32_00_06_core/packages/xdc/bld/Script.xs
-/home/ivan/ti/xdctools_3_32_00_06_core/packages/xdc/bld/Manifest.xs:
-package.mak: /home/ivan/ti/xdctools_3_32_00_06_core/packages/xdc/bld/Manifest.xs
-/home/ivan/ti/xdctools_3_32_00_06_core/packages/xdc/bld/Utils.xs:
-package.mak: /home/ivan/ti/xdctools_3_32_00_06_core/packages/xdc/bld/Utils.xs
-/home/ivan/ti/xdctools_3_32_00_06_core/packages/xdc/bld/ITarget.xs:
-package.mak: /home/ivan/ti/xdctools_3_32_00_06_core/packages/xdc/bld/ITarget.xs
-/home/ivan/ti/xdctools_3_32_00_06_core/packages/xdc/bld/ITarget2.xs:
-package.mak: /home/ivan/ti/xdctools_3_32_00_06_core/packages/xdc/bld/ITarget2.xs
-/home/ivan/ti/xdctools_3_32_00_06_core/packages/xdc/bld/ITarget3.xs:
-package.mak: /home/ivan/ti/xdctools_3_32_00_06_core/packages/xdc/bld/ITarget3.xs
-/home/ivan/ti/xdctools_3_32_00_06_core/packages/xdc/bld/ITargetFilter.xs:
-package.mak: /home/ivan/ti/xdctools_3_32_00_06_core/packages/xdc/bld/ITargetFilter.xs
-/home/ivan/ti/xdctools_3_32_00_06_core/packages/xdc/bld/package.xs:
-package.mak: /home/ivan/ti/xdctools_3_32_00_06_core/packages/xdc/bld/package.xs
+/home/steven/ti/tirex-content/xdctools_3_32_00_06_core/packages/xdc/utils.js:
+package.mak: /home/steven/ti/tirex-content/xdctools_3_32_00_06_core/packages/xdc/utils.js
+/home/steven/ti/tirex-content/xdctools_3_32_00_06_core/packages/xdc/xdc.tci:
+package.mak: /home/steven/ti/tirex-content/xdctools_3_32_00_06_core/packages/xdc/xdc.tci
+/home/steven/ti/tirex-content/xdctools_3_32_00_06_core/packages/xdc/template.xs:
+package.mak: /home/steven/ti/tirex-content/xdctools_3_32_00_06_core/packages/xdc/template.xs
+/home/steven/ti/tirex-content/xdctools_3_32_00_06_core/packages/xdc/om2.xs:
+package.mak: /home/steven/ti/tirex-content/xdctools_3_32_00_06_core/packages/xdc/om2.xs
+/home/steven/ti/tirex-content/xdctools_3_32_00_06_core/packages/xdc/xmlgen.xs:
+package.mak: /home/steven/ti/tirex-content/xdctools_3_32_00_06_core/packages/xdc/xmlgen.xs
+/home/steven/ti/tirex-content/xdctools_3_32_00_06_core/packages/xdc/xmlgen2.xs:
+package.mak: /home/steven/ti/tirex-content/xdctools_3_32_00_06_core/packages/xdc/xmlgen2.xs
+/home/steven/ti/tirex-content/xdctools_3_32_00_06_core/packages/xdc/Warnings.xs:
+package.mak: /home/steven/ti/tirex-content/xdctools_3_32_00_06_core/packages/xdc/Warnings.xs
+/home/steven/ti/tirex-content/xdctools_3_32_00_06_core/packages/xdc/IPackage.xs:
+package.mak: /home/steven/ti/tirex-content/xdctools_3_32_00_06_core/packages/xdc/IPackage.xs
+/home/steven/ti/tirex-content/xdctools_3_32_00_06_core/packages/xdc/package.xs:
+package.mak: /home/steven/ti/tirex-content/xdctools_3_32_00_06_core/packages/xdc/package.xs
+/home/steven/ti/tirex-content/xdctools_3_32_00_06_core/packages/xdc/services/global/Clock.xs:
+package.mak: /home/steven/ti/tirex-content/xdctools_3_32_00_06_core/packages/xdc/services/global/Clock.xs
+/home/steven/ti/tirex-content/xdctools_3_32_00_06_core/packages/xdc/services/global/Trace.xs:
+package.mak: /home/steven/ti/tirex-content/xdctools_3_32_00_06_core/packages/xdc/services/global/Trace.xs
+/home/steven/ti/tirex-content/xdctools_3_32_00_06_core/packages/xdc/bld/bld.js:
+package.mak: /home/steven/ti/tirex-content/xdctools_3_32_00_06_core/packages/xdc/bld/bld.js
+/home/steven/ti/tirex-content/xdctools_3_32_00_06_core/packages/xdc/bld/BuildEnvironment.xs:
+package.mak: /home/steven/ti/tirex-content/xdctools_3_32_00_06_core/packages/xdc/bld/BuildEnvironment.xs
+/home/steven/ti/tirex-content/xdctools_3_32_00_06_core/packages/xdc/bld/PackageContents.xs:
+package.mak: /home/steven/ti/tirex-content/xdctools_3_32_00_06_core/packages/xdc/bld/PackageContents.xs
+/home/steven/ti/tirex-content/xdctools_3_32_00_06_core/packages/xdc/bld/_gen.xs:
+package.mak: /home/steven/ti/tirex-content/xdctools_3_32_00_06_core/packages/xdc/bld/_gen.xs
+/home/steven/ti/tirex-content/xdctools_3_32_00_06_core/packages/xdc/bld/Library.xs:
+package.mak: /home/steven/ti/tirex-content/xdctools_3_32_00_06_core/packages/xdc/bld/Library.xs
+/home/steven/ti/tirex-content/xdctools_3_32_00_06_core/packages/xdc/bld/Executable.xs:
+package.mak: /home/steven/ti/tirex-content/xdctools_3_32_00_06_core/packages/xdc/bld/Executable.xs
+/home/steven/ti/tirex-content/xdctools_3_32_00_06_core/packages/xdc/bld/Repository.xs:
+package.mak: /home/steven/ti/tirex-content/xdctools_3_32_00_06_core/packages/xdc/bld/Repository.xs
+/home/steven/ti/tirex-content/xdctools_3_32_00_06_core/packages/xdc/bld/Configuration.xs:
+package.mak: /home/steven/ti/tirex-content/xdctools_3_32_00_06_core/packages/xdc/bld/Configuration.xs
+/home/steven/ti/tirex-content/xdctools_3_32_00_06_core/packages/xdc/bld/Script.xs:
+package.mak: /home/steven/ti/tirex-content/xdctools_3_32_00_06_core/packages/xdc/bld/Script.xs
+/home/steven/ti/tirex-content/xdctools_3_32_00_06_core/packages/xdc/bld/Manifest.xs:
+package.mak: /home/steven/ti/tirex-content/xdctools_3_32_00_06_core/packages/xdc/bld/Manifest.xs
+/home/steven/ti/tirex-content/xdctools_3_32_00_06_core/packages/xdc/bld/Utils.xs:
+package.mak: /home/steven/ti/tirex-content/xdctools_3_32_00_06_core/packages/xdc/bld/Utils.xs
+/home/steven/ti/tirex-content/xdctools_3_32_00_06_core/packages/xdc/bld/ITarget.xs:
+package.mak: /home/steven/ti/tirex-content/xdctools_3_32_00_06_core/packages/xdc/bld/ITarget.xs
+/home/steven/ti/tirex-content/xdctools_3_32_00_06_core/packages/xdc/bld/ITarget2.xs:
+package.mak: /home/steven/ti/tirex-content/xdctools_3_32_00_06_core/packages/xdc/bld/ITarget2.xs
+/home/steven/ti/tirex-content/xdctools_3_32_00_06_core/packages/xdc/bld/ITarget3.xs:
+package.mak: /home/steven/ti/tirex-content/xdctools_3_32_00_06_core/packages/xdc/bld/ITarget3.xs
+/home/steven/ti/tirex-content/xdctools_3_32_00_06_core/packages/xdc/bld/ITargetFilter.xs:
+package.mak: /home/steven/ti/tirex-content/xdctools_3_32_00_06_core/packages/xdc/bld/ITargetFilter.xs
+/home/steven/ti/tirex-content/xdctools_3_32_00_06_core/packages/xdc/bld/package.xs:
+package.mak: /home/steven/ti/tirex-content/xdctools_3_32_00_06_core/packages/xdc/bld/package.xs
 package.mak: config.bld
-/home/ivan/ti/tirtos_cc13xx_cc26xx_2_21_00_06/products/bios_6_46_01_37/packages/ti/targets/ITarget.xs:
-package.mak: /home/ivan/ti/tirtos_cc13xx_cc26xx_2_21_00_06/products/bios_6_46_01_37/packages/ti/targets/ITarget.xs
-/home/ivan/ti/tirtos_cc13xx_cc26xx_2_21_00_06/products/bios_6_46_01_37/packages/ti/targets/C28_large.xs:
-package.mak: /home/ivan/ti/tirtos_cc13xx_cc26xx_2_21_00_06/products/bios_6_46_01_37/packages/ti/targets/C28_large.xs
-/home/ivan/ti/tirtos_cc13xx_cc26xx_2_21_00_06/products/bios_6_46_01_37/packages/ti/targets/C28_float.xs:
-package.mak: /home/ivan/ti/tirtos_cc13xx_cc26xx_2_21_00_06/products/bios_6_46_01_37/packages/ti/targets/C28_float.xs
-/home/ivan/ti/tirtos_cc13xx_cc26xx_2_21_00_06/products/bios_6_46_01_37/packages/ti/targets/package.xs:
-package.mak: /home/ivan/ti/tirtos_cc13xx_cc26xx_2_21_00_06/products/bios_6_46_01_37/packages/ti/targets/package.xs
-/home/ivan/ti/tirtos_cc13xx_cc26xx_2_21_00_06/products/bios_6_46_01_37/packages/ti/targets/arm/elf/IArm.xs:
-package.mak: /home/ivan/ti/tirtos_cc13xx_cc26xx_2_21_00_06/products/bios_6_46_01_37/packages/ti/targets/arm/elf/IArm.xs
-/home/ivan/ti/tirtos_cc13xx_cc26xx_2_21_00_06/products/bios_6_46_01_37/packages/ti/targets/arm/elf/package.xs:
-package.mak: /home/ivan/ti/tirtos_cc13xx_cc26xx_2_21_00_06/products/bios_6_46_01_37/packages/ti/targets/arm/elf/package.xs
+/home/steven/ti/tirex-content/tirtos_cc13xx_cc26xx_2_21_00_06/products/bios_6_46_01_37/packages/ti/targets/ITarget.xs:
+package.mak: /home/steven/ti/tirex-content/tirtos_cc13xx_cc26xx_2_21_00_06/products/bios_6_46_01_37/packages/ti/targets/ITarget.xs
+/home/steven/ti/tirex-content/tirtos_cc13xx_cc26xx_2_21_00_06/products/bios_6_46_01_37/packages/ti/targets/C28_large.xs:
+package.mak: /home/steven/ti/tirex-content/tirtos_cc13xx_cc26xx_2_21_00_06/products/bios_6_46_01_37/packages/ti/targets/C28_large.xs
+/home/steven/ti/tirex-content/tirtos_cc13xx_cc26xx_2_21_00_06/products/bios_6_46_01_37/packages/ti/targets/C28_float.xs:
+package.mak: /home/steven/ti/tirex-content/tirtos_cc13xx_cc26xx_2_21_00_06/products/bios_6_46_01_37/packages/ti/targets/C28_float.xs
+/home/steven/ti/tirex-content/tirtos_cc13xx_cc26xx_2_21_00_06/products/bios_6_46_01_37/packages/ti/targets/package.xs:
+package.mak: /home/steven/ti/tirex-content/tirtos_cc13xx_cc26xx_2_21_00_06/products/bios_6_46_01_37/packages/ti/targets/package.xs
+/home/steven/ti/tirex-content/tirtos_cc13xx_cc26xx_2_21_00_06/products/bios_6_46_01_37/packages/ti/targets/arm/elf/IArm.xs:
+package.mak: /home/steven/ti/tirex-content/tirtos_cc13xx_cc26xx_2_21_00_06/products/bios_6_46_01_37/packages/ti/targets/arm/elf/IArm.xs
+/home/steven/ti/tirex-content/tirtos_cc13xx_cc26xx_2_21_00_06/products/bios_6_46_01_37/packages/ti/targets/arm/elf/package.xs:
+package.mak: /home/steven/ti/tirex-content/tirtos_cc13xx_cc26xx_2_21_00_06/products/bios_6_46_01_37/packages/ti/targets/arm/elf/package.xs
 package.mak: package.bld
-/home/ivan/ti/xdctools_3_32_00_06_core/packages/xdc/tools/configuro/template/compiler.opt.xdt:
-package.mak: /home/ivan/ti/xdctools_3_32_00_06_core/packages/xdc/tools/configuro/template/compiler.opt.xdt
-/home/ivan/ti/xdctools_3_32_00_06_core/packages/xdc/services/io/File.xs:
-package.mak: /home/ivan/ti/xdctools_3_32_00_06_core/packages/xdc/services/io/File.xs
-/home/ivan/ti/xdctools_3_32_00_06_core/packages/xdc/services/io/package.xs:
-package.mak: /home/ivan/ti/xdctools_3_32_00_06_core/packages/xdc/services/io/package.xs
-/home/ivan/ti/xdctools_3_32_00_06_core/packages/xdc/tools/configuro/template/compiler.defs.xdt:
-package.mak: /home/ivan/ti/xdctools_3_32_00_06_core/packages/xdc/tools/configuro/template/compiler.defs.xdt
-/home/ivan/ti/xdctools_3_32_00_06_core/packages/xdc/tools/configuro/template/custom.mak.exe.xdt:
-package.mak: /home/ivan/ti/xdctools_3_32_00_06_core/packages/xdc/tools/configuro/template/custom.mak.exe.xdt
-/home/ivan/ti/xdctools_3_32_00_06_core/packages/xdc/tools/configuro/template/package.xs.xdt:
-package.mak: /home/ivan/ti/xdctools_3_32_00_06_core/packages/xdc/tools/configuro/template/package.xs.xdt
+/home/steven/ti/tirex-content/xdctools_3_32_00_06_core/packages/xdc/tools/configuro/template/compiler.opt.xdt:
+package.mak: /home/steven/ti/tirex-content/xdctools_3_32_00_06_core/packages/xdc/tools/configuro/template/compiler.opt.xdt
+/home/steven/ti/tirex-content/xdctools_3_32_00_06_core/packages/xdc/services/io/File.xs:
+package.mak: /home/steven/ti/tirex-content/xdctools_3_32_00_06_core/packages/xdc/services/io/File.xs
+/home/steven/ti/tirex-content/xdctools_3_32_00_06_core/packages/xdc/services/io/package.xs:
+package.mak: /home/steven/ti/tirex-content/xdctools_3_32_00_06_core/packages/xdc/services/io/package.xs
+/home/steven/ti/tirex-content/xdctools_3_32_00_06_core/packages/xdc/tools/configuro/template/compiler.defs.xdt:
+package.mak: /home/steven/ti/tirex-content/xdctools_3_32_00_06_core/packages/xdc/tools/configuro/template/compiler.defs.xdt
+/home/steven/ti/tirex-content/xdctools_3_32_00_06_core/packages/xdc/tools/configuro/template/custom.mak.exe.xdt:
+package.mak: /home/steven/ti/tirex-content/xdctools_3_32_00_06_core/packages/xdc/tools/configuro/template/custom.mak.exe.xdt
+/home/steven/ti/tirex-content/xdctools_3_32_00_06_core/packages/xdc/tools/configuro/template/package.xs.xdt:
+package.mak: /home/steven/ti/tirex-content/xdctools_3_32_00_06_core/packages/xdc/tools/configuro/template/package.xs.xdt
 endif
 
-ti.targets.arm.elf.M3.rootDir ?= /home/ivan/ti/ccsv6/tools/compiler/arm_15.12.3.LTS
-ti.targets.arm.elf.packageBase ?= /home/ivan/ti/tirtos_cc13xx_cc26xx_2_21_00_06/products/bios_6_46_01_37/packages/ti/targets/arm/elf/
+ti.targets.arm.elf.M3.rootDir ?= /home/steven/ti/ccsv6/tools/compiler/arm_15.12.3.LTS
+ti.targets.arm.elf.packageBase ?= /home/steven/ti/tirex-content/tirtos_cc13xx_cc26xx_2_21_00_06/products/bios_6_46_01_37/packages/ti/targets/arm/elf/
 .PRECIOUS: $(XDCCFGDIR)/%.oem3
 .PHONY: all,em3 .dlls,em3 .executables,em3 test,em3
 all,em3: .executables,em3

@@ -96,7 +96,7 @@ static void rxDoneCallbackSend(EasyLink_RxPacket * rxPacket, EasyLink_Status sta
 static void rxDoneCallbackReceive(EasyLink_RxPacket * rxPacket, EasyLink_Status status);
 
 /***** Function definitions *****/
-void radioAlpha_init(void) {
+void radioSendReceive_init(void) {
 	/* Create semaphore used for exclusive radio access */
 	Semaphore_Params semParam;
 	Semaphore_Params_init(&semParam);

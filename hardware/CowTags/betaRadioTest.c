@@ -89,6 +89,7 @@ static void betaRadioTestTaskFunction(UArg arg0, UArg arg1)
 		sampledata.cowID = 1;
 		sampledata.packetType = RADIO_PACKET_TYPE_SENSOR_PACKET;
 		sampledata.timestamp = 0x12345678;
+		sampledata.error = 0x0;
 
 		if(ignoreSensors){
 			if(verbose_betaRadioTest){System_printf("Ignoring sensors, making fake packets\n");System_flush();}
@@ -98,7 +99,6 @@ static void betaRadioTestTaskFunction(UArg arg0, UArg arg1)
 			sampledata.heartRateData.rate_l = 0x87;
 			sampledata.heartRateData.temp_h = 0x45;
 			sampledata.heartRateData.temp_l = 0x32;
-			sampledata.error = 0x0;
 		} else {
 			if(verbose_betaRadioTest){System_printf("Creating Packet...\n");System_flush();}
 			makeSensorPacket(&sampledata);
@@ -115,13 +115,12 @@ static void betaRadioTestTaskFunction(UArg arg0, UArg arg1)
 		sampledata.cowID = 1;
 		sampledata.packetType = RADIO_PACKET_TYPE_ACCEL_PACKET;
 		sampledata.timestamp = 0x12345678;
-
+		sampledata.error = 0x0;
 		if(ignoreSensors){
 			if(verbose_betaRadioTest){System_printf("Ignoring sensors, making fake packets\n");System_flush();}
 			sampledata.accelerometerData.x=0x12;
 			sampledata.accelerometerData.y=0x34;
 			sampledata.accelerometerData.z=0x56;
-			sampledata.error = 0x0;
 		} else {
 			if(verbose_betaRadioTest){System_printf("Creating Packet...\n");System_flush();}
 			makeSensorPacket(&sampledata);

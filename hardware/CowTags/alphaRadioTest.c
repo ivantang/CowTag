@@ -113,7 +113,8 @@ static void alphaRadioTestTaskFunction(UArg arg0, UArg arg1){
 	/* Enter main task loop */
 	while(1) {
 		/* Wait for event */
-		uint32_t events = Event_pend(alphaRadioTestEventHandle, 0, ALPHARADIOTEST_EVENT_ALL, 0);
+		uint32_t events = Event_pend(alphaRadioTestEventHandle, 0, ALPHARADIOTEST_EVENT_ALL, BIOS_NO_WAIT);
+
 
 		if(events & ALPHARADIOTEST_EVENT_NEW_SENSOR_VALUE) {
 			if(verbose_alphaRadioTest){System_printf("RECEIVE: received a packet.\n");}

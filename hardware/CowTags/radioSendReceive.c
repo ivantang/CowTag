@@ -150,8 +150,7 @@ static void alphaRadioTaskFunction(UArg arg0, UArg arg1)
 	/* Enter main task loop */
 	while (1)
 	{
-		//uint32_t events = Event_pend(radioOperationEventHandle, 0, ALPHARADIO_EVENT_ALL, BIOS_WAIT_FOREVER);
-		uint32_t events = Event_pend(radioOperationEventHandle, 0, ALPHARADIO_EVENT_ALL, 0);
+		uint32_t events = Event_pend(radioOperationEventHandle, 0, ALPHARADIO_EVENT_ALL, BIOS_WAIT_FOREVER);
 
 		/* If valid packet received */
 		if(events & ALPHARADIO_EVENT_VALID_PACKET_RECEIVED) {
@@ -244,13 +243,16 @@ enum alphaRadioOperationStatus alphaRadioSendData(struct sampleData data){
 	Event_post(radioOperationEventHandle, ALPHARADIO_EVENT_SEND_DATA);
 
 	/* Wait for result */
+	System_printf("BEFORE RESULTS SEM\n");
 	Semaphore_pend(radioResultSemHandle, BIOS_WAIT_FOREVER);
+	System_printf("AFTER RESUTLS SEM\n");
 
 	/* Get result */
 	status = currentRadioOperation.result;
 
 	/* Return radio access semaphore */
 	Semaphore_post(radioAccessSemHandle);
+	System_printf("AFTER RADIO SEM\n");
 
 	return status;
 }
@@ -300,6 +302,8 @@ static void sendAlphaPacket(struct sensorPacket bp, uint8_t maxNumberOfRetries, 
 		//System_abort("EasyLink_receiveAsync failed");
 		System_printf("EasyLink_receiveAsync failed: send\n");
 	}
+
+	Event_post(radioOperationEventHandle, ALPHARADIO_EVENT_SEND_FAIL);
 }
 
 static void resendPacket()

@@ -19,6 +19,7 @@ ORDERED_OBJS += \
 "./config_parse.obj" \
 "./eeprom.obj" \
 "./eepromTest.obj" \
+"./radioSendReceive.obj" \
 "./sensors.obj" \
 "./serialize.obj" \
 "./uArtEcho.obj" \
@@ -172,8 +173,8 @@ CowTag.hex: $(EXE_OUTPUTS)
 clean:
 	-$(RM) $(GEN_MISC_FILES__QUOTED)$(EXE_OUTPUTS__QUOTED)$(GEN_FILES__QUOTED)$(BIN_OUTPUTS__QUOTED)$(GEN_OPTS__QUOTED)$(GEN_CMDS__QUOTED)
 	-$(RMDIR) $(GEN_MISC_DIRS__QUOTED)
-	-$(RM) "CC1310_LAUNCHXL.d" "EventManager.d" "IIC.d" "RadioSend.d" "Sleep.d" "betaMain.d" "betaRadioTest.d" "ccfg.d" "config_parse.d" "eeprom.d" "eepromTest.d" "sensors.d" "serialize.d" "uArtEcho.d" "easylink/EasyLink.d" "smartrf_settings/smartrf_settings.d" "smartrf_settings/smartrf_settings_predefined.d" 
-	-$(RM) "CC1310_LAUNCHXL.obj" "EventManager.obj" "IIC.obj" "RadioSend.obj" "Sleep.obj" "betaMain.obj" "betaRadioTest.obj" "ccfg.obj" "config_parse.obj" "eeprom.obj" "eepromTest.obj" "sensors.obj" "serialize.obj" "uArtEcho.obj" "easylink/EasyLink.obj" "smartrf_settings/smartrf_settings.obj" "smartrf_settings/smartrf_settings_predefined.obj" 
+	-$(RM) "CC1310_LAUNCHXL.d" "EventManager.d" "IIC.d" "RadioSend.d" "Sleep.d" "betaMain.d" "betaRadioTest.d" "ccfg.d" "config_parse.d" "eeprom.d" "eepromTest.d" "radioSendReceive.d" "sensors.d" "serialize.d" "uArtEcho.d" "easylink/EasyLink.d" "smartrf_settings/smartrf_settings.d" "smartrf_settings/smartrf_settings_predefined.d" 
+	-$(RM) "CC1310_LAUNCHXL.obj" "EventManager.obj" "IIC.obj" "RadioSend.obj" "Sleep.obj" "betaMain.obj" "betaRadioTest.obj" "ccfg.obj" "config_parse.obj" "eeprom.obj" "eepromTest.obj" "radioSendReceive.obj" "sensors.obj" "serialize.obj" "uArtEcho.obj" "easylink/EasyLink.obj" "smartrf_settings/smartrf_settings.obj" "smartrf_settings/smartrf_settings_predefined.obj" 
 	-@echo 'Finished clean'
 	-@echo ' '
 

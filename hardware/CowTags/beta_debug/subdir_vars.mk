@@ -21,6 +21,7 @@ C_SRCS += \
 ../config_parse.c \
 ../eeprom.c \
 ../eepromTest.c \
+../radioSendReceive.c \
 ../sensors.c \
 ../serialize.c \
 ../uArtEcho.c 
@@ -37,6 +38,7 @@ OBJS += \
 ./config_parse.obj \
 ./eeprom.obj \
 ./eepromTest.obj \
+./radioSendReceive.obj \
 ./sensors.obj \
 ./serialize.obj \
 ./uArtEcho.obj 
@@ -53,6 +55,7 @@ C_DEPS += \
 ./config_parse.d \
 ./eeprom.d \
 ./eepromTest.d \
+./radioSendReceive.d \
 ./sensors.d \
 ./serialize.d \
 ./uArtEcho.d 
@@ -89,6 +92,7 @@ C_DEPS__QUOTED += \
 "config_parse.d" \
 "eeprom.d" \
 "eepromTest.d" \
+"radioSendReceive.d" \
 "sensors.d" \
 "serialize.d" \
 "uArtEcho.d" 
@@ -105,6 +109,7 @@ OBJS__QUOTED += \
 "config_parse.obj" \
 "eeprom.obj" \
 "eepromTest.obj" \
+"radioSendReceive.obj" \
 "sensors.obj" \
 "serialize.obj" \
 "uArtEcho.obj" 
@@ -121,6 +126,7 @@ C_SRCS__QUOTED += \
 "../config_parse.c" \
 "../eeprom.c" \
 "../eepromTest.c" \
+"../radioSendReceive.c" \
 "../sensors.c" \
 "../serialize.c" \
 "../uArtEcho.c" 

@@ -121,7 +121,6 @@ void radioAlpha_init(void) {
 	Task_construct(&alphaRadioTask, alphaRadioTaskFunction, &alphaRadioTaskParams, NULL);
 }
 
-//static uint16_t i = 0;
 static void alphaRadioTaskFunction(UArg arg0, UArg arg1)
 {
 	/* Initialize EasyLink */
@@ -152,12 +151,12 @@ static void alphaRadioTaskFunction(UArg arg0, UArg arg1)
 	while (1)
 	{
 		//uint32_t events = Event_pend(radioOperationEventHandle, 0, ALPHARADIO_EVENT_ALL, BIOS_WAIT_FOREVER);
-		uint32_t events = Event_pend(radioOperationEventHandle, 0, ALPHARADIO_EVENT_ALL, 3);
+		uint32_t events = Event_pend(radioOperationEventHandle, 0, ALPHARADIO_EVENT_ALL, 0);
 
 		/* If valid packet received */
 		if(events & ALPHARADIO_EVENT_VALID_PACKET_RECEIVED) {
 
-			System_printf("Valid Packet, sending ACK...\n");
+			System_printf("RadioReceive: Valid Packet, sending ACK...\n");
 
 			/* Send the ack packet */
 			sendAck(latestRxPacket.header.sourceAddress);
@@ -169,7 +168,8 @@ static void alphaRadioTaskFunction(UArg arg0, UArg arg1)
 
 			/* Go back to RX (to wait to sensor packet) */
 			if(EasyLink_receiveAsync(rxDoneCallbackReceive, 0) != EasyLink_Status_Success) {
-				System_abort("EasyLink_receiveAsync failed: ALPHARADIO_EVENT_VALID_PACKET_RECEIVED");
+				//System_abort("EasyLink_receiveAsync failed: ALPHARADIO_EVENT_VALID_PACKET_RECEIVED");
+				System_printf("EasyLink_receiveAsync failed: ALPHARADIO_EVENT_VALID_PACKET_RECEIVED\n");
 			}
 
 			/* toggle Activity LED */
@@ -183,7 +183,8 @@ static void alphaRadioTaskFunction(UArg arg0, UArg arg1)
 			System_printf("RadioReceive: invalid Packet, back to listening.\n");
 			/* Go back to RX */
 			if(EasyLink_receiveAsync(rxDoneCallbackReceive, 0) != EasyLink_Status_Success) {
-				System_abort("EasyLink_receiveAsync failed: ALPHARADIO_EVENT_INVALID_PACKET_RECEIVED");
+				//System_abort("EasyLink_receiveAsync failed: ALPHARADIO_EVENT_INVALID_PACKET_RECEIVED");
+				System_printf("EasyLink_receiveAsync failed: ALPHARADIO_EVENT_INVALID_PACKET_RECEIVED\n");
 			}
 		}
 
@@ -336,7 +337,8 @@ static void sendAck(uint8_t latestSourceAddress) {
 	/* Send packet  */
 	if (EasyLink_transmit(&txPacket) != EasyLink_Status_Success)
 	{
-		System_abort("EasyLink_transmit failed: failed to send ACK");
+		//System_abort("EasyLink_transmit failed: failed to send ACK");
+		System_printf("EasyLink_transmit failed: failed to send ACK\n");
 	}
 }
 

@@ -20,12 +20,10 @@
 
 /*test suites*/
 #include <alphaRadioTest.h>
-#include <betaRadioTest.h>
 #include <eepromTest.h>
 #include <serializeTest.h>
 #include <arduinoComTest.h>
-#include <RadioReceive.h>
-#include <RadioSend.h>
+#include <radioSendReceive.h>
 
 /* Global PIN_Config table */
 PIN_State ledPinState;
@@ -47,11 +45,8 @@ int main(void){
 	//if(verbose_main){System_printf("Initializing serialization thread...\n");}
 	//serialize_testStart();
 
-	//if(verbose_main){System_printf("Initializing radio antenna...\n");}
-	//radioReceive_init();
-
 	if(verbose_main){System_printf("Initializing radio antenna...\n");}
-	radioSend_init();
+	radioSendReceive_init();
 
 	if(verbose_main){System_printf("Initializing alpha tasks...\n");}
 	alphaRadioTest_init();

@@ -60,6 +60,7 @@
 /* Board Header files */
 #include <Board.h>
 #include <pinTable.h>
+#include <Sleep.h>
 
 /***** Defines *****/
 #define ALPHARADIOTEST_TASK_STACK_SIZE 1024
@@ -180,7 +181,7 @@ static void alphaRadioTestTaskFunction(UArg arg0, UArg arg1){
 		if(verbose_alphaRadioTest){System_printf("packet sent error: %i\n",results);System_flush();}
 		 */
 
-
+		Task_sleep(sleepFiveSeconds());
 		System_printf("--------------------------------------------------------------\n");
 
 	} // end of while loop

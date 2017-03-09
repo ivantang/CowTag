@@ -11,6 +11,7 @@
 
 long int sleepAnHour();
 long int sleepAMinute();
+long int sleepFiveSeconds();
 long int sleepASecond();
 
 

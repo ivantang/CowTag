@@ -243,16 +243,13 @@ enum alphaRadioOperationStatus alphaRadioSendData(struct sampleData data){
 	Event_post(radioOperationEventHandle, ALPHARADIO_EVENT_SEND_DATA);
 
 	/* Wait for result */
-	System_printf("BEFORE RESULTS SEM\n");
 	Semaphore_pend(radioResultSemHandle, BIOS_WAIT_FOREVER);
-	System_printf("AFTER RESUTLS SEM\n");
 
 	/* Get result */
 	status = currentRadioOperation.result;
 
 	/* Return radio access semaphore */
 	Semaphore_post(radioAccessSemHandle);
-	System_printf("AFTER RADIO SEM\n");
 
 	return status;
 }

@@ -1,5 +1,5 @@
 /*
- * radioAlpha.c
+ * radioSendReceive.c
  *
  *  Created on: Feb 16, 2017
  *      Author: Erik-PC
@@ -86,7 +86,7 @@ static int8_t latestRssi;
 /***** Prototypes *****/
 static void alphaRadioTaskFunction(UArg arg0, UArg arg1);
 
-static void sendBetaPacket(struct sensorPacket betaPacket, uint8_t maxNumberOfRetries, uint32_t ackTimeoutMs);
+static void sendAlphaPacket(struct sensorPacket betaPacket, uint8_t maxNumberOfRetries, uint32_t ackTimeoutMs);
 static void resendPacket();
 static void notifyPacketReceived(union ConcentratorPacket* latestRxPacket);
 static void sendAck(uint8_t latestSourceAddress);
@@ -193,7 +193,7 @@ static void alphaRadioTaskFunction(UArg arg0, UArg arg1)
 			sensorPacket.sampledata = sampledata;
 			sensorPacket.header.packetType = sampledata.packetType;
 			System_printf("RadioSend: sending data...\n");
-			sendBetaPacket(sensorPacket, ALPHARADIO_MAX_RETRIES, ALPHARADIO_ACK_TIMEOUT_TIME_MS);
+			sendAlphaPacket(sensorPacket, ALPHARADIO_MAX_RETRIES, ALPHARADIO_ACK_TIMEOUT_TIME_MS);
 
 		}
 
@@ -263,7 +263,7 @@ static void returnRadioOperationStatus(enum alphaRadioOperationStatus result)
 	Semaphore_post(radioResultSemHandle);
 }
 
-static void sendBetaPacket(struct sensorPacket bp, uint8_t maxNumberOfRetries, uint32_t ackTimeoutMs){
+static void sendAlphaPacket(struct sensorPacket bp, uint8_t maxNumberOfRetries, uint32_t ackTimeoutMs){
 
 	//sends to alpha and gateway
 	/*

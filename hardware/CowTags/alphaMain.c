@@ -37,6 +37,7 @@ int main(void){
 	if(verbose_main){System_printf("Initializing board...\n");}
 	Board_initGeneral(); // init board
 
+	if(verbose_main){System_printf("Initializing event manager...\n");}
 	eventManager_init();
 
 	//if(verbose_main){System_printf("Initializing sensors...\n");}

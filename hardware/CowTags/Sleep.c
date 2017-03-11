@@ -20,7 +20,7 @@ long int sleepAMinute() {
 }
 
 long int sleepFiveSeconds() {
-	return minuteSleepTicks / 60 * 5 / Clock_tickPeriod;
+	return minuteSleepTicks * 5 / 60 / Clock_tickPeriod;
 }
 
 long int sleepASecond() {

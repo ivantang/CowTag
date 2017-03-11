@@ -31,21 +31,13 @@
 #include "pinTable.h"
 #include <config_parse.h>
 #include <stdlib.h>
+#include <EventManager.h>
 #include <driverlib/trng.h>
 #include <driverlib/aon_batmon.h>
 
 /***** Defines *****/
 #define ALPHARADIO_TASK_STACK_SIZE 1024
 #define ALPHARADIO_TASK_PRIORITY   3
-
-#define ALPHARADIO_EVENT_ALL                 0xFFFFFFFF
-#define ALPHARADIO_EVENT_SEND_DATA      	(uint32_t)(1 << 0)
-#define ALPHARADIO_EVENT_DATA_ACK_RECEIVED   (uint32_t)(1 << 1)
-#define ALPHARADIO_EVENT_ACK_TIMEOUT         (uint32_t)(1 << 2)
-#define ALPHARADIO_EVENT_SEND_FAIL           (uint32_t)(1 << 3)
-#define ALPHARADIO_EVENT_VALID_PACKET_RECEIVED      (uint32_t)(1 << 4)
-#define ALPHARADIO_EVENT_INVALID_PACKET_RECEIVED (uint32_t)(1 << 5)
-
 #define ALPHARADIO_MAX_RETRIES 6
 #define ALPHARADIO_ACK_TIMEOUT_TIME_MS (500)
 
@@ -64,8 +56,7 @@ Task_Struct alphaRadioTask;        /* not static so you can see in ROV */
 static uint8_t alphaRadioTaskStack[ALPHARADIO_TASK_STACK_SIZE];
 Semaphore_Struct radioAccessSem;  /* not static so you can see in ROV */
 static Semaphore_Handle radioAccessSemHandle;
-Event_Struct radioOperationEvent; /* not static so you can see in ROV */
-static Event_Handle radioOperationEventHandle;
+static Event_Handle *radioOperationEventHandle;
 Semaphore_Struct radioResultSem;  /* not static so you can see in ROV */
 static Semaphore_Handle radioResultSemHandle;
 
@@ -108,10 +99,7 @@ void radioSendReceive_init(void) {
 	radioResultSemHandle = Semaphore_handle(&radioResultSem);
 
 	/* Create event used internally for state changes */
-	Event_Params eventParam;
-	Event_Params_init(&eventParam);
-	Event_construct(&radioOperationEvent, &eventParam);
-	radioOperationEventHandle = Event_handle(&radioOperationEvent);
+	radioOperationEventHandle = getEventHandle();
 
 	/* Create the radio protocol task */
 	Task_Params_init(&alphaRadioTaskParams);
@@ -150,10 +138,10 @@ static void alphaRadioTaskFunction(UArg arg0, UArg arg1)
 	/* Enter main task loop */
 	while (1)
 	{
-		uint32_t events = Event_pend(radioOperationEventHandle, 0, ALPHARADIO_EVENT_ALL, BIOS_WAIT_FOREVER);
+		uint32_t events = Event_pend(*radioOperationEventHandle, 0, RADIO_EVENT_ALL, BIOS_WAIT_FOREVER);
 
 		/* If valid packet received */
-		if(events & ALPHARADIO_EVENT_VALID_PACKET_RECEIVED) {
+		if(events & RADIO_EVENT_VALID_PACKET_RECEIVED) {
 
 			System_printf("RadioReceive: Valid Packet, sending ACK...\n");
 
@@ -177,7 +165,7 @@ static void alphaRadioTaskFunction(UArg arg0, UArg arg1)
 		}
 
 		/* If invalid packet received */
-		if(events & ALPHARADIO_EVENT_INVALID_PACKET_RECEIVED) {
+		if(events & RADIO_EVENT_INVALID_PACKET_RECEIVED) {
 
 			System_printf("RadioReceive: invalid Packet, back to listening.\n");
 			/* Go back to RX */
@@ -188,7 +176,7 @@ static void alphaRadioTaskFunction(UArg arg0, UArg arg1)
 		}
 
 		/* If we should send data */
-		if (events & ALPHARADIO_EVENT_SEND_DATA)
+		if (events & RADIO_EVENT_SEND_DATA)
 		{
 			sensorPacket.sampledata = sampledata;
 			sensorPacket.header.packetType = sampledata.packetType;
@@ -198,14 +186,14 @@ static void alphaRadioTaskFunction(UArg arg0, UArg arg1)
 		}
 
 		/* If we get an ACK from the concentrator */
-		if (events & ALPHARADIO_EVENT_DATA_ACK_RECEIVED)
+		if (events & RADIO_EVENT_DATA_ACK_RECEIVED)
 		{
 			returnRadioOperationStatus(AlphaRadioStatus_Success);
 			System_printf("RadioSend: ACK RECEIVED! Transmission successful.\n");
 		}
 
 		/* If we get an ACK timeout */
-		if (events & ALPHARADIO_EVENT_ACK_TIMEOUT)
+		if (events & RADIO_EVENT_ACK_TIMEOUT)
 		{
 			/* If we haven't resent it the maximum number of times yet, then resend packet */
 			if (currentRadioOperation.retriesDone < currentRadioOperation.maxNumberOfRetries)
@@ -221,7 +209,7 @@ static void alphaRadioTaskFunction(UArg arg0, UArg arg1)
 		}
 
 		/* If send fail */
-		if (events & ALPHARADIO_EVENT_SEND_FAIL)
+		if (events & RADIO_EVENT_SEND_FAIL)
 		{
 			System_printf("RadioSend: Send failed\n");
 			returnRadioOperationStatus(AlphaRadioStatus_FailedNotConnected);
@@ -240,7 +228,7 @@ enum alphaRadioOperationStatus alphaRadioSendData(struct sampleData data){
 	sampledata = data;
 
 	/* Raise RADIO_EVENT_SEND_DATA event */
-	Event_post(radioOperationEventHandle, ALPHARADIO_EVENT_SEND_DATA);
+	Event_post(*radioOperationEventHandle, RADIO_EVENT_SEND_DATA);
 
 	/* Wait for result */
 	Semaphore_pend(radioResultSemHandle, BIOS_WAIT_FOREVER);
@@ -300,7 +288,7 @@ static void sendAlphaPacket(struct sensorPacket bp, uint8_t maxNumberOfRetries, 
 		System_printf("EasyLink_receiveAsync failed: send\n");
 	}
 
-	Event_post(radioOperationEventHandle, ALPHARADIO_EVENT_SEND_FAIL);
+	Event_post(*radioOperationEventHandle, RADIO_EVENT_SEND_FAIL);
 }
 
 static void resendPacket()
@@ -373,27 +361,27 @@ static void rxDoneCallbackSend(EasyLink_RxPacket * rxPacket, EasyLink_Status sta
 		if (packetHeader->packetType == RADIO_PACKET_TYPE_ACK_PACKET)
 		{
 			/* Signal ACK packet received */
-			Event_post(radioOperationEventHandle, ALPHARADIO_EVENT_DATA_ACK_RECEIVED);
+			Event_post(*radioOperationEventHandle, RADIO_EVENT_DATA_ACK_RECEIVED);
 		}
 		else
 		{
 			/* Packet Error, treat as a Timeout and Post a RADIO_EVENT_ACK_TIMEOUT
                event */
-			Event_post(radioOperationEventHandle, ALPHARADIO_EVENT_ACK_TIMEOUT);
+			Event_post(*radioOperationEventHandle, RADIO_EVENT_ACK_TIMEOUT);
 		}
 	}
 	/* did the Rx timeout */
 	else if(status == EasyLink_Status_Rx_Timeout)
 	{
 		/* Post a RADIO_EVENT_ACK_TIMEOUT event */
-		Event_post(radioOperationEventHandle, ALPHARADIO_EVENT_ACK_TIMEOUT);
+		Event_post(*radioOperationEventHandle, RADIO_EVENT_ACK_TIMEOUT);
 	}
 	else
 	{
 		/* The Ack reception may have been corrupted causing an error.
 		 * Treat this as a timeout
 		 */
-		Event_post(radioOperationEventHandle, ALPHARADIO_EVENT_SEND_FAIL);
+		Event_post(*radioOperationEventHandle, RADIO_EVENT_SEND_FAIL);
 	}
 }
 
@@ -419,7 +407,7 @@ static void rxDoneCallbackReceive(EasyLink_RxPacket * rxPacket, EasyLink_Status 
 			if( (concentratorAddress & 0x3) == ALPHA_ADDRESS){ // IF I AM AN ALPHA
 				if((tmpRxPacket->header.sourceAddress & 0x1) == 1){ // IF THE SOURCE IS ANOTHER CONCENTRATOR
 					// ignore the alpha packet
-					Event_post(radioOperationEventHandle, ALPHARADIO_EVENT_INVALID_PACKET_RECEIVED);
+					Event_post(*radioOperationEventHandle, RADIO_EVENT_INVALID_PACKET_RECEIVED);
 					return;
 				}
 			}
@@ -428,7 +416,7 @@ static void rxDoneCallbackReceive(EasyLink_RxPacket * rxPacket, EasyLink_Status 
 			/* Save packet */
 			memcpy((void*)&latestRxPacket, &rxPacket->payload, sizeof(struct sensorPacket));
 			/* Signal packet received */
-			Event_post(radioOperationEventHandle, ALPHARADIO_EVENT_VALID_PACKET_RECEIVED);
+			Event_post(*radioOperationEventHandle, RADIO_EVENT_VALID_PACKET_RECEIVED);
 
 		}else if(tmpRxPacket->header.packetType == RADIO_PACKET_TYPE_ACCEL_PACKET){
 
@@ -436,7 +424,7 @@ static void rxDoneCallbackReceive(EasyLink_RxPacket * rxPacket, EasyLink_Status 
 						if( (concentratorAddress & 0x3) == ALPHA_ADDRESS){ // IF I AM AN ALPHA
 							if((tmpRxPacket->header.sourceAddress & 0x1) == 1){ // IF THE SOURCE IS ANOTHER CONCENTRATOR
 								// ignore the alpha packet
-								Event_post(radioOperationEventHandle, ALPHARADIO_EVENT_INVALID_PACKET_RECEIVED);
+								Event_post(*radioOperationEventHandle, RADIO_EVENT_INVALID_PACKET_RECEIVED);
 								return;
 							}
 						}
@@ -445,20 +433,20 @@ static void rxDoneCallbackReceive(EasyLink_RxPacket * rxPacket, EasyLink_Status 
 						/* Save packet */
 						memcpy((void*)&latestRxPacket, &rxPacket->payload, sizeof(struct sensorPacket));
 						/* Signal packet received */
-						Event_post(radioOperationEventHandle, ALPHARADIO_EVENT_VALID_PACKET_RECEIVED);
+						Event_post(*radioOperationEventHandle, RADIO_EVENT_VALID_PACKET_RECEIVED);
 		}
 		else if(tmpRxPacket->header.packetType == RADIO_PACKET_TYPE_ACK_PACKET){
 			//alpha sends now, so it needs ACK packets
-			Event_post(radioOperationEventHandle, ALPHARADIO_EVENT_DATA_ACK_RECEIVED);
+			Event_post(*radioOperationEventHandle, RADIO_EVENT_DATA_ACK_RECEIVED);
 		}
 		else{
 			// ignore unknown packet or ACK packet
-			Event_post(radioOperationEventHandle, ALPHARADIO_EVENT_INVALID_PACKET_RECEIVED);
+			Event_post(*radioOperationEventHandle, RADIO_EVENT_INVALID_PACKET_RECEIVED);
 		}
 	}	else // status = some error; packet not rx'd successfully
 	{
 		//System_printf("Receive Error.\n");
 		/* Signal invalid packet received */
-		Event_post(radioOperationEventHandle, ALPHARADIO_EVENT_SEND_FAIL);
+		Event_post(*radioOperationEventHandle, RADIO_EVENT_SEND_FAIL);
 	}
 }

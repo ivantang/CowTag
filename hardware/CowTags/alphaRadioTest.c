@@ -61,12 +61,11 @@
 #include <Board.h>
 #include <pinTable.h>
 #include <Sleep.h>
+#include <EventManager.h>
 
 /***** Defines *****/
 #define ALPHARADIOTEST_TASK_STACK_SIZE 1024
 #define ALPHARADIOTEST_TASK_PRIORITY   3
-#define ALPHARADIOTEST_EVENT_ALL                         0xFFFFFFFF
-#define ALPHARADIOTEST_EVENT_NEW_SENSOR_VALUE    (uint32_t)(1 << 0)
 #define ALPHARADIOTEST_MAX_NODES 7
 #define ALPHARADIOTEST_DISPLAY_LINES 8
 
@@ -74,8 +73,7 @@
 static Task_Params alphaRadioTestTaskParams;
 Task_Struct alphaRadioTestTask;    /* not static so you can see in ROV */
 static uint8_t alphaRadioTestTaskStack[ALPHARADIOTEST_TASK_STACK_SIZE];
-Event_Struct alphaRadioTestEvent;  /* not static so you can see in ROV */
-static Event_Handle alphaRadioTestEventHandle;
+static Event_Handle *alphaRadioTestEventHandle;
 static struct sensorPacket latestActivePacket;
 
 /***** Prototypes *****/
@@ -88,10 +86,7 @@ void sendToGateway(struct sampleData sampledata);
 void alphaRadioTest_init(void) {
 
 	/* Create event used internally for state changes */
-	Event_Params eventParam;
-	Event_Params_init(&eventParam);
-	Event_construct(&alphaRadioTestEvent, &eventParam);
-	alphaRadioTestEventHandle = Event_handle(&alphaRadioTestEvent);
+	alphaRadioTestEventHandle = getEventHandle();
 
 	/* Create the alphaRadioTest radio protocol task */
 	Task_Params_init(&alphaRadioTestTaskParams);
@@ -105,31 +100,17 @@ static void alphaRadioTestTaskFunction(UArg arg0, UArg arg1){
 	/* Register a packet received callback with the radio task */
 	AlphaRadioTask_registerPacketReceivedCallback(packetReceivedCallback);
 
-	int delay = 10000;
 	struct sampleData sampledata;
 	enum alphaRadioOperationStatus results;
 
 	if(verbose_alphaRadioTest){System_printf("Initializing alphaRadioTest...\n");}
 
-	/* Enter main task loop */
-	while(1) {
-		/* Wait for event */
-		uint32_t events = Event_pend(alphaRadioTestEventHandle, 0, ALPHARADIOTEST_EVENT_ALL, BIOS_NO_WAIT);
-
-		if(events & ALPHARADIOTEST_EVENT_NEW_SENSOR_VALUE) {
-			if(verbose_alphaRadioTest){System_printf("RECEIVE: received a packet.\n");}
-			if(verbose_alphaRadioTest){printSampleData(latestActivePacket.sampledata);}
-		}
-		else{
-			if(verbose_alphaRadioTest){System_printf("RECEIVE: did not receive packet.\n");System_flush();}
-		}
-
-		CPUdelay(delay*5000);
-
+	while (1) {
 		sampledata.cowID = 2;
 		sampledata.packetType = RADIO_PACKET_TYPE_SENSOR_PACKET;
 		sampledata.timestamp = 0x12345678;
 
+		// make/fake a sensor packet
 		if(ignoreSensors){
 			if(verbose_alphaRadioTest){System_printf("SEND: Ignoring sensors, making fake packets\n");System_flush();}
 			sampledata.tempData.temp_h = 0x78;
@@ -142,68 +123,43 @@ static void alphaRadioTestTaskFunction(UArg arg0, UArg arg1){
 		} else {
 			if(verbose_alphaRadioTest){System_printf("SEND: Creating Packet...");System_flush();}
 			makeSensorPacket(&sampledata);
-			if(verbose_alphaRadioTest){System_printf("Packet Created\n");System_flush();}
 		}
 
+		// send packet
 		if(verbose_alphaRadioTest){System_printf("SEND: sending packet...\n");System_flush();}
 		results = alphaRadioSendData(sampledata);
-
-		//
-		if(results == AlphaRadioStatus_Success){
-			if(verbose_alphaRadioTest){printSampleData(sampledata);}
+		if (results == AlphaRadioStatus_Success){
+			if(verbose_alphaRadioTest){System_printf("SEND: Sent Correctly!\n");}
 		}else{
 			if(verbose_alphaRadioTest){System_printf("SEND: packet sent error: %i\n",results);System_flush();}
 		}
 
-		CPUdelay(delay*5000);
-
-		/*sampledata.cowID = 1;
-
-		sampledata.packetType = RADIO_PACKET_TYPE_ACCEL_PACKET;
-		sampledata.timestamp = 0x12345678;
-
-		if(ignoreSensors){
-			if(verbose_alphaRadioTest){System_printf("Ignoring sensors, making fake packets\n");System_flush();}
-			sampledata.accelerometerData.x=0x12;
-			sampledata.accelerometerData.y=0x34;
-			sampledata.accelerometerData.z=0x56;
-			sampledata.error = 0x0;
-		} else {
-			if(verbose_alphaRadioTest){System_printf("Creating Packet...\n");System_flush();}
-			makeSensorPacket(&sampledata);
-			if(verbose_alphaRadioTest){System_printf("Packet Created\n");System_flush();}
+		// wait for incoming sample packets
+		uint32_t events = Event_pend(*alphaRadioTestEventHandle, 0, RADIO_EVENT_ALL, sleepFiveSeconds());
+		if(events & RADIO_EVENT_NEW_SENSOR_PACKET) {
+			if(verbose_alphaRadioTest) {
+				System_printf("RECEIVE: received a packet.\n");
+				printSampleData(latestActivePacket.sampledata);
+			}
+		}
+		else{
+			if(verbose_alphaRadioTest) {
+				System_printf("RECEIVE: did not receive packet.\n");
+				System_flush();
+			}
 		}
 
-		//if(verbose_alphaRadioTest){printSampleData(sampledata);}
-		if(verbose_alphaRadioTest){System_printf("sending packet...\n");System_flush();}
-		results = alphaRadioSendData(sampledata);
-
-		if(verbose_alphaRadioTest){System_printf("packet sent error: %i\n",results);System_flush();}
-		 */
-
+		System_printf("zZzZzZzZzZzZzZzZzZ\n");
+		System_printf("Z going to sleep z\n");
+		System_printf("zZzZzZzZzZzZzZzZzZ\n");
 		Task_sleep(sleepFiveSeconds());
-		System_printf("--------------------------------------------------------------\n");
-
-	} // end of while loop
+	}
 }
 
 static void packetReceivedCallback(union ConcentratorPacket* packet, int8_t rssi){
 	latestActivePacket.header = packet->header;
 	latestActivePacket.sampledata = packet->sensorPacket.sampledata;
-
-	Event_post(alphaRadioTestEventHandle, ALPHARADIOTEST_EVENT_NEW_SENSOR_VALUE);
-}
-
-/*print what you received*/
-void sendToGateway(struct sampleData sampledata){
-	//send to Gateway now
-	//
-	//	enum NodeRadioOperationStatus results = betaRadioSendData(latestActiveSensorNode.sample);
-	//
-	//	// catch a timeout
-	//	if (results == NodeRadioStatus_Failed) {
-	//		if(verbose_alphaRadioTestRadioTest){System_printf("Error: %x @ packet: %d\n", latestActiveSensorNode.sample.error, receivedPackets);}
-	//	}
+	Event_post(*alphaRadioTestEventHandle, RADIO_EVENT_NEW_SENSOR_PACKET);
 }
 
 void printSampleData(struct sampleData sampledata){

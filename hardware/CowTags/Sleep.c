@@ -7,9 +7,10 @@
 
 #include <Sleep.h>
 #include <ti/sysbios/knl/Clock.h>
+#include "global_cfg.h"
 
-long long int hourSleepTicks = 3600000000;
-long long int minuteSleepTicks = 60000000;
+long long int hourSleepTicks = HOUR_SLEEP_TICKS;
+long long int minuteSleepTicks = MINUTE_SLEEP_TICKS;
 
 long int sleepAnHour() {
 	return hourSleepTicks / Clock_tickPeriod;

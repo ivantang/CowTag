@@ -128,16 +128,16 @@ static void concentratorRadioTaskFunction(UArg arg0, UArg arg1)
 	// tmp
 	/* buildType = TAG_TYPE; */
 
-	System_printf("buildType = %i\n",buildType);
-
-	if(buildType == 1){
-		concentratorAddress = ALPHA_ADDRESS;
-	} else if ( buildType == 3 ){
-		concentratorAddress = GATEWAY_ADDRESS;
-	} else {
-		System_printf("buildType ERROR");
-		concentratorAddress = GATEWAY_ADDRESS;
-	}*/
+//	System_printf("buildType = %i\n",buildType);
+//
+//	if(buildType == 1){
+//		concentratorAddress = ALPHA_ADDRESS;
+//	} else if ( buildType == 3 ){
+//		concentratorAddress = GATEWAY_ADDRESS;
+//	} else {
+//		System_printf("buildType ERROR");
+//		concentratorAddress = GATEWAY_ADDRESS;
+//	}*/
 
 
 	/* Set src address of ACK packet */;

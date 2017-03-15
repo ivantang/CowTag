@@ -140,6 +140,7 @@ static void alphaRadioTaskFunction(UArg arg0, UArg arg1)
 	/* Enter main task loop */
 	while (1)
 	{
+		System_printf("Startin that loop\n");
 		uint32_t events = Event_pend(*radioOperationEventHandle, 0, RADIO_EVENT_ALL, BIOS_WAIT_FOREVER);
 
 		/* If valid packet received */
@@ -158,6 +159,10 @@ static void alphaRadioTaskFunction(UArg arg0, UArg arg1)
 			if(verbose_alphaRadio){
 				System_printf("RadioReceive: ACK sent. Back to listening\n");
 				System_flush();}
+
+			if(EasyLink_init(RADIO_EASYLINK_MODULATION) != EasyLink_Status_Success) {
+				System_abort("EasyLink_init failed");
+			}
 
 			/* Go back to RX (to wait to sensor packet) */
 			if(EasyLink_receiveAsync(rxDoneCallbackReceive, 0) != EasyLink_Status_Success) {
@@ -305,25 +310,25 @@ static void sendAlphaPacket(struct sensorPacket bp, uint8_t maxNumberOfRetries, 
 	EasyLink_setCtrl(EasyLink_Ctrl_AsyncRx_TimeOut, EasyLink_ms_To_RadioTime(ackTimeoutMs));
 
 	/* Send packet  */
+	System_printf("TRANSMIT\n");
 	if (EasyLink_transmit(&currentRadioOperation.easyLinkTxPacket) != EasyLink_Status_Success)
 	{
-		//System_abort("EasyLink_transmit failed: failed to send packet");
 		if(verbose_alphaRadio){
 			System_printf("EasyLink_transmit failed: failed to send packet\n");
 			System_flush();}
-
 	}
 
 	/* Enter RX */
+	System_printf("ASYNC START\n");
 	if (EasyLink_receiveAsync(rxDoneCallbackSend, 0) != EasyLink_Status_Success)
 	{
-		//System_abort("EasyLink_receiveAsync failed");
 		if(verbose_alphaRadio){
 			System_printf("EasyLink_receiveAsync failed: send\n");
 			System_flush();}
 	}
+	System_printf("ASYNC STARTED!!!!!!!!\n");
 
-	Event_post(*radioOperationEventHandle, RADIO_EVENT_SEND_FAIL);
+//	Event_post(*radioOperationEventHandle, RADIO_EVENT_DATA_ACK_RECEIVED);
 }
 
 static void resendPacket()
@@ -385,10 +390,12 @@ void AlphaRadioTask_registerPacketReceivedCallback(ConcentratorRadio_PacketRecei
 static void rxDoneCallbackSend(EasyLink_RxPacket * rxPacket, EasyLink_Status status)
 {
 	struct PacketHeader* packetHeader;
+	System_printf("entering this function\n");
 
 	/* If this callback is called because of a packet received */
 	if (status == EasyLink_Status_Success)
 	{
+		System_printf("GOOD SEND CALLBACK!\n");
 		/* Check the payload header */
 		packetHeader = (struct PacketHeader*)rxPacket->payload;
 
@@ -402,6 +409,7 @@ static void rxDoneCallbackSend(EasyLink_RxPacket * rxPacket, EasyLink_Status sta
 		{
 			/* Packet Error, treat as a Timeout and Post a RADIO_EVENT_ACK_TIMEOUT
                event */
+			System_printf("TIMEOUT!\n");
 			Event_post(*radioOperationEventHandle, RADIO_EVENT_ACK_TIMEOUT);
 		}
 	}

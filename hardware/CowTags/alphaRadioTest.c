@@ -134,32 +134,21 @@ static void alphaRadioTestTaskFunction(UArg arg0, UArg arg1){
 			if(verbose_alphaRadioTest){System_printf("SEND: packet sent error: %i\n",results);System_flush();}
 		}
 
-		// wait for incoming sample packets
-		uint32_t events = Event_pend(*alphaRadioTestEventHandle, 0, RADIO_EVENT_ALL, sleepFiveSeconds());
-		if(events & RADIO_EVENT_NEW_SENSOR_PACKET) {
-			if(verbose_alphaRadioTest) {
-				System_printf("RECEIVE: received a packet.\n");
-				printSampleData(latestActivePacket.sampledata);
-			}
-		}
-		else{
-			if(verbose_alphaRadioTest) {
-				System_printf("RECEIVE: did not receive packet.\n");
-				System_flush();
-			}
-		}
-
-		System_printf("zZzZzZzZzZzZzZzZzZ\n");
-		System_printf("Z going to sleep z\n");
-		System_printf("zZzZzZzZzZzZzZzZzZ\n");
-		Task_sleep(sleepFiveSeconds());
+//		System_printf("zZzZzZzZzZzZzZzZzZ\n");
+//		System_printf("Z going to sleep z\n");
+//		System_printf("zZzZzZzZzZzZzZzZzZ\n");
+//		Task_sleep(sleepFiveSeconds());
 	}
 }
 
 static void packetReceivedCallback(union ConcentratorPacket* packet, int8_t rssi){
 	latestActivePacket.header = packet->header;
 	latestActivePacket.sampledata = packet->sensorPacket.sampledata;
-	Event_post(*alphaRadioTestEventHandle, RADIO_EVENT_NEW_SENSOR_PACKET);
+
+	if(verbose_alphaRadioTest) {
+		System_printf("RECEIVE: received a packet.\n");
+		printSampleData(latestActivePacket.sampledata);
+	}
 }
 
 void printSampleData(struct sampleData sampledata){

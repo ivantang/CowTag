@@ -101,6 +101,7 @@
 					</folderInfo>
 					<sourceEntries>
 						<entry excluding="src" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="src/sysbios"/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>
@@ -207,6 +208,7 @@
 					</folderInfo>
 					<sourceEntries>
 						<entry excluding="src" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="src/sysbios"/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>
@@ -313,6 +315,7 @@
 					</folderInfo>
 					<sourceEntries>
 						<entry excluding="gatewayRadioTest.c|gatewayMain.c|arduinoComTest.c|arduinoCom.c|betaRadioTest.c|betaMain.c|src" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="src/sysbios"/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>
@@ -419,6 +422,7 @@
 					</folderInfo>
 					<sourceEntries>
 						<entry excluding="arduinoCom.c|arduinoComTest.c|gatewayMain.c|gatewayRadioTest.c|alphaMain.c|RadioReceive.c|alphaRadioTest.c|src" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="src/sysbios"/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>
@@ -525,6 +529,7 @@
 					</folderInfo>
 					<sourceEntries>
 						<entry excluding="eepromTest.c|sensors.c|RadioSend.c|IIC.c|eeprom.c|alphaMain.c|alphaRadioTest.c|betaRadioTest.c|betaMain.c|src" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="src/sysbios"/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>

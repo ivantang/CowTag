@@ -39,3 +39,5 @@ Release/
 *.aem3
 
 configPkg
+
+global_cfg.h

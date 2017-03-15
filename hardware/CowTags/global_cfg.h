@@ -16,7 +16,7 @@
 // [2] = NOT USED
 // [3] = Gateway
 // Specifies the Tag Type being used
-#define TAG_TYPE 1
+#define TAG_TYPE 0
 
 // Original value: 6
 // Specifies the number of retries for send
@@ -34,6 +34,11 @@
 // Specifies the timeout for send and receive in milliseconds
 #define RADIO_RECEIVE_ACK_TIMEOUT_TIME_MS (500)
 
+#define HOUR_SLEEP_TICKS 3600000000
+#define MINUTE_SLEEP_TICKS 60000000
+
+#define MAX_EEPROM_ADDRESS 0x7FFF
+#define MIN_EEPROM_ADDRESS 0x0000
 
 #endif // GLOBAL_CFG_H
 

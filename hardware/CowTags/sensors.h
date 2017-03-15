@@ -99,6 +99,8 @@ void Sensors_init(void);
 #define	MAX30100_LED_CURR_50MA			0x0f	//default LEDcurrent
 #define MAX30100_SPC_SPO2_HI_RES_EN     (1 << 6)
 #define MAX30100_HRDATA_READY			0x20
+#define MAX30100_DATA_FULL				0x80
+
 
 //void echoFxn(UArg arg0, UArg arg1);
 void getAcceleration(struct sampleData*);

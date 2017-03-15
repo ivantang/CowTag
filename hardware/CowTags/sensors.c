@@ -138,10 +138,10 @@ void getTempNoPtr(){
 
 void getHeartRate(struct sampleData *sampleData){
 	int i = 0;
+	int j = 0;
 	uint16_t numValues = 50;
 	uint16_t HRData[50];
-	uint16_t RedData[50];
-	uint16_t Derivative[50];
+	int Derivative[50];
 	uint32_t start_timestamp;
 	uint32_t end_timestamp;
 	uint32_t start_clock;
@@ -159,7 +159,7 @@ void getHeartRate(struct sampleData *sampleData){
 
 	writeI2CRegister(Board_MAX30100_ADDR, MAX30100_REG_MODE_CONFIGURATION, 0x02);	//enable HR only
 	writeI2CRegister(Board_MAX30100_ADDR, MAX30100_REG_SPO2_CONFIGURATION, 0x07);	//enable HR only
-	writeI2CRegister(Board_MAX30100_ADDR, MAX30100_REG_LED_CONFIGURATION, MAX30100_LED_CURR_50MA);	//set LED 50mA
+	writeI2CRegister(Board_MAX30100_ADDR, MAX30100_REG_LED_CONFIGURATION, 0x0f);	//set LED 50mA
 	writeI2CRegister(Board_MAX30100_ADDR, MAX30100_REG_INTERRUPT_CONFIGURATION, 0xA0);	//turn on interrupts
 
 	//clearing FIFO write pointer, overflow counter and read pointer
@@ -179,10 +179,7 @@ void getHeartRate(struct sampleData *sampleData){
 		writeI2CRegister(Board_MAX30100_ADDR, MAX30100_REG_FIFO_WRITE_POINTER, 0x00);
 		writeI2CRegister(Board_MAX30100_ADDR, MAX30100_REG_FIFO_READ_POINTER, 0x00);
 
-		/*while((readI2CRegister(Board_MAX30100_ADDR, MAX30100_REG_INTERRUPT_STATUS) & MAX30100_HRDATA_READY) != MAX30100_HRDATA_READY){
-			//check if hr data is ready
-		}*/
-
+		//check if hr data is ready
 		while(!tempval){
 			tempval = readI2CRegister(Board_MAX30100_ADDR, MAX30100_REG_INTERRUPT_STATUS);
 			tempval &= MAX30100_HRDATA_READY;
@@ -191,15 +188,21 @@ void getHeartRate(struct sampleData *sampleData){
 		//fifo data is 16 bits so 4 reads is needed
 		//first 16 bits is IR data, in our case, HR data
 		HRData[i] = readI2CRegister(Board_MAX30100_ADDR,MAX30100_REG_FIFO_DATA)<<8 + readI2CRegister(Board_MAX30100_ADDR,MAX30100_REG_FIFO_DATA);
-		while(HRData[i] < 15000 || HRData[i] > 50000){
-			if(i == 0) HRData[i] = 44444;
+
+		//filter out 0 measurements
+		while(HRData[i] == 0){
+			HRData[i] = readI2CRegister(Board_MAX30100_ADDR,MAX30100_REG_FIFO_DATA)<<8 + readI2CRegister(Board_MAX30100_ADDR,MAX30100_REG_FIFO_DATA);
+		}
+
+		if(HRData[i] < 40000 || HRData[i] > 60000){
+			if(i != 0)
 			HRData[i] = HRData[i-1];
 		}
 
-		if(i!=0) Derivative[i] = HRData[i] - HRData[i-1];
+		if(i!=0) Derivative[i] = (int)(HRData[i] - HRData[i-1]);
 
 		//next 16 bits is useless data red led data
-		RedData[i] = readI2CRegister(Board_MAX30100_ADDR,MAX30100_REG_FIFO_DATA)<<8 + readI2CRegister(Board_MAX30100_ADDR,MAX30100_REG_FIFO_DATA);
+		//RedData[i] = readI2CRegister(Board_MAX30100_ADDR,MAX30100_REG_FIFO_DATA)<<8 + readI2CRegister(Board_MAX30100_ADDR,MAX30100_REG_FIFO_DATA);
 
 		Timestamp_getFreq(&frequency);
 
@@ -213,20 +216,23 @@ void getHeartRate(struct sampleData *sampleData){
 
 		end_timestamp = Timestamp_get32();
 		end_clock = Clock_getTicks();
-		if(!verbose_sensors) System_printf("%5d" , HRData[i]);
-		if(!verbose_sensors) System_printf("     %d\n" , RedData[i]);
-		if(!verbose_sensors) System_printf("     %d\n" , Derivative[i]);
+		//if(!verbose_sensors) System_printf("HR %5d" , HRData[i]);
+		//if(!verbose_sensors) System_printf("       HR-1 %5d" , HRData[i-1]);
+		//if(!verbose_sensors) System_printf("       DER %5d\n" , Derivative[i]);
+		//System_flush();
 
 		i++;
+
 	}
 
 	//split data into 8 bit low and high
-	sampleData->heartRateData.rate_l = HRData[0] & 0xFF;
-	sampleData->heartRateData.rate_h = HRData[0] >> 8;
+		sampleData->heartRateData.rate_l = HRData[0] & 0xFF;
+		sampleData->heartRateData.rate_h = HRData[0] >> 8;
 
-	if(verbose_sensors){
-		for(i = 0 ; i < numValues ; i++){
-			System_printf("%d\n",HRData[i]);
+		if(!verbose_sensors){
+		for(j = 0 ; j < i ; j++){
+			System_printf("HR %5d",HRData[j]);
+			System_printf("       DER %5d\n" , Derivative[j]);
 		}
 
 		System_printf("Timestamp diff: %d\n" , end_timestamp-start_timestamp);

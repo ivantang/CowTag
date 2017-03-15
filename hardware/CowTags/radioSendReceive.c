@@ -59,6 +59,8 @@ static Semaphore_Handle radioAccessSemHandle;
 static Event_Handle *radioOperationEventHandle;
 Semaphore_Struct radioResultSem;  /* not static so you can see in ROV */
 static Semaphore_Handle radioResultSemHandle;
+Semaphore_Struct sendReceiveSem;
+static Semaphore_Handle sendReceiveSemHandle;
 
 static struct RadioOperation currentRadioOperation;
 static uint8_t nodeAddress = 0; // ending in 0
@@ -97,6 +99,10 @@ void radioSendReceive_init(void) {
 	/* Create semaphore used for callers to wait for result */
 	Semaphore_construct(&radioResultSem, 0, &semParam);
 	radioResultSemHandle = Semaphore_handle(&radioResultSem);
+
+	/* Create semaphore to manage send and receive operations */
+	Semaphore_construct(&sendReceiveSem, 0, &semParam);
+	sendReceiveSemHandle = Semaphore_handle(&sendReceiveSem);
 
 	/* Create event used internally for state changes */
 	radioOperationEventHandle = getEventHandle();
@@ -140,12 +146,10 @@ static void alphaRadioTaskFunction(UArg arg0, UArg arg1)
 	/* Enter main task loop */
 	while (1)
 	{
-		System_printf("Startin that loop\n");
 		uint32_t events = Event_pend(*radioOperationEventHandle, 0, RADIO_EVENT_ALL, BIOS_WAIT_FOREVER);
 
 		/* If valid packet received */
 		if(events & RADIO_EVENT_VALID_PACKET_RECEIVED) {
-
 			if(verbose_alphaRadio){
 				System_printf("RadioReceive: Valid Packet, sending ACK...\n");
 				System_flush();}
@@ -166,7 +170,6 @@ static void alphaRadioTaskFunction(UArg arg0, UArg arg1)
 
 			/* Go back to RX (to wait to sensor packet) */
 			if(EasyLink_receiveAsync(rxDoneCallbackReceive, 0) != EasyLink_Status_Success) {
-				//System_abort("EasyLink_receiveAsync failed: ALPHARADIO_EVENT_VALID_PACKET_RECEIVED");
 				if(verbose_alphaRadio){
 					System_printf("EasyLink_receiveAsync failed: ALPHARADIO_EVENT_VALID_PACKET_RECEIVED\n");
 					System_flush();}
@@ -179,15 +182,12 @@ static void alphaRadioTaskFunction(UArg arg0, UArg arg1)
 
 		/* If invalid packet received */
 		if(events & RADIO_EVENT_INVALID_PACKET_RECEIVED) {
-
 			if(verbose_alphaRadio){
 				System_printf("RadioReceive: invalid Packet, back to listening.\n");
 				System_flush();}
 
 			/* Go back to RX */
 			if(EasyLink_receiveAsync(rxDoneCallbackReceive, 0) != EasyLink_Status_Success) {
-				//System_abort("EasyLink_receiveAsync failed: ALPHARADIO_EVENT_INVALID_PACKET_RECEIVED");
-
 				if(verbose_alphaRadio){
 					System_printf("EasyLink_receiveAsync failed: ALPHARADIO_EVENT_INVALID_PACKET_RECEIVED\n");
 					System_flush();}
@@ -289,13 +289,6 @@ static void returnRadioOperationStatus(enum alphaRadioOperationStatus result)
 static void sendAlphaPacket(struct sensorPacket bp, uint8_t maxNumberOfRetries, uint32_t ackTimeoutMs){
 
 	//sends to alpha and gateway
-	/*
-	if( Timestamp_get32() % 2 ){
-		currentRadioOperation.easyLinkTxPacket.dstAddr[0] = 0x01;
-	}else{
-		currentRadioOperation.easyLinkTxPacket.dstAddr[0] = 0x02;
-	}*/
-	//System_printf("sending to alpha's or gateway\n");
 	currentRadioOperation.easyLinkTxPacket.dstAddr[0] = GATEWAY_ADDRESS;
 
 	/* Copy packet to payload */
@@ -310,25 +303,16 @@ static void sendAlphaPacket(struct sensorPacket bp, uint8_t maxNumberOfRetries, 
 	EasyLink_setCtrl(EasyLink_Ctrl_AsyncRx_TimeOut, EasyLink_ms_To_RadioTime(ackTimeoutMs));
 
 	/* Send packet  */
-	System_printf("TRANSMIT\n");
-	if (EasyLink_transmit(&currentRadioOperation.easyLinkTxPacket) != EasyLink_Status_Success)
+	/*if (EasyLink_transmit(&currentRadioOperation.easyLinkTxPacket) != EasyLink_Status_Success)
 	{
 		if(verbose_alphaRadio){
 			System_printf("EasyLink_transmit failed: failed to send packet\n");
 			System_flush();}
 	}
 
-	/* Enter RX */
-	System_printf("ASYNC START\n");
-	if (EasyLink_receiveAsync(rxDoneCallbackSend, 0) != EasyLink_Status_Success)
-	{
-		if(verbose_alphaRadio){
-			System_printf("EasyLink_receiveAsync failed: send\n");
-			System_flush();}
-	}
-	System_printf("ASYNC STARTED!!!!!!!!\n");
-
-//	Event_post(*radioOperationEventHandle, RADIO_EVENT_DATA_ACK_RECEIVED);
+	if(EasyLink_receiveAsync(rxDoneCallbackSend, 0) != EasyLink_Status_Success) {
+		System_abort("EasyLink_receiveAsync failed");
+	}*/
 }
 
 static void resendPacket()
@@ -338,14 +322,10 @@ static void resendPacket()
 	{
 		//System_abort("EasyLink_transmit failed: failed to RESEND packet");
 		System_printf("EasyLink_transmit failed: failed to RESEND packet\n");
-
 	}
 
-	/* Enter RX and wait for ACK with timeout */
-	if (EasyLink_receiveAsync(rxDoneCallbackSend, 0) != EasyLink_Status_Success)
-	{
-		//System_abort("EasyLink_receiveAsync failed");
-		System_printf("EasyLink_receiveAsync failed: resend\n");
+	if(EasyLink_receiveAsync(rxDoneCallbackSend, 0) != EasyLink_Status_Success) {
+		System_abort("EasyLink_receiveAsync failed");
 	}
 
 	/* Increase retries by one */
@@ -385,17 +365,15 @@ void AlphaRadioTask_registerPacketReceivedCallback(ConcentratorRadio_PacketRecei
 	packetReceivedCallback = callback;
 }
 
-
 /*callback for send: wait for ACK packet*/
 static void rxDoneCallbackSend(EasyLink_RxPacket * rxPacket, EasyLink_Status status)
 {
+	Semaphore_pend(sendReceiveSemHandle, BIOS_WAIT_FOREVER);
 	struct PacketHeader* packetHeader;
-	System_printf("entering this function\n");
 
 	/* If this callback is called because of a packet received */
 	if (status == EasyLink_Status_Success)
 	{
-		System_printf("GOOD SEND CALLBACK!\n");
 		/* Check the payload header */
 		packetHeader = (struct PacketHeader*)rxPacket->payload;
 
@@ -409,7 +387,6 @@ static void rxDoneCallbackSend(EasyLink_RxPacket * rxPacket, EasyLink_Status sta
 		{
 			/* Packet Error, treat as a Timeout and Post a RADIO_EVENT_ACK_TIMEOUT
                event */
-			System_printf("TIMEOUT!\n");
 			Event_post(*radioOperationEventHandle, RADIO_EVENT_ACK_TIMEOUT);
 		}
 	}
@@ -426,11 +403,14 @@ static void rxDoneCallbackSend(EasyLink_RxPacket * rxPacket, EasyLink_Status sta
 		 */
 		Event_post(*radioOperationEventHandle, RADIO_EVENT_SEND_FAIL);
 	}
+
+	Semaphore_post(sendReceiveSemHandle);
 }
 
 /*callback for receive: wait for sensor packet, and check for src address of packet (for Alphas only)*/
 static void rxDoneCallbackReceive(EasyLink_RxPacket * rxPacket, EasyLink_Status status)
 {
+	Semaphore_pend(sendReceiveSemHandle, BIOS_WAIT_FOREVER);
 	union ConcentratorPacket* tmpRxPacket;
 
 	/* If we received a packet successfully */
@@ -451,10 +431,10 @@ static void rxDoneCallbackReceive(EasyLink_RxPacket * rxPacket, EasyLink_Status 
 				if((tmpRxPacket->header.sourceAddress & 0x1) == 1){ // IF THE SOURCE IS ANOTHER CONCENTRATOR
 					// ignore the alpha packet
 					Event_post(*radioOperationEventHandle, RADIO_EVENT_INVALID_PACKET_RECEIVED);
+					Semaphore_post(sendReceiveSemHandle);
 					return;
 				}
 			}
-
 			// both alpha(passed check) and gateway do this
 			/* Save packet */
 			memcpy((void*)&latestRxPacket, &rxPacket->payload, sizeof(struct sensorPacket));
@@ -467,6 +447,7 @@ static void rxDoneCallbackReceive(EasyLink_RxPacket * rxPacket, EasyLink_Status 
 				if((tmpRxPacket->header.sourceAddress & 0x1) == 1){ // IF THE SOURCE IS ANOTHER CONCENTRATOR
 					// ignore the alpha packet
 					Event_post(*radioOperationEventHandle, RADIO_EVENT_INVALID_PACKET_RECEIVED);
+					Semaphore_post(sendReceiveSemHandle);
 					return;
 				}
 			}
@@ -476,19 +457,20 @@ static void rxDoneCallbackReceive(EasyLink_RxPacket * rxPacket, EasyLink_Status 
 			memcpy((void*)&latestRxPacket, &rxPacket->payload, sizeof(struct sensorPacket));
 			/* Signal packet received */
 			Event_post(*radioOperationEventHandle, RADIO_EVENT_VALID_PACKET_RECEIVED);
-		}
-		else if(tmpRxPacket->header.packetType == RADIO_PACKET_TYPE_ACK_PACKET){
+
+		} else if(tmpRxPacket->header.packetType == RADIO_PACKET_TYPE_ACK_PACKET){
 			//alpha sends now, so it needs ACK packets
 			Event_post(*radioOperationEventHandle, RADIO_EVENT_DATA_ACK_RECEIVED);
-		}
-		else{
+
+		} else {
 			// ignore unknown packet or ACK packet
 			Event_post(*radioOperationEventHandle, RADIO_EVENT_INVALID_PACKET_RECEIVED);
 		}
-	}	else // status = some error; packet not rx'd successfully
-	{
+	} else {
 		//System_printf("Receive Error.\n");
 		/* Signal invalid packet received */
 		Event_post(*radioOperationEventHandle, RADIO_EVENT_SEND_FAIL);
 	}
+
+	Semaphore_post(sendReceiveSemHandle);
 }

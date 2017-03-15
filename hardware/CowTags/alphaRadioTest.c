@@ -134,9 +134,11 @@ static void alphaRadioTestTaskFunction(UArg arg0, UArg arg1){
 			if(verbose_alphaRadioTest){System_printf("SEND: packet sent error: %i\n",results);System_flush();}
 		}
 
-//		System_printf("zZzZzZzZzZzZzZzZzZ\n");
-//		System_printf("Z going to sleep z\n");
-//		System_printf("zZzZzZzZzZzZzZzZzZ\n");
+		Task_sleep(sleepASecond());
+
+		System_printf("zZzZzZzZzZzZzZzZzZ\n");
+		System_printf("Z going to sleep z\n");
+		System_printf("zZzZzZzZzZzZzZzZzZ\n");
 //		Task_sleep(sleepFiveSeconds());
 	}
 }

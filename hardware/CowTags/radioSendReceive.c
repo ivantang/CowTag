@@ -85,7 +85,7 @@ static void notifyPacketReceived(union ConcentratorPacket* latestRxPacket);
 static void sendAck(uint8_t latestSourceAddress);
 static void returnRadioOperationStatus(enum alphaRadioOperationStatus status);
 
-static void rxDoneCallbackSend(EasyLink_RxPacket * rxPacket, EasyLink_Status status);
+//static void rxDoneCallbackSend(EasyLink_RxPacket * rxPacket, EasyLink_Status status);
 static void rxDoneCallbackReceive(EasyLink_RxPacket * rxPacket, EasyLink_Status status);
 
 /***** Function definitions *****/
@@ -164,11 +164,11 @@ static void alphaRadioTaskFunction(UArg arg0, UArg arg1)
 				System_printf("RadioReceive: ACK sent. Back to listening\n");
 				System_flush();}
 
-			if(EasyLink_init(RADIO_EASYLINK_MODULATION) != EasyLink_Status_Success) {
-				System_abort("EasyLink_init failed");
-			}
+			//if(EasyLink_init(RADIO_EASYLINK_MODULATION) != EasyLink_Status_Success) {
+			//	System_abort("EasyLink_init failed");
+			//}
 
-			/* Go back to RX (to wait to sensor packet) */
+			/* Go back to RX to wait to keep listening for packets */
 			if(EasyLink_receiveAsync(rxDoneCallbackReceive, 0) != EasyLink_Status_Success) {
 				if(verbose_alphaRadio){
 					System_printf("EasyLink_receiveAsync failed: ALPHARADIO_EVENT_VALID_PACKET_RECEIVED\n");
@@ -181,18 +181,18 @@ static void alphaRadioTaskFunction(UArg arg0, UArg arg1)
 		}
 
 		/* If invalid packet received */
-		if(events & RADIO_EVENT_INVALID_PACKET_RECEIVED) {
-			if(verbose_alphaRadio){
-				System_printf("RadioReceive: invalid Packet, back to listening.\n");
-				System_flush();}
-
-			/* Go back to RX */
-			if(EasyLink_receiveAsync(rxDoneCallbackReceive, 0) != EasyLink_Status_Success) {
-				if(verbose_alphaRadio){
-					System_printf("EasyLink_receiveAsync failed: ALPHARADIO_EVENT_INVALID_PACKET_RECEIVED\n");
-					System_flush();}
-			}
-		}
+//		if(events & RADIO_EVENT_INVALID_PACKET_RECEIVED) {
+//			if(verbose_alphaRadio){
+//				System_printf("RadioReceive: invalid Packet, back to listening.\n");
+//				System_flush();}
+//
+//			/* Go back to RX */
+//			if(EasyLink_receiveAsync(rxDoneCallbackReceive, 0) != EasyLink_Status_Success) {
+//				if(verbose_alphaRadio){
+//					System_printf("EasyLink_receiveAsync failed: ALPHARADIO_EVENT_INVALID_PACKET_RECEIVED\n");
+//					System_flush();}
+//			}
+//		}
 
 		/* If we should send data */
 		if (events & RADIO_EVENT_SEND_DATA)
@@ -301,6 +301,8 @@ static void sendAlphaPacket(struct sensorPacket bp, uint8_t maxNumberOfRetries, 
 	currentRadioOperation.ackTimeoutMs = ackTimeoutMs;
 	currentRadioOperation.retriesDone = 0;
 	EasyLink_setCtrl(EasyLink_Ctrl_AsyncRx_TimeOut, EasyLink_ms_To_RadioTime(ackTimeoutMs));
+	//EasyLink_setCtrl(EasyLink_Ctrl_MultiClient_Mode, true);
+
 
 	/* Send packet  */
 	if (EasyLink_transmit(&currentRadioOperation.easyLinkTxPacket) != EasyLink_Status_Success)
@@ -309,7 +311,6 @@ static void sendAlphaPacket(struct sensorPacket bp, uint8_t maxNumberOfRetries, 
 			System_printf("EasyLink_transmit failed: failed to send packet\n");
 			System_flush();}
 	}
-
 	if(EasyLink_receiveAsync(rxDoneCallbackReceive, 0) != EasyLink_Status_Success) {
 		System_abort("EasyLink_receiveAsync failed");
 	}
@@ -364,45 +365,6 @@ void AlphaRadioTask_registerPacketReceivedCallback(ConcentratorRadio_PacketRecei
 	packetReceivedCallback = callback;
 }
 
-/*callback for send: wait for ACK packet*/
-static void rxDoneCallbackSend(EasyLink_RxPacket * rxPacket, EasyLink_Status status)
-{
-	struct PacketHeader* packetHeader;
-
-	/* If this callback is called because of a packet received */
-	if (status == EasyLink_Status_Success)
-	{
-		/* Check the payload header */
-		packetHeader = (struct PacketHeader*)rxPacket->payload;
-
-		/* Check if this is an ACK packet */
-		if (packetHeader->packetType == RADIO_PACKET_TYPE_ACK_PACKET)
-		{
-			/* Signal ACK packet received */
-			Event_post(*radioOperationEventHandle, RADIO_EVENT_DATA_ACK_RECEIVED);
-		}
-		else
-		{
-			/* Packet Error, treat as a Timeout and Post a RADIO_EVENT_ACK_TIMEOUT
-               event */
-			Event_post(*radioOperationEventHandle, RADIO_EVENT_ACK_TIMEOUT);
-		}
-	}
-	/* did the Rx timeout */
-	else if(status == EasyLink_Status_Rx_Timeout)
-	{
-		/* Post a RADIO_EVENT_ACK_TIMEOUT event */
-		Event_post(*radioOperationEventHandle, RADIO_EVENT_ACK_TIMEOUT);
-	}
-	else
-	{
-		/* The Ack reception may have been corrupted causing an error.
-		 * Treat this as a timeout
-		 */
-		Event_post(*radioOperationEventHandle, RADIO_EVENT_SEND_FAIL);
-	}
-}
-
 /*callback for receive: wait for sensor packet, and check for src address of packet (for Alphas only)*/
 static void rxDoneCallbackReceive(EasyLink_RxPacket * rxPacket, EasyLink_Status status)
 {
@@ -454,10 +416,11 @@ static void rxDoneCallbackReceive(EasyLink_RxPacket * rxPacket, EasyLink_Status 
 			//alpha sends now, so it needs ACK packets
 			Event_post(*radioOperationEventHandle, RADIO_EVENT_DATA_ACK_RECEIVED);
 
-		} else {
-			// ignore unknown packet or ACK packet
-			Event_post(*radioOperationEventHandle, RADIO_EVENT_INVALID_PACKET_RECEIVED);
 		}
+//		else {
+//			// ignore unknown packet or ACK packet
+//			//Event_post(*radioOperationEventHandle, RADIO_EVENT_INVALID_PACKET_RECEIVED);
+//		}
 
 	} else if(status == EasyLink_Status_Rx_Timeout) {
 		/* Post a RADIO_EVENT_ACK_TIMEOUT event */

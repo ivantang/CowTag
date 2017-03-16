@@ -139,9 +139,9 @@ static void alphaRadioTaskFunction(UArg arg0, UArg arg1)
 	EasyLink_enableRxAddrFilter(NULL, 0, 0); // address filtering is disabled for A and G
 
 	/* Wait for sensor packet (and save to memory) */
-	if(EasyLink_receiveAsync(rxDoneCallbackReceive, 0) != EasyLink_Status_Success) {
-		System_abort("EasyLink_receiveAsync failed");
-	}
+	//if(EasyLink_receiveAsync(rxDoneCallbackReceive, 0) != EasyLink_Status_Success) {
+		//System_abort("EasyLink_receiveAsync failed");
+	//}
 
 	/* Enter main task loop */
 	while (1)

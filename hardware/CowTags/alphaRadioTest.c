@@ -154,7 +154,7 @@ static void packetReceivedCallback(union ConcentratorPacket* packet, int8_t rssi
 }
 
 void printSampleData(struct sampleData sampledata){
-	System_printf("BetaRadio: sent packet with CowID = %i, "
+	System_printf("ALPHA: received packet with CowID = %i, "
 			"PacketType: %i, "
 			"Timestamp: %i, "
 			"Error: %i, ",

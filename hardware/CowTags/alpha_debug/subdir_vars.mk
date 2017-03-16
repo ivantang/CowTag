@@ -13,8 +13,6 @@ C_SRCS += \
 ../CC1310_LAUNCHXL.c \
 ../EventManager.c \
 ../IIC.c \
-../RadioReceive.c \
-../RadioSend.c \
 ../Sleep.c \
 ../alphaMain.c \
 ../alphaRadioTest.c \
@@ -31,8 +29,6 @@ OBJS += \
 ./CC1310_LAUNCHXL.obj \
 ./EventManager.obj \
 ./IIC.obj \
-./RadioReceive.obj \
-./RadioSend.obj \
 ./Sleep.obj \
 ./alphaMain.obj \
 ./alphaRadioTest.obj \
@@ -49,8 +45,6 @@ C_DEPS += \
 ./CC1310_LAUNCHXL.d \
 ./EventManager.d \
 ./IIC.d \
-./RadioReceive.d \
-./RadioSend.d \
 ./Sleep.d \
 ./alphaMain.d \
 ./alphaRadioTest.d \
@@ -87,8 +81,6 @@ C_DEPS__QUOTED += \
 "CC1310_LAUNCHXL.d" \
 "EventManager.d" \
 "IIC.d" \
-"RadioReceive.d" \
-"RadioSend.d" \
 "Sleep.d" \
 "alphaMain.d" \
 "alphaRadioTest.d" \
@@ -105,8 +97,6 @@ OBJS__QUOTED += \
 "CC1310_LAUNCHXL.obj" \
 "EventManager.obj" \
 "IIC.obj" \
-"RadioReceive.obj" \
-"RadioSend.obj" \
 "Sleep.obj" \
 "alphaMain.obj" \
 "alphaRadioTest.obj" \
@@ -123,8 +113,6 @@ C_SRCS__QUOTED += \
 "../CC1310_LAUNCHXL.c" \
 "../EventManager.c" \
 "../IIC.c" \
-"../RadioReceive.c" \
-"../RadioSend.c" \
 "../Sleep.c" \
 "../alphaMain.c" \
 "../alphaRadioTest.c" \

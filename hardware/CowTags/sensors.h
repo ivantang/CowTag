@@ -101,6 +101,13 @@ void Sensors_init(void);
 #define MAX30100_HRDATA_READY			0x20
 #define MAX30100_DATA_FULL				0x80
 
+struct MAX30100Packet{
+	uint8_t hrLow;
+	uint8_t hrHigh;
+	uint8_t redLow;
+	uint8_t redhigh;
+
+}
 
 //void echoFxn(UArg arg0, UArg arg1);
 void getAcceleration(struct sampleData*);

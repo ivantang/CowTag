@@ -40,4 +40,4 @@ Release/
 
 configPkg
 
-global_cfg.h
+config

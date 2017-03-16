@@ -9,9 +9,6 @@ CMD_SRCS += \
 CFG_SRCS += \
 ../cowtagOS.cfg 
 
-A_SRCS += \
-../libiniparser.a 
-
 C_SRCS += \
 ../CC1310_LAUNCHXL.c \
 ../EventManager.c \
@@ -24,7 +21,6 @@ C_SRCS += \
 ../config_parse.c \
 ../eeprom.c \
 ../eepromTest.c \
-../radioSendReceive.c \
 ../sensors.c \
 ../serialize.c \
 ../uArtEcho.c 
@@ -41,7 +37,6 @@ OBJS += \
 ./config_parse.obj \
 ./eeprom.obj \
 ./eepromTest.obj \
-./radioSendReceive.obj \
 ./sensors.obj \
 ./serialize.obj \
 ./uArtEcho.obj 
@@ -58,7 +53,6 @@ C_DEPS += \
 ./config_parse.d \
 ./eeprom.d \
 ./eepromTest.d \
-./radioSendReceive.d \
 ./sensors.d \
 ./serialize.d \
 ./uArtEcho.d 
@@ -77,11 +71,11 @@ GEN_FILES += \
 ./configPkg/compiler.opt 
 
 GEN_FILES__QUOTED += \
-"configPkg/linker.cmd" \
-"configPkg/compiler.opt" 
+"configPkg\linker.cmd" \
+"configPkg\compiler.opt" 
 
 GEN_MISC_DIRS__QUOTED += \
-"configPkg/" 
+"configPkg\" 
 
 C_DEPS__QUOTED += \
 "CC1310_LAUNCHXL.d" \
@@ -95,7 +89,6 @@ C_DEPS__QUOTED += \
 "config_parse.d" \
 "eeprom.d" \
 "eepromTest.d" \
-"radioSendReceive.d" \
 "sensors.d" \
 "serialize.d" \
 "uArtEcho.d" 
@@ -112,7 +105,6 @@ OBJS__QUOTED += \
 "config_parse.obj" \
 "eeprom.obj" \
 "eepromTest.obj" \
-"radioSendReceive.obj" \
 "sensors.obj" \
 "serialize.obj" \
 "uArtEcho.obj" 
@@ -129,12 +121,8 @@ C_SRCS__QUOTED += \
 "../config_parse.c" \
 "../eeprom.c" \
 "../eepromTest.c" \
-"../radioSendReceive.c" \
 "../sensors.c" \
 "../serialize.c" \
 "../uArtEcho.c" 
-
-A_SRCS__QUOTED += \
-"../libiniparser.a" 
 
 

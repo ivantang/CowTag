@@ -192,7 +192,8 @@ clean:
 	-@echo ' '
 
 pre-build:
-	-/home/steven/Documents/school-assignments/cpen491/72point5/hardware/CowTags/add_timestamp_to_cfg_file.sh
+	-gcc /home/steven/Documents/school-assignments/cpen491/72point5/hardware/CowTags/../../add_timestamp_to_config.c -o /home/steven/Documents/school-assignments/cpen491/72point5/hardware/CowTags/../../config
+	-/home/steven/Documents/school-assignments/cpen491/72point5/hardware/CowTags/../../config
 	-@echo ' '
 
 .PHONY: all clean dependents

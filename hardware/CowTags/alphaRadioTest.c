@@ -161,12 +161,12 @@ static void alphaRadioTestTaskFunction(UArg arg0, UArg arg1){
 		// -------------------- Receiving! -------------------------
 
 		AlphaRadioTask_registerPacketReceivedCallback(packetReceivedCallback); // register callback
-		results = alphaRadioReceiveData();	// start listening
+		results = alphaRadioReceiveData();	// start listening, obtain radioAccessSem
 
 		uint32_t events = Event_pend(*alphaRadioTestEventHandle, 0, RADIO_EVENT_ALL, 0);
 
-		if(events & ALPHARADIOTEST_EVENT_NEW_SENSOR_VALUE) {
-		//if(results == AlphaRadioStatus_ReceivedValidPacket){
+		//if(events & ALPHARADIOTEST_EVENT_NEW_SENSOR_VALUE) {
+		if(results == AlphaRadioStatus_ReceivedValidPacket){
 			if(verbose_alphaRadioTest){
 				System_printf("RECEIVE: received a packet.\n");
 				printSampleData(latestActivePacket.sampledata);}

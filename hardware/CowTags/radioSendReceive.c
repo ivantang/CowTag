@@ -171,11 +171,11 @@ static void alphaRadioTaskFunction(UArg arg0, UArg arg1)
 				System_flush();}
 
 			/* Go back to RX to wait to keep listening for packets */
-			if(EasyLink_receiveAsync(rxDoneCallbackReceive, 0) != EasyLink_Status_Success) {
+			/*if(EasyLink_receiveAsync(rxDoneCallbackReceive, 0) != EasyLink_Status_Success) {
 				if(verbose_alphaRadio){
 					System_printf("EasyLink_receiveAsync failed: ALPHARADIO_EVENT_VALID_PACKET_RECEIVED\n");
 					System_flush();}
-			}
+			}*/
 
 			/* toggle Activity LED */
 			PIN_setOutputValue(ledPinHandle, CONCENTRATOR_ACTIVITY_LED,
@@ -364,12 +364,10 @@ enum alphaRadioOperationStatus alphaRadioReceiveData(void){
 
 	System_printf("INSIDE RECEIVE FUNCTION!!\n");
 
-	//Event_post(*radioOperationEventHandle, RADIO_EVENT_SEND_DATA);
 	if(EasyLink_receiveAsync(rxDoneCallbackReceive, 0) != EasyLink_Status_Success) {
-		System_abort("EasyLink_receiveAsync failed");
-	}
+				System_printf("EasyLink_receiveAsync failed");
+			}
 
-	/* Wait for result */
 	Semaphore_pend(radioResultSemHandle, BIOS_WAIT_FOREVER);
 
 	/* Get result */

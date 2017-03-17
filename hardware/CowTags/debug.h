@@ -25,7 +25,7 @@ static const int verbose_eeprom = 0;
 static const int verbose_arduinoCom = 0;
 
 /* Alpha send and receive radio */
-static const int verbose_alphaRadio = 1;
+static const int verbose_alphaRadio = 0;
 
 /* Tests suites */
 static const int verbose_serializeTest = 0;

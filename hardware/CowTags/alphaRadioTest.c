@@ -151,7 +151,7 @@ static void alphaRadioTestTaskFunction(UArg arg0, UArg arg1){
 		}
 
 		System_printf("zZzZzZzZzZzZzZzZzZ\n");
-		Task_sleep(sleepASecond());
+		Task_sleep(3*sleepASecond());
 
 		// NOTE:
 		// It's not in our requirements to have asynchronous send and receive
@@ -163,7 +163,7 @@ static void alphaRadioTestTaskFunction(UArg arg0, UArg arg1){
 		AlphaRadioTask_registerPacketReceivedCallback(packetReceivedCallback); // register callback
 		results = alphaRadioReceiveData();	// start listening, obtain radioAccessSem
 
-		uint32_t events = Event_pend(*alphaRadioTestEventHandle, 0, RADIO_EVENT_ALL, 0);
+		//uint32_t events = Event_pend(*alphaRadioTestEventHandle, 0, RADIO_EVENT_ALL, 0);
 
 		//if(events & ALPHARADIOTEST_EVENT_NEW_SENSOR_VALUE) {
 		if(results == AlphaRadioStatus_ReceivedValidPacket){
@@ -177,7 +177,7 @@ static void alphaRadioTestTaskFunction(UArg arg0, UArg arg1){
 		}
 
 		System_printf("zZzZzZzZzZzZzZzZzZ\n");
-		Task_sleep(sleepASecond());
+		Task_sleep(3*sleepASecond());
 
 	}
 }
@@ -186,7 +186,7 @@ static void alphaRadioTestTaskFunction(UArg arg0, UArg arg1){
 void packetReceivedCallback(union ConcentratorPacket* packet, int8_t rssi){
 	latestActivePacket.header = packet->header;
 	latestActivePacket.sampledata = packet->sensorPacket.sampledata;
-	Event_post(*alphaRadioTestEventHandle, RADIO_EVENT_NEW_SENSOR_PACKET);
+	//Event_post(*alphaRadioTestEventHandle, RADIO_EVENT_NEW_SENSOR_PACKET);
 }
 
 /*print the received packet*/

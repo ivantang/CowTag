@@ -90,7 +90,7 @@ static Task_Params alphaRadioTestTaskParams;
 Task_Struct alphaRadioTestTask;    /* not static so you can see in ROV */
 static uint8_t alphaRadioTestTaskStack[ALPHARADIOTEST_TASK_STACK_SIZE];
 Event_Struct alphaRadioTestEvent;  /* not static so you can see in ROV */
-static Event_Handle alphaRadioTestEventHandle;
+static Event_Handle *alphaRadioTestEventHandle;
 static struct sensorPacket latestActivePacket;
 
 /***** Prototypes *****/
@@ -103,11 +103,7 @@ void sendToGateway(struct sampleData sampledata);
 void alphaRadioTest_init(void) {
 
 	/* Create event used internally for state changes */
-	Event_Params eventParam;
-	Event_Params_init(&eventParam);
-	Event_construct(&alphaRadioTestEvent, &eventParam);
-	alphaRadioTestEventHandle = Event_handle(&alphaRadioTestEvent);
-	//alphaRadioTestEventHandle = getEventHandle();
+	alphaRadioTestEventHandle = getEventHandle();
 
 	/* Create the alphaRadioTest radio protocol task */
 	Task_Params_init(&alphaRadioTestTaskParams);
@@ -118,8 +114,6 @@ void alphaRadioTest_init(void) {
 }
 
 static void alphaRadioTestTaskFunction(UArg arg0, UArg arg1){
-	/* Register a packet received callback with the radio task */
-	AlphaRadioTask_registerPacketReceivedCallback(packetReceivedCallback);
 
 	struct sampleData sampledata;
 	enum alphaRadioOperationStatus results;
@@ -127,7 +121,6 @@ static void alphaRadioTestTaskFunction(UArg arg0, UArg arg1){
 	if(verbose_alphaRadioTest){System_printf("Initializing alphaRadioTest...\n");}
 
 	while (1) {
-
 		// -------------------- SENDING -------------------------
 		sampledata.cowID = 2;
 		sampledata.packetType = RADIO_PACKET_TYPE_SENSOR_PACKET;
@@ -167,14 +160,20 @@ static void alphaRadioTestTaskFunction(UArg arg0, UArg arg1){
 
 		// -------------------- Receiving! -------------------------
 
-		uint32_t events = Event_pend(alphaRadioTestEventHandle, 0, ALPHARADIOTEST_EVENT_ALL, 0);
+		AlphaRadioTask_registerPacketReceivedCallback(packetReceivedCallback); // register callback
+		results = alphaRadioReceiveData();	// start listening
+
+		uint32_t events = Event_pend(*alphaRadioTestEventHandle, 0, RADIO_EVENT_ALL, 0);
 
 		if(events & ALPHARADIOTEST_EVENT_NEW_SENSOR_VALUE) {
-			if(verbose_alphaRadioTest){System_printf("RECEIVE: received a packet.\n");}
-			if(verbose_alphaRadioTest){printSampleData(latestActivePacket.sampledata);}
+		//if(results == AlphaRadioStatus_ReceivedValidPacket){
+			if(verbose_alphaRadioTest){
+				System_printf("RECEIVE: received a packet.\n");
+				printSampleData(latestActivePacket.sampledata);}
 		}
 		else{
-			if(verbose_alphaRadioTest){System_printf("RECEIVE: did not receive packet.\n");System_flush();}
+			if(verbose_alphaRadioTest){
+				System_printf("RECEIVE: did not receive packet.\n");System_flush();}
 		}
 
 		System_printf("zZzZzZzZzZzZzZzZzZ\n");
@@ -184,10 +183,10 @@ static void alphaRadioTestTaskFunction(UArg arg0, UArg arg1){
 }
 
 /*callback for received sensor packets*/
-static void packetReceivedCallback(union ConcentratorPacket* packet, int8_t rssi){
+void packetReceivedCallback(union ConcentratorPacket* packet, int8_t rssi){
 	latestActivePacket.header = packet->header;
 	latestActivePacket.sampledata = packet->sensorPacket.sampledata;
-	Event_post(alphaRadioTestEventHandle, ALPHARADIOTEST_EVENT_NEW_SENSOR_VALUE);
+	Event_post(*alphaRadioTestEventHandle, RADIO_EVENT_NEW_SENSOR_PACKET);
 }
 
 /*print the received packet*/

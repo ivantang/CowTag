@@ -15,11 +15,11 @@
 #define RADIO_EVENT_DATA_ACK_RECEIVED   	(uint32_t)(1 << 1)
 #define RADIO_EVENT_ACK_TIMEOUT         	(uint32_t)(1 << 2)
 #define RADIO_EVENT_SEND_FAIL           	(uint32_t)(1 << 3)
-#define RADIO_EVENT_NEW_SENSOR_PACKET       (uint32_t)(1 << 6)
 #define RADIO_EVENT_VALID_PACKET_RECEIVED   (uint32_t)(1 << 4)
 #define RADIO_EVENT_INVALID_PACKET_RECEIVED (uint32_t)(1 << 5)
+#define RADIO_EVENT_NEW_SENSOR_PACKET       (uint32_t)(1 << 6)
 
-
+//#define RADIO_EVENT_RELEASE 				(uint32_t)(1 << 7)
 
 
 

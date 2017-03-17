@@ -16,6 +16,7 @@ enum alphaRadioOperationStatus {
 	AlphaRadioStatus_Success,
 	AlphaRadioStatus_Failed,
 	AlphaRadioStatus_FailedNotConnected,
+	AlphaRadioStatus_ReceivedValidPacket
 };
 
 union ConcentratorPacket {
@@ -31,7 +32,10 @@ typedef void (*ConcentratorRadio_PacketReceivedCallback)(union ConcentratorPacke
 /* Register the packet received callback */
 void AlphaRadioTask_registerPacketReceivedCallback(ConcentratorRadio_PacketReceivedCallback callback);
 
-/* Sends an ADC value to the concentrator */
+/* receiving function */
+enum alphaRadioOperationStatus alphaRadioReceiveData(void);
+
+/* sending function */
 enum alphaRadioOperationStatus alphaRadioSendData(struct sampleData data);
 
 

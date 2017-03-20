@@ -1,21 +1,10 @@
 #include <stdio.h>
 #include <string.h>
-#include <stdlib.h>
 #include <time.h>
 
-// OS specific libraries
-//#ifdef _WIN32
-/* #ifdef  __gnu_linux__ */
-/*   #include <unistd.h> */
-/* #elif __WIN32 */
-/*   #include <Windows.h> */
-/*   #include <Winbase.h> */
-/*   #include <direct.h> */
-/* #endif */
-
-/* #define MAX_CFG_FILE_PATH 200 */
 #define EPOCH_TIME_CHARS 15
 #define TESTING_DONT_WRITE_TO_FILE 0
+#define DEBUG 0
 
 int getCurrentTime() {
   return (int)time(NULL);
@@ -61,49 +50,20 @@ int Search_in_File(FILE *fp, char *str) {
 #endif
 }
 
-/* #if  __gnu_linux__ */
-/* int removeExecutableFilenameFromString(char *str) { */
-/*   // Start checking for the first forward slash from the end of the string */
-/*   for (int i = strlen(str)-1; i >= 0; i--) { */
-/*     if (str[i] == '/') { */
-/*       // When we find the forward slash, replace it with a null character (ie, */
-/*       // end the string here) */
-/*       str[i] = 0; */
-/*       return 1; */
-/*     } */
-/*   } */
-/*   return 0; */
-/* } */
-/* #endif */
 
 int main(int argc, char *argv[]) {
+  // argv[1] should be the path to the config file
   if (argc != 2) {
     printf("Expects the path to the config file as argument\n");
     return 1;
   }
-  /* char path[MAX_CFG_FILE_PATH]; */
 
-  // Get the path of the config executable
-/* #ifdef __WIN32 */
-/*   getcwd(path, MAX_CFG_FILE_PATH); */
-/* #elif  __gnu_linux__ */
-/*   readlink("/proc/self/exe", path, MAX_CFG_FILE_PATH); */
+  if (DEBUG) {
+    printf("config path: %s\n", argv[1]);
+  }
 
-/*   // Remove this executable name from the end of the path */
-/*   // path is returned as the updated string from this function */
-/*   int ret = removeExecutableFilenameFromString(path); */
-/*   if (!ret) { */
-/*     printf("Error occurred trying to extract filepath"); */
-/*     return 1; */
-/*   } */
-/* #endif */
-
-  // Append the rest of the path to the config file
-  /* strcat(path, "/hardware/CowTags/global_cfg.h"); */
-
-  printf("config path: %s\n", argv[1]);
-
-  // Open config file for writing
+  // Open config file for writing. r+ specifies read and write, but the write
+  // does not delete the contents of the file
   FILE *fp = fopen(argv[1], "r+");
 
   int byte_count = Search_in_File(fp, "#define TIMESTAMP_AT_BUILDTIME");

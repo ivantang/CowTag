@@ -28,11 +28,6 @@ ORDERED_OBJS += \
 "./easylink/EasyLink.obj" \
 "./smartrf_settings/smartrf_settings.obj" \
 "./smartrf_settings/smartrf_settings_predefined.obj" \
-"../src/sysbios/m3_Hwi_asm.obj" \
-"../src/sysbios/m3_Hwi_asm_switch.obj" \
-"../src/sysbios/m3_IntrinsicsSupport_asm.obj" \
-"../src/sysbios/m3_TaskSupport_asm.obj" \
-"../src/sysbios/rom_sysbios.obj" \
 "../CC1310_LAUNCHXL.cmd" \
 $(GEN_CMDS__FLAG) \
 -l"/home/steven/ti/tirex-content/tirtos_cc13xx_cc26xx_2_21_00_06/products/cc13xxware_2_04_03_17272/driverlib/bin/ccs/driverlib.lib" \
@@ -48,11 +43,9 @@ RMDIR := rm -rf
 -include subdir_vars.mk
 -include easylink/subdir_vars.mk
 -include smartrf_settings/subdir_vars.mk
--include src/sysbios/subdir_vars.mk
 -include subdir_rules.mk
 -include easylink/subdir_rules.mk
 -include smartrf_settings/subdir_rules.mk
--include src/sysbios/subdir_rules.mk
 -include objects.mk
 
 ifneq ($(MAKECMDGOALS),clean)

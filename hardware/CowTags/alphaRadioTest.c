@@ -101,7 +101,7 @@ static void alphaRadioTestTaskFunction(UArg arg0, UArg arg1){
 	AlphaRadioTask_registerPacketReceivedCallback(packetReceivedCallback);
 
 	struct sampleData sampledata;
-	enum alphaRadioxz            vf
+	enum alphaRadioOperationStatus results;
 	if(verbose_alphaRadioTest){System_printf("Initializing alphaRadioTest...\n");}
 
 	while (1) {

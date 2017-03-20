@@ -7,7 +7,7 @@
 //#ifdef _WIN32
 #ifdef  __gnu_linux__
   #include <unistd.h>
-#else //windows?
+#elif __WIN32
   #include <Windows.h>
   #include <Winbase.h>
   #include <direct.h>
@@ -26,8 +26,14 @@ int Search_in_File(FILE *fp, char *str) {
   char current_line[512];
   int byte_count=0;
   char c;
+#ifdef __WIN32
+  int current_line_number=0;
+#endif
 
   while (fgets(current_line, 512, fp) != NULL) {
+#ifdef __WIN32
+    current_line_number++;
+#endif
     if ((strstr(current_line, str)) != NULL) {
       // String found - Take the current count, and add the length of the search
       // string to the byte_count (to get the byte_count to the end of the line)
@@ -44,9 +50,14 @@ int Search_in_File(FILE *fp, char *str) {
       }
     }
   }
+#ifdef __WIN32
+  return byte_count + current_line_number;
+#else
   return byte_count;
+#endif
 }
 
+#if  __gnu_linux__
 int removeExecutableFilenameFromString(char *str) {
   // Start checking for the first forward slash from the end of the string
   for (int i = strlen(str)-1; i >= 0; i--) {
@@ -59,21 +70,16 @@ int removeExecutableFilenameFromString(char *str) {
   }
   return 0;
 }
+#endif
 
 int main() {
   char path[MAX_CFG_FILE_PATH];
 
   // Get the path of the config executable
 #ifdef __WIN32
-  //GetModuleFileName(NULL, path, MAX_CFG_FILE_PATH);
-  //GetCurrentDirectory(MAX_CFG_FILE_PATH, path);
-  //_getcwd(path, MAX_CFG_FILE_PATH); 
-  getcwd(path, MAX_CFG_FILE_PATH); 
-
+  getcwd(path, MAX_CFG_FILE_PATH);
 #elif  __gnu_linux__
   readlink("/proc/self/exe", path, MAX_CFG_FILE_PATH);
-
-    
 
   // Remove this executable name from the end of the path
   // path is returned as the updated string from this function
@@ -82,12 +88,12 @@ int main() {
     printf("Error occurred trying to extract filepath");
     return 1;
   }
-
 #endif
+
   // Append the rest of the path to the config file
   strcat(path, "/hardware/CowTags/global_cfg.h");
 
-  printf("%s\n", path);
+  printf("config path: %s\n", path);
 
   // Open config file for writing
   FILE *fp = fopen(path, "r+");

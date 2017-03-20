@@ -51,7 +51,7 @@ int Search_in_File(FILE *fp, char *str) {
     }
   }
 #ifdef __WIN32
-  return byte_count + current_line_number;
+  return byte_count + current_line_number - 1;
 #else
   return byte_count;
 #endif

@@ -23,43 +23,48 @@
 #include <eepromTest.h>
 #include <serializeTest.h>
 #include <arduinoComTest.h>
+#include <xdc/runtime/Timestamp.h>
 #include <EventManager.h>
+#include "bootTimestamp.h"
 
 /* Global PIN_Config table */
 PIN_State ledPinState;
 PIN_Handle ledPinHandle;
 
 int main(void) {
-	if(verbose_main){System_printf("Initializing tasks & debug file...\n");}
+	// boot_timestamp is in bootTimestamp.h
+	boot_timestamp = Timestamp_get32();
 
-	//if(verbose_main){System_printf("Initializing board...\n");}
+	if (verbose_main) {System_printf("Initializing tasks & debug file...\n");}
+
+	//if (verbose_main) {System_printf("Initializing board...\n");}
 	Board_initGeneral(); // init board
 
-	if(verbose_main){System_printf("Initializing event manager...\n");}
+	if (verbose_main) {System_printf("Initializing event manager...\n");}
 	eventManager_init();
 
-	//if(verbose_main){System_printf("Initializing sensors...\n");}
+	//if (verbose_main) {System_printf("Initializing sensors...\n");}
 	//Sensors_init(); // init i2C
 
-	//if(verbose_main){System_printf("Initializing EEPROM...\n");}
+	//if (verbose_main) {System_printf("Initializing EEPROM...\n");}
 	//eepromTest_init();
 
-	//if(verbose_main){System_printf("Initializing serialization thread...\n");}
+	//if (verbose_main) {System_printf("Initializing serialization thread...\n");}
 	//serializeTestStart();
 
-	//if(verbose_main){System_printf("Initializing radio antenna...\n");}
+	//if (verbose_main) {System_printf("Initializing radio antenna...\n");}
 	radioSend_init();
 
-	//if(verbose_main){System_printf("Initializing Beta tasks...\n");}
+	//if (verbose_main) {System_printf("Initializing Beta tasks...\n");}
 	betaRadioTest_init();
 
 	System_flush();
 
-	if(verbose_main) {
+	if (verbose_main) {
 		/* Open LED pins */
 		ledPinHandle = PIN_open(&ledPinState, ledPinTable);
 
-		if(!ledPinHandle) {
+		if (!ledPinHandle) {
 			System_printf("led pin table error code %i \n", ledPinHandle);
 			System_flush();
 			System_abort("Error initializing board LED pins\n");
@@ -69,7 +74,7 @@ int main(void) {
 		PIN_setOutputValue(ledPinHandle, Board_LED1, 1); //signal init success
 	}
 
-	if(verbose_main) {
+	if (verbose_main) {
 		System_printf("Starting BIOS:\n");
 		System_flush();
 	}

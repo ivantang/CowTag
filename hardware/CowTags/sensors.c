@@ -32,6 +32,8 @@
 
 #include <sensors.h>
 #include <IIC.h>
+#include "bootTimestamp.h"
+#include "global_cfg.h"
 
 PIN_Config BoardGpioInitialTable[] = {
 //		Board_I2C0_SDA0 | PIN_GPIO_LOW,
@@ -49,7 +51,7 @@ Task_Struct task0Struct;
 Char task0Stack[TASKSTACKSIZE];
 
 /*function definition */
-void Sensors_init(void){
+void Sensors_init(void) {
 	//PIN_init(BoardGpioInitialTable);
 	Task_Params taskParams;
 
@@ -60,8 +62,8 @@ void Sensors_init(void){
 }
 
 
-void getAcceleration(struct sampleData *sampleData){
-	//if(verbose_sensors)System_printf("\n\nwhoamI: 0x%x \n", readI2CRegister(Board_LIS3DH_ADDR, 15)); //should read 0x33
+void getAcceleration(struct sampleData *sampleData) {
+	//if (verbose_sensors)System_printf("\n\nwhoamI: 0x%x \n", readI2CRegister(Board_LIS3DH_ADDR, 15)); //should read 0x33
 	//System_flush();
 
 	unsigned int	i;
@@ -73,14 +75,14 @@ void getAcceleration(struct sampleData *sampleData){
     //writeI2C(Board_LIS3DH_ADDR, LIS3DH_REG_OUT_X_L | 0x80);    //enable auto increment
 
     //polling status register to check for new set of data
-    for(i = 0 ; i < 30 ; i++){
-    	if( (readI2CRegister(Board_LIS3DH_ADDR,0x27) & 0x8) >> 3 == 1 ){
-    		if( (readI2CRegister(Board_LIS3DH_ADDR,0x27) >> 7) == 1 ){
+    for (i = 0 ; i < 30 ; i++) {
+    	if ( (readI2CRegister(Board_LIS3DH_ADDR,0x27) & 0x8) >> 3 == 1 ) {
+    		if ( (readI2CRegister(Board_LIS3DH_ADDR,0x27) >> 7) == 1 ) {
     			sampleData->accelerometerData.x = readI2CRegister(Board_LIS3DH_ADDR,0x28) | (readI2CRegister(Board_LIS3DH_ADDR,0x29) << 8);
     			sampleData->accelerometerData.y = readI2CRegister(Board_LIS3DH_ADDR,0x2A) | (readI2CRegister(Board_LIS3DH_ADDR,0x2B) << 8) ;
     			sampleData->accelerometerData.z = readI2CRegister(Board_LIS3DH_ADDR,0x2C) | (readI2CRegister(Board_LIS3DH_ADDR,0x2D) << 8) ;
 
-    			if(verbose_sensors) System_printf("x:%d y:%d z:%d\n", 	sampleData->accelerometerData.x ,
+    			if (verbose_sensors) System_printf("x:%d y:%d z:%d\n", 	sampleData->accelerometerData.x ,
     																	sampleData->accelerometerData.y,
 																		sampleData->accelerometerData.z);
     			System_flush();
@@ -94,7 +96,7 @@ void getAcceleration(struct sampleData *sampleData){
     return;
 }
 
-void getTemp(struct sampleData *sampleData){
+void getTemp(struct sampleData *sampleData) {
 	uint16_t temp_obj;
 	uint16_t temp_amb;
 
@@ -106,14 +108,14 @@ void getTemp(struct sampleData *sampleData){
 	sampleData->heartRateData.temp_l = temp_amb & 0xFF;
 	sampleData->heartRateData.temp_h = temp_amb >> 8;
 
-	if(verbose_sensors){
+	if (verbose_sensors) {
 		System_printf("temp_obj %d\n", temp_obj);
 	}
 
 	return;
 }
 
-void getTempNoPtr(){
+void getTempNoPtr() {
 	uint16_t temp_obj;
 	uint16_t temp_amb;
 
@@ -127,7 +129,7 @@ void getTempNoPtr(){
 	//sampleData->heartRateData.temp_l = temp_amb & 0xFF;
 	//sampleData->heartRateData.temp_h = temp_amb >> 8;
 
-	if(verbose_sensors){
+	if (verbose_sensors) {
 		System_printf("temp_obj %d\n", temp_obj);
 		System_printf("temp_obj %d\n", temp_amb);
 		System_flush();
@@ -136,7 +138,7 @@ void getTempNoPtr(){
 	return;
 }
 
-void getHeartRate(struct sampleData *sampleData){
+void getHeartRate(struct sampleData *sampleData) {
 	int i = 0;
 	uint16_t numValues = 10;
 	uint16_t HRData[10];
@@ -150,7 +152,7 @@ void getHeartRate(struct sampleData *sampleData){
 	//Types_FreqHz *frequency_p = &frequency;
 
 	//check if device is connected
-//	if(readI2CRegister(Board_MAX30100_ADDR,0xFF) != 0x11){
+//	if (readI2CRegister(Board_MAX30100_ADDR,0xFF) != 0x11) {
 //		System_printf("Hardware is not the MAX30100 : 0x%x\n",readI2CRegister(Board_MAX30100_ADDR,0xFF));
 //		System_flush();
 //	}
@@ -166,28 +168,28 @@ void getHeartRate(struct sampleData *sampleData){
 
 	start_clock = Clock_getTicks();
 	end_clock = Clock_getTicks();
-	while(i < numValues){
-	//while((end_clock-start_clock)/100000 < 5){
-		while((readI2CRegister(Board_MAX30100_ADDR, 0x00) & 0x20) != 0x20){
+	while (i < numValues) {
+	//while ((end_clock-start_clock)/100000 < 5) {
+		while ((readI2CRegister(Board_MAX30100_ADDR, 0x00) & 0x20) != 0x20) {
 			//check if hr data is ready
 		}
 		//fifo data is 16 bits so 4 reads is needed
 		//first 16 bits is IR data, in our case, HR data
 		//HRData[i] = readI2CRegister(Board_MAX30100_ADDR,MAX30100_REG_FIFO_DATA);
 		HRData[i] = readI2CRegister(Board_MAX30100_ADDR,MAX30100_REG_FIFO_DATA)<<8 + readI2CRegister(Board_MAX30100_ADDR,MAX30100_REG_FIFO_DATA);
-		while(HRData[i] == 0){
+		while (HRData[i] == 0) {
 			HRData[i] = readI2CRegister(Board_MAX30100_ADDR,MAX30100_REG_FIFO_DATA)<<8 + readI2CRegister(Board_MAX30100_ADDR,MAX30100_REG_FIFO_DATA);
 		}
 
 		Timestamp_getFreq(&frequency);
 
-		if(i == 0){
-			start_timestamp = Timestamp_get32();
+		if (i == 0) {
+			start_timestamp = TrueTimestamp();
 		}
 
 		Task_sleep(10000 / Clock_tickPeriod);						//adding this to extend measurement to 10 seconds
 
-		end_timestamp = Timestamp_get32();
+		end_timestamp = TrueTimestamp();
 		end_clock = Clock_getTicks();
 
 		//System_printf("%d\n" , HRData[i]);
@@ -197,8 +199,8 @@ void getHeartRate(struct sampleData *sampleData){
 	sampleData->heartRateData.rate_l = HRData[0] & 0xFF;
 	sampleData->heartRateData.rate_h = HRData[0] >> 8;
 
-	if(verbose_sensors){
-		for(i = 0 ; i < numValues ; i++){
+	if (verbose_sensors) {
+		for (i = 0 ; i < numValues ; i++) {
 			System_printf("%d\n",HRData[i]);
 		}
 
@@ -215,11 +217,11 @@ void getHeartRate(struct sampleData *sampleData){
 	return;
 }
 
-void getTimestamp(struct sampleData *sampleData){
-	sampleData->timestamp = Timestamp_get32();
+void getTimestamp(struct sampleData *sampleData) {
+	sampleData->timestamp = TrueTimestamp();
 }
 
-void makeSensorPacket(struct sampleData *sampleData){
+void makeSensorPacket(struct sampleData *sampleData) {
 
 	getAcceleration(sampleData);
 
@@ -245,10 +247,10 @@ void makeSensorPacket(struct sampleData *sampleData){
 	System_flush();
 }
 
-void testSensors(){
+void testSensors() {
 	struct sampleData sampleData;
 
-	while(1){
+	while (1) {
 		makeSensorPacket(&sampleData);
 	}
 	System_printf("Tests done\n");

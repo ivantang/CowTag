@@ -18,6 +18,7 @@ C_SRCS += \
 ../Sleep.c \
 ../alphaMain.c \
 ../alphaRadioTest.c \
+../bootTimestamp.c \
 ../ccfg.c \
 ../config_parse.c \
 ../eeprom.c \
@@ -36,6 +37,7 @@ OBJS += \
 ./Sleep.obj \
 ./alphaMain.obj \
 ./alphaRadioTest.obj \
+./bootTimestamp.obj \
 ./ccfg.obj \
 ./config_parse.obj \
 ./eeprom.obj \
@@ -54,6 +56,7 @@ C_DEPS += \
 ./Sleep.d \
 ./alphaMain.d \
 ./alphaRadioTest.d \
+./bootTimestamp.d \
 ./ccfg.d \
 ./config_parse.d \
 ./eeprom.d \
@@ -92,6 +95,7 @@ C_DEPS__QUOTED += \
 "Sleep.d" \
 "alphaMain.d" \
 "alphaRadioTest.d" \
+"bootTimestamp.d" \
 "ccfg.d" \
 "config_parse.d" \
 "eeprom.d" \
@@ -110,6 +114,7 @@ OBJS__QUOTED += \
 "Sleep.obj" \
 "alphaMain.obj" \
 "alphaRadioTest.obj" \
+"bootTimestamp.obj" \
 "ccfg.obj" \
 "config_parse.obj" \
 "eeprom.obj" \
@@ -128,6 +133,7 @@ C_SRCS__QUOTED += \
 "../Sleep.c" \
 "../alphaMain.c" \
 "../alphaRadioTest.c" \
+"../bootTimestamp.c" \
 "../ccfg.c" \
 "../config_parse.c" \
 "../eeprom.c" \

@@ -4,12 +4,16 @@
 #include <time.h>
 
 // OS specific libraries
-#ifdef __WINDOWS__
-#elif  __gnu_linux__
-#include <unistd.h>
+//#ifdef _WIN32
+#ifdef  __gnu_linux__
+  #include <unistd.h>
+#else //windows?
+  #include <Windows.h>
+  #include <Winbase.h>
+  #include <direct.h>
 #endif
 
-#define MAX_PATH 200
+#define MAX_CFG_FILE_PATH 200
 #define EPOCH_TIME_CHARS 15
 #define TESTING_DONT_WRITE_TO_FILE 0
 
@@ -57,14 +61,19 @@ int removeExecutableFilenameFromString(char *str) {
 }
 
 int main() {
-  char path[MAX_PATH];
+  char path[MAX_CFG_FILE_PATH];
 
   // Get the path of the config executable
-#ifdef __WINDOWS__
-  GetModuleFileName(NULL, path, MAX_PATH);
+#ifdef __WIN32
+  //GetModuleFileName(NULL, path, MAX_CFG_FILE_PATH);
+  //GetCurrentDirectory(MAX_CFG_FILE_PATH, path);
+  //_getcwd(path, MAX_CFG_FILE_PATH); 
+  getcwd(path, MAX_CFG_FILE_PATH); 
+
 #elif  __gnu_linux__
-  readlink("/proc/self/exe", path, MAX_PATH);
-#endif
+  readlink("/proc/self/exe", path, MAX_CFG_FILE_PATH);
+
+    
 
   // Remove this executable name from the end of the path
   // path is returned as the updated string from this function
@@ -73,8 +82,12 @@ int main() {
     printf("Error occurred trying to extract filepath");
     return 1;
   }
+
+#endif
   // Append the rest of the path to the config file
   strcat(path, "/hardware/CowTags/global_cfg.h");
+
+  printf("%s\n", path);
 
   // Open config file for writing
   FILE *fp = fopen(path, "r+");

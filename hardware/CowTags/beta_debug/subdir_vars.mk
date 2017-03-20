@@ -9,9 +9,6 @@ CMD_SRCS += \
 CFG_SRCS += \
 ../cowtagOS.cfg 
 
-A_SRCS += \
-../libiniparser.a 
-
 C_SRCS += \
 ../CC1310_LAUNCHXL.c \
 ../EventManager.c \
@@ -77,11 +74,11 @@ GEN_FILES += \
 ./configPkg/compiler.opt 
 
 GEN_FILES__QUOTED += \
-"configPkg/linker.cmd" \
-"configPkg/compiler.opt" 
+"configPkg\linker.cmd" \
+"configPkg\compiler.opt" 
 
 GEN_MISC_DIRS__QUOTED += \
-"configPkg/" 
+"configPkg\" 
 
 C_DEPS__QUOTED += \
 "CC1310_LAUNCHXL.d" \
@@ -133,8 +130,5 @@ C_SRCS__QUOTED += \
 "../sensors.c" \
 "../serialize.c" \
 "../uArtEcho.c" 
-
-A_SRCS__QUOTED += \
-"../libiniparser.a" 
 
 

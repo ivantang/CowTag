@@ -2,9 +2,7 @@
 # Automatically-generated file. Do not edit!
 ################################################################################
 
-SHELL = cmd.exe
-
-CG_TOOL_ROOT := C:/ti/ccsv6/tools/compiler/arm_15.12.3.LTS
+CG_TOOL_ROOT := /home/steven/ti/ccsv6/tools/compiler/arm_15.12.3.LTS
 
 GEN_OPTS__FLAG := --cmd_file="configPkg/compiler.opt"
 GEN_CMDS__FLAG := -l"configPkg/linker.cmd"
@@ -37,13 +35,13 @@ ORDERED_OBJS += \
 "../src/sysbios/rom_sysbios.obj" \
 "../CC1310_LAUNCHXL.cmd" \
 $(GEN_CMDS__FLAG) \
--l"C:/ti/tirtos_cc13xx_cc26xx_2_21_00_06/products/cc13xxware_2_04_03_17272/driverlib/bin/ccs/driverlib.lib" \
+-l"/home/steven/ti/tirex-content/tirtos_cc13xx_cc26xx_2_21_00_06/products/cc13xxware_2_04_03_17272/driverlib/bin/ccs/driverlib.lib" \
 -llibc.a \
 
 -include ../makefile.init
 
-RM := DEL /F
-RMDIR := RMDIR /S/Q
+RM := rm -rf
+RMDIR := rm -rf
 
 # All of the sources participating in the build are defined here
 -include sources.mk
@@ -164,43 +162,41 @@ BIN_OUTPUTS__QUOTED += \
 
 
 # All Target
-all:
-	@$(MAKE) --no-print-directory pre-build
-	@$(MAKE) --no-print-directory main-build
-
-# Main-build Target
-main-build: CowTag.out
+all: CowTag.out
 
 # Tool invocations
-CowTag.out: $(OBJS) $(CMD_SRCS) $(GEN_CMDS)
+CowTag.out: $(OBJS) $(CMD_SRCS) $(A_SRCS) $(GEN_CMDS)
 	@echo 'Building target: $@'
 	@echo 'Invoking: ARM Linker'
-	"C:/ti/ccsv6/tools/compiler/arm_15.12.3.LTS/bin/armcl" -mv7M3 --code_state=16 --float_support=vfplib -me -g --define=ccs --diag_warning=225 --diag_warning=255 --diag_wrap=off --display_error_number --gen_func_subsections=on --abi=eabi -z -m"CowTag.map" --stack_size=256 --heap_size=0 -i"C:/ti/ccsv6/tools/compiler/arm_15.12.3.LTS/lib" -i"C:/ti/ccsv6/tools/compiler/arm_15.12.3.LTS/include" --reread_libs --warn_sections --diag_wrap=off --display_error_number --xml_link_info="CowTag_linkInfo.xml" --rom_model -o "CowTag.out" $(ORDERED_OBJS)
+	"/home/steven/ti/ccsv6/tools/compiler/arm_15.12.3.LTS/bin/armcl" -mv7M3 --code_state=16 --float_support=vfplib -me -g --define=ccs --display_error_number --diag_warning=225 --diag_warning=255 --diag_wrap=off --gen_func_subsections=on --abi=eabi -z -m"CowTag.map" --heap_size=0 --stack_size=256 -i"/home/steven/ti/ccsv6/tools/compiler/arm_15.12.3.LTS/lib" -i"/home/steven/ti/ccsv6/tools/compiler/arm_15.12.3.LTS/include" --reread_libs --warn_sections --display_error_number --diag_wrap=off --xml_link_info="CowTag_linkInfo.xml" --rom_model -o "CowTag.out" $(ORDERED_OBJS) $(A_SRCS)
 	@echo 'Finished building target: $@'
 	@echo ' '
+	@$(MAKE) --no-print-directory post-build
 
 CowTag.hex: $(EXE_OUTPUTS)
 	@echo 'Invoking: ARM Hex Utility'
-	"C:/ti/ccsv6/tools/compiler/arm_15.12.3.LTS/bin/armhex" --memwidth=8 --romwidth=8 --intel -o "CowTag.hex" $(EXE_OUTPUTS__QUOTED)
+	"/home/steven/ti/ccsv6/tools/compiler/arm_15.12.3.LTS/bin/armhex" --memwidth=8 --romwidth=8 --intel -o "CowTag.hex" $(EXE_OUTPUTS__QUOTED)
 	@echo 'Finished building: $@'
 	@echo ' '
+	@$(MAKE) --no-print-directory post-build
 
 # Other Targets
 clean:
 	-$(RM) $(GEN_MISC_FILES__QUOTED)$(EXE_OUTPUTS__QUOTED)$(GEN_FILES__QUOTED)$(BIN_OUTPUTS__QUOTED)$(GEN_OPTS__QUOTED)$(GEN_CMDS__QUOTED)
 	-$(RMDIR) $(GEN_MISC_DIRS__QUOTED)
-	-$(RM) "CC1310_LAUNCHXL.d" "EventManager.d" "IIC.d" "RadioReceive.d" "RadioSend.d" "Sleep.d" "alphaMain.d" "alphaRadioTest.d" "bootTimestamp.d" "ccfg.d" "config_parse.d" "eeprom.d" "eepromTest.d" "radioSendReceive.d" "sensors.d" "serialize.d" "uArtEcho.d" "easylink\EasyLink.d" "smartrf_settings\smartrf_settings.d" "smartrf_settings\smartrf_settings_predefined.d" 
-	-$(RM) "CC1310_LAUNCHXL.obj" "EventManager.obj" "IIC.obj" "RadioReceive.obj" "RadioSend.obj" "Sleep.obj" "alphaMain.obj" "alphaRadioTest.obj" "bootTimestamp.obj" "ccfg.obj" "config_parse.obj" "eeprom.obj" "eepromTest.obj" "radioSendReceive.obj" "sensors.obj" "serialize.obj" "uArtEcho.obj" "easylink\EasyLink.obj" "smartrf_settings\smartrf_settings.obj" "smartrf_settings\smartrf_settings_predefined.obj" 
+	-$(RM) "CC1310_LAUNCHXL.d" "EventManager.d" "IIC.d" "RadioReceive.d" "RadioSend.d" "Sleep.d" "alphaMain.d" "alphaRadioTest.d" "bootTimestamp.d" "ccfg.d" "config_parse.d" "eeprom.d" "eepromTest.d" "radioSendReceive.d" "sensors.d" "serialize.d" "uArtEcho.d" "easylink/EasyLink.d" "smartrf_settings/smartrf_settings.d" "smartrf_settings/smartrf_settings_predefined.d" 
+	-$(RM) "CC1310_LAUNCHXL.obj" "EventManager.obj" "IIC.obj" "RadioReceive.obj" "RadioSend.obj" "Sleep.obj" "alphaMain.obj" "alphaRadioTest.obj" "bootTimestamp.obj" "ccfg.obj" "config_parse.obj" "eeprom.obj" "eepromTest.obj" "radioSendReceive.obj" "sensors.obj" "serialize.obj" "uArtEcho.obj" "easylink/EasyLink.obj" "smartrf_settings/smartrf_settings.obj" "smartrf_settings/smartrf_settings_predefined.obj" 
 	-@echo 'Finished clean'
 	-@echo ' '
 
-pre-build:
-	-gcc C:/Users/annik/Desktop/COWS/72point5/hardware/CowTags/../../add_timestamp_to_config.c -o C:/Users/annik/Desktop/COWS/72point5/hardware/CowTags/../../config
-	-C:/Users/annik/Desktop/COWS/72point5/hardware/CowTags/../../config C:/Users/annik/Desktop/COWS/72point5/hardware/CowTags/global_cfg.h
+post-build:
+	-@echo 'Build and run the configuration setup. This updates the timestamp in the config file'
+	-gcc /home/steven/Documents/school-assignments/cpen491/72point5/hardware/CowTags/../../add_timestamp_to_config.c -o /home/steven/Documents/school-assignments/cpen491/72point5/hardware/CowTags/../../config
+	-/home/steven/Documents/school-assignments/cpen491/72point5/hardware/CowTags/../../config /home/steven/Documents/school-assignments/cpen491/72point5/hardware/CowTags/global_cfg.h
 	-@echo ' '
 
 .PHONY: all clean dependents
-.SECONDARY: main-build pre-build
+.SECONDARY: post-build
 
 -include ../makefile.targets
 

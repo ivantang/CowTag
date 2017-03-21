@@ -1,9 +1,9 @@
-#include <xdc/runtime/Timestamp.h>
 #include <stdint.h>
 #include "bootTimestamp.h"
 #include "global_cfg.h"
 #include <stdio.h>
-#include <xdc/runtime/Types.h>
+#include <ti/sysbios/knl/Clock.h>
+#include "debug.h"
 
 // The timestamp returned by Timestamp_get32() / frequency is really just the
 // number of seconds that the tag has been up for. The timestamp is not accurate
@@ -14,15 +14,19 @@
 // computer that is building the project, thus adding the uptime to this will
 // give us a semi-accurate timestamp to use for our packets
 uint32_t TrueTimestamp() {
-  Types_FreqHz frequency;
-  Timestamp_getFreq(&frequency);
-  uint32_t current_stamp = Timestamp_get32() / (frequency.hi << 8 | frequency.lo);
+  uint32_t current_stamp = Clock_getTicks();
 
 	// boot_timestamp is defined in bootTimestamp.h, and is the first thing that
 	// is set in the main() function
-  uint32_t uptime = current - boot_timestamp;
-  uint32_t ret = TIMESTAMP_AT_BUILDTIME + uptime;
+  uint32_t uptime = (current_stamp - boot_timestamp) / 100000;
+  if (verbose_uptime) {
+    printf("uptime = %u\n", uptime);
+  }
 
-  printf("Timestamp = %i\n", ret);
+  uint32_t ret = TIMESTAMP_AT_BUILDTIME + uptime;
+  if (verbose_timestamp) {
+    printf("Timestamp = %u\n", ret);
+  }
+
   return ret;
 }

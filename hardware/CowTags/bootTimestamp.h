@@ -12,7 +12,9 @@
 #include <stdint.h>
 
 // Set once at the very beginning in main()
-uint32_t boot_timestamp;
+uint64_t boot_timestamp;
+
+uint32_t sleep_offset;
 
 uint32_t TrueTimestamp();
 

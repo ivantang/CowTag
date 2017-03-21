@@ -136,10 +136,12 @@ static void alphaRadioTestTaskFunction(UArg arg0, UArg arg1){
 
 		Task_sleep(sleepASecond());
 
-		System_printf("zZzZzZzZzZzZzZzZzZ\n");
-		System_printf("Z going to sleep z\n");
-		System_printf("zZzZzZzZzZzZzZzZzZ\n");
-//		Task_sleep(sleepFiveSeconds());
+		if (verbose_sleep) {
+			System_printf("zZzZzZzZzZzZzZzZzZ\n");
+			System_printf("Z going to sleep z\n");
+			System_printf("zZzZzZzZzZzZzZzZzZ\n");
+			//		Task_sleep(sleepFiveSeconds());
+		}
 	}
 }
 

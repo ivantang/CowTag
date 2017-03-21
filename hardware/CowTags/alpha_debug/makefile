@@ -162,7 +162,12 @@ BIN_OUTPUTS__QUOTED += \
 
 
 # All Target
-all: CowTag.out
+all:
+	@$(MAKE) --no-print-directory pre-build
+	@$(MAKE) --no-print-directory main-build
+
+# Main-build Target
+main-build: CowTag.out
 
 # Tool invocations
 CowTag.out: $(OBJS) $(CMD_SRCS) $(A_SRCS) $(GEN_CMDS)
@@ -171,14 +176,12 @@ CowTag.out: $(OBJS) $(CMD_SRCS) $(A_SRCS) $(GEN_CMDS)
 	"/home/steven/ti/ccsv6/tools/compiler/arm_15.12.3.LTS/bin/armcl" -mv7M3 --code_state=16 --float_support=vfplib -me -g --define=ccs --display_error_number --diag_warning=225 --diag_warning=255 --diag_wrap=off --gen_func_subsections=on --abi=eabi -z -m"CowTag.map" --heap_size=0 --stack_size=256 -i"/home/steven/ti/ccsv6/tools/compiler/arm_15.12.3.LTS/lib" -i"/home/steven/ti/ccsv6/tools/compiler/arm_15.12.3.LTS/include" --reread_libs --warn_sections --display_error_number --diag_wrap=off --xml_link_info="CowTag_linkInfo.xml" --rom_model -o "CowTag.out" $(ORDERED_OBJS) $(A_SRCS)
 	@echo 'Finished building target: $@'
 	@echo ' '
-	@$(MAKE) --no-print-directory post-build
 
 CowTag.hex: $(EXE_OUTPUTS)
 	@echo 'Invoking: ARM Hex Utility'
 	"/home/steven/ti/ccsv6/tools/compiler/arm_15.12.3.LTS/bin/armhex" --memwidth=8 --romwidth=8 --intel -o "CowTag.hex" $(EXE_OUTPUTS__QUOTED)
 	@echo 'Finished building: $@'
 	@echo ' '
-	@$(MAKE) --no-print-directory post-build
 
 # Other Targets
 clean:
@@ -189,14 +192,14 @@ clean:
 	-@echo 'Finished clean'
 	-@echo ' '
 
-post-build:
+pre-build:
 	-@echo 'Build and run the configuration setup. This updates the timestamp in the config file'
 	-gcc /home/steven/Documents/school-assignments/cpen491/72point5/hardware/CowTags/../../add_timestamp_to_config.c -o /home/steven/Documents/school-assignments/cpen491/72point5/hardware/CowTags/../../config
 	-/home/steven/Documents/school-assignments/cpen491/72point5/hardware/CowTags/../../config /home/steven/Documents/school-assignments/cpen491/72point5/hardware/CowTags/global_cfg.h
 	-@echo ' '
 
 .PHONY: all clean dependents
-.SECONDARY: post-build
+.SECONDARY: main-build pre-build
 
 -include ../makefile.targets
 

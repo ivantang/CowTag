@@ -109,10 +109,12 @@ static void betaRadioTestTaskFunction(UArg arg0, UArg arg1)
 		results = betaRadioSendData(sampledata);
 		if(verbose_betaRadioTest){System_printf("packet sent error: %i\n",results);System_flush();}
 
-		System_printf("zZzZzZzZzZzZzZzZzZ\n");
-		System_printf("Z going to sleep z\n");
-		System_printf("zZzZzZzZzZzZzZzZzZ\n");
-		Task_sleep(sleepFiveSeconds());
+		if (verbose_sleep) {
+			System_printf("zZzZzZzZzZzZzZzZzZ\n");
+			System_printf("Z going to sleep z\n");
+			System_printf("zZzZzZzZzZzZzZzZzZ\n");
+			Task_sleep(sleepFiveSeconds());
+		}
 	}
 }
 

@@ -27,6 +27,7 @@
 #include <xdc/runtime/Timestamp.h>
 #include <EventManager.h>
 #include "bootTimestamp.h"
+#include <xdc/runtime/Types.h>
 
 /* Global PIN_Config table */
 PIN_State ledPinState;
@@ -35,7 +36,9 @@ PIN_Handle ledPinHandle;
 
 int main(void) {
 	// boot_timestamp is in bootTimestamp.h
-	boot_timestamp = Timestamp_get32();
+	Types_FreqHz frequency;
+	Timestamp_getFreq(&frequency);
+	boot_timestamp = Timestamp_get32() / (frequency.hi << 8 | frequency.lo);
 
 	if (verbose_main) {System_printf("Initializing tasks...\n");}
 

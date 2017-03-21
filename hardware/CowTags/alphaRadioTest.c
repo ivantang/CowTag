@@ -119,6 +119,7 @@ static void alphaRadioTestTaskFunction(UArg arg0, UArg arg1){
 			sampledata.heartRateData.temp_h = 0x45;
 			sampledata.heartRateData.temp_l = 0x32;
 			sampledata.error = 0x0;
+			getTimestamp(&sampledata);
 		} else {
 			if(verbose_alphaRadioTest){System_printf("SEND: Creating Packet...");System_flush();}
 			makeSensorPacket(&sampledata);

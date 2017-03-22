@@ -37,7 +37,6 @@ PIN_Handle ledPinHandle;
 
 int main(void) {
 	// boot_timestamp is in bootTimestamp.h
-	sleep_offset = 0;
 	Types_FreqHz frequency;
 	Timestamp_getFreq(&frequency);
 //	boot_timestamp = Timestamp_get32() / (frequency.lo / 1000000000000.0);

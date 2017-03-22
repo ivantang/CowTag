@@ -74,7 +74,7 @@ static struct AckPacket ackPacket;
 
 static int8_t latestRssi;
 
-static int sendReceiveMode = 0; // 0 for receive, 1 for send
+//static int sendReceiveMode = 0; // 0 for receive, 1 for send
 
 /***** Prototypes *****/
 static void alphaRadioTaskFunction(UArg arg0, UArg arg1);
@@ -255,7 +255,7 @@ enum alphaRadioOperationStatus alphaRadioSendData(struct sampleData data){
 		System_printf("INSIDE RADIO SEND!!\n");
 		System_flush();}
 
-	sendReceiveMode = 1;
+	//sendReceiveMode = 1;
 
 	/* Save data to send */
 	sampledata = data;
@@ -372,7 +372,7 @@ enum alphaRadioOperationStatus alphaRadioReceiveData(void){
 		System_printf("INSIDE RADIO RECEIVE!!\n");
 		System_flush();}
 
-	sendReceiveMode = 0;
+	//sendReceiveMode = 0;
 
 	if(EasyLink_receiveAsync(rxDoneCallbackReceive, 0) != EasyLink_Status_Success) {
 		System_printf("EasyLink_receiveAsync failed");
@@ -414,10 +414,10 @@ static void rxDoneCallbackReceive(EasyLink_RxPacket * rxPacket, EasyLink_Status 
 			// ignore the alpha packet
 			if((tmpRxPacket->header.sourceAddress & 0x1) == 1){
 
-				if(verbose_alphaRadio){
+				/*if(verbose_alphaRadio){
 					System_printf("ANOTHER ALPHA! IGNORING...\n");
 					System_flush();}
-
+				 */
 
 				//Event_post(*radioOperationEventHandle, RADIO_EVENT_SEND_FAIL);
 				Event_post(*radioOperationEventHandle, RADIO_EVENT_INVALID_PACKET_RECEIVED);

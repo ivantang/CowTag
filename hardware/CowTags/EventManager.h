@@ -19,9 +19,6 @@
 #define RADIO_EVENT_INVALID_PACKET_RECEIVED (uint32_t)(1 << 5)
 #define RADIO_EVENT_NEW_SENSOR_PACKET       (uint32_t)(1 << 6)
 
-//#define RADIO_EVENT_RELEASE 				(uint32_t)(1 << 7)
-
-
 
 void eventManager_init();
 Event_Handle * getEventHandle();

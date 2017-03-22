@@ -221,8 +221,17 @@ static void alphaRadioTaskFunction(UArg arg0, UArg arg1)
 			}
 		}
 
+		else if (events & RADIO_EVENT_INVALID_PACKET_RECEIVED)
+		{
+
+			if(verbose_alphaRadio){
+				System_printf("RadioSend: Invalid packet received (from other alpha)\n");
+				System_flush();}
+
+			returnRadioOperationStatus(AlphaRadioStatus_ReceivedInvalidPacket);
+		}
 		/* If send fail */
-		else if (events & RADIO_EVENT_SEND_FAIL)
+		else if (events & RADIO_EVENT_INVALID_PACKET_RECEIVED)
 		{
 
 			if(verbose_alphaRadio){
@@ -410,8 +419,8 @@ static void rxDoneCallbackReceive(EasyLink_RxPacket * rxPacket, EasyLink_Status 
 					System_flush();}
 
 
-				Event_post(*radioOperationEventHandle, RADIO_EVENT_SEND_FAIL);
-				//Event_post(*radioOperationEventHandle, RADIO_EVENT_INVALID_PACKET_RECEIVED);
+				//Event_post(*radioOperationEventHandle, RADIO_EVENT_SEND_FAIL);
+				Event_post(*radioOperationEventHandle, RADIO_EVENT_INVALID_PACKET_RECEIVED);
 				//return;
 
 			}else{ // source is beta

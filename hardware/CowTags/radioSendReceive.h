@@ -16,7 +16,8 @@ enum alphaRadioOperationStatus {
 	AlphaRadioStatus_Success,
 	AlphaRadioStatus_Failed,
 	AlphaRadioStatus_FailedNotConnected,
-	AlphaRadioStatus_ReceivedValidPacket
+	AlphaRadioStatus_ReceivedValidPacket,
+	AlphaRadioStatus_ReceivedInvalidPacket
 };
 
 union ConcentratorPacket {

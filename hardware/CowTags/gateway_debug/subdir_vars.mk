@@ -20,7 +20,6 @@ C_SRCS += \
 ../config_parse.c \
 ../gatewayMain.c \
 ../gatewayRadioTest.c \
-../radioSendReceive.c \
 ../serialize.c \
 ../uArtEcho.c 
 
@@ -35,7 +34,6 @@ OBJS += \
 ./config_parse.obj \
 ./gatewayMain.obj \
 ./gatewayRadioTest.obj \
-./radioSendReceive.obj \
 ./serialize.obj \
 ./uArtEcho.obj 
 
@@ -50,7 +48,6 @@ C_DEPS += \
 ./config_parse.d \
 ./gatewayMain.d \
 ./gatewayRadioTest.d \
-./radioSendReceive.d \
 ./serialize.d \
 ./uArtEcho.d 
 
@@ -85,7 +82,6 @@ C_DEPS__QUOTED += \
 "config_parse.d" \
 "gatewayMain.d" \
 "gatewayRadioTest.d" \
-"radioSendReceive.d" \
 "serialize.d" \
 "uArtEcho.d" 
 
@@ -100,7 +96,6 @@ OBJS__QUOTED += \
 "config_parse.obj" \
 "gatewayMain.obj" \
 "gatewayRadioTest.obj" \
-"radioSendReceive.obj" \
 "serialize.obj" \
 "uArtEcho.obj" 
 
@@ -115,7 +110,6 @@ C_SRCS__QUOTED += \
 "../config_parse.c" \
 "../gatewayMain.c" \
 "../gatewayRadioTest.c" \
-"../radioSendReceive.c" \
 "../serialize.c" \
 "../uArtEcho.c" 
 

@@ -20,7 +20,6 @@ ORDERED_OBJS += \
 "./config_parse.obj" \
 "./gatewayMain.obj" \
 "./gatewayRadioTest.obj" \
-"./radioSendReceive.obj" \
 "./serialize.obj" \
 "./uArtEcho.obj" \
 "./easylink/EasyLink.obj" \
@@ -173,8 +172,8 @@ CowTag.hex: $(EXE_OUTPUTS)
 clean:
 	-$(RM) $(GEN_MISC_FILES__QUOTED)$(EXE_OUTPUTS__QUOTED)$(GEN_FILES__QUOTED)$(BIN_OUTPUTS__QUOTED)$(GEN_OPTS__QUOTED)$(GEN_CMDS__QUOTED)
 	-$(RMDIR) $(GEN_MISC_DIRS__QUOTED)
-	-$(RM) "CC1310_LAUNCHXL.d" "EventManager.d" "RadioReceive.d" "Sleep.d" "arduinoCom.d" "arduinoComTest.d" "ccfg.d" "config_parse.d" "gatewayMain.d" "gatewayRadioTest.d" "radioSendReceive.d" "serialize.d" "uArtEcho.d" "easylink\EasyLink.d" "smartrf_settings\smartrf_settings.d" "smartrf_settings\smartrf_settings_predefined.d" 
-	-$(RM) "CC1310_LAUNCHXL.obj" "EventManager.obj" "RadioReceive.obj" "Sleep.obj" "arduinoCom.obj" "arduinoComTest.obj" "ccfg.obj" "config_parse.obj" "gatewayMain.obj" "gatewayRadioTest.obj" "radioSendReceive.obj" "serialize.obj" "uArtEcho.obj" "easylink\EasyLink.obj" "smartrf_settings\smartrf_settings.obj" "smartrf_settings\smartrf_settings_predefined.obj" 
+	-$(RM) "CC1310_LAUNCHXL.d" "EventManager.d" "RadioReceive.d" "Sleep.d" "arduinoCom.d" "arduinoComTest.d" "ccfg.d" "config_parse.d" "gatewayMain.d" "gatewayRadioTest.d" "serialize.d" "uArtEcho.d" "easylink\EasyLink.d" "smartrf_settings\smartrf_settings.d" "smartrf_settings\smartrf_settings_predefined.d" 
+	-$(RM) "CC1310_LAUNCHXL.obj" "EventManager.obj" "RadioReceive.obj" "Sleep.obj" "arduinoCom.obj" "arduinoComTest.obj" "ccfg.obj" "config_parse.obj" "gatewayMain.obj" "gatewayRadioTest.obj" "serialize.obj" "uArtEcho.obj" "easylink\EasyLink.obj" "smartrf_settings\smartrf_settings.obj" "smartrf_settings\smartrf_settings_predefined.obj" 
 	-@echo 'Finished clean'
 	-@echo ' '
 

@@ -399,35 +399,30 @@ static void rxDoneCallbackReceive(EasyLink_RxPacket * rxPacket, EasyLink_Status 
 				(tmpRxPacket->header.packetType == RADIO_PACKET_TYPE_ACCEL_PACKET))
 		{
 			// alpha check
-			if( (concentratorAddress & 0x3) == ALPHA_ADDRESS){ // IF I AM AN ALPHA
-				if((tmpRxPacket->header.sourceAddress & 0x1) == 1){ // IF THE SOURCE IS ANOTHER CONCENTRATOR
-					// ignore the alpha packet
-					return;
-				}
+			//if( (concentratorAddress & 0x3) == ALPHA_ADDRESS) // IF I AM AN ALPHA
+			//	&& ((tmpRxPacket->header.sourceAddress & 0x1) == 1) ){ // IF THE SOURCE IS ANOTHER CONCENTRATOR
+
+			// ignore the alpha packet
+			if((tmpRxPacket->header.sourceAddress & 0x1) == 1){
+
+				if(verbose_alphaRadio){
+					System_printf("ANOTHER ALPHA! IGNORING...\n");
+					System_flush();}
+
+
+				Event_post(*radioOperationEventHandle, RADIO_EVENT_SEND_FAIL);
+				//Event_post(*radioOperationEventHandle, RADIO_EVENT_INVALID_PACKET_RECEIVED);
+				//return;
+
+			}else{ // source is beta
+				// both alpha(passed check) and gateway do this
+				/* Save packet */
+				memcpy((void*)&latestRxPacket, &rxPacket->payload, sizeof(struct sensorPacket));
+				/* Signal packet received */
+				Event_post(*radioOperationEventHandle, RADIO_EVENT_VALID_PACKET_RECEIVED);
 			}
-			// both alpha(passed check) and gateway do this
-			/* Save packet */
-			memcpy((void*)&latestRxPacket, &rxPacket->payload, sizeof(struct sensorPacket));
-			/* Signal packet received */
-			Event_post(*radioOperationEventHandle, RADIO_EVENT_VALID_PACKET_RECEIVED);
 
 		}
-		//		else if(tmpRxPacket->header.packetType == RADIO_PACKET_TYPE_ACCEL_PACKET){
-		//			// alpha check
-		//			if( (concentratorAddress & 0x3) == ALPHA_ADDRESS){ // IF I AM AN ALPHA
-		//				if((tmpRxPacket->header.sourceAddress & 0x1) == 1){ // IF THE SOURCE IS ANOTHER CONCENTRATOR
-		//					// ignore the alpha packet
-		//					return;
-		//				}
-		//			}
-		//
-		//			// both alpha(passed check) and gateway do this
-		//			/* Save packet */
-		//			memcpy((void*)&latestRxPacket, &rxPacket->payload, sizeof(struct sensorPacket));
-		//			/* Signal packet received */
-		//			Event_post(*radioOperationEventHandle, RADIO_EVENT_VALID_PACKET_RECEIVED);
-
-		//		}
 		else if(tmpRxPacket->header.packetType == RADIO_PACKET_TYPE_ACK_PACKET){
 			//alpha sends now, so it needs ACK packets
 			Event_post(*radioOperationEventHandle, RADIO_EVENT_DATA_ACK_RECEIVED);

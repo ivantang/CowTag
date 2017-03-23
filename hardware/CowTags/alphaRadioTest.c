@@ -123,7 +123,7 @@ static void alphaRadioTestTaskFunction(UArg arg0, UArg arg1){
 
 	while (1) {
 		// -------------------- SENDING -------------------------
-		sampledata.cowID = 2;
+		sampledata.cowID = 3;
 		sampledata.packetType = RADIO_PACKET_TYPE_SENSOR_PACKET;
 		sampledata.timestamp = 0x12345678;
 

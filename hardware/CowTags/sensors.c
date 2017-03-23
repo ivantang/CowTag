@@ -68,6 +68,7 @@ void getAcceleration(struct sampleData *sampleData) {
 	unsigned int	i;
 
 	// 7 specifies that all x, y, and z axes are enabled
+	// See pg35: http://www.st.com/content/ccc/resource/technical/document/datasheet/3c/ae/50/85/d6/b1/46/fe/CD00274221.pdf/files/CD00274221.pdf/jcr:content/translations/en.CD00274221.pdf
 	char accelerometer_state = 0x07;
 
 	switch(ACCELEROMETER_SAMPLE_RATE_HZ) {
@@ -189,6 +190,7 @@ void getHeartRate(struct sampleData *sampleData) {
 	// The register is now set like so: x1x0 0011 (x denotes, does not matter)
 	// This sets high res on ------------^     ^^
 	// and LED Pulse width to 1600 us ---------^^
+	// See pg16: https://datasheets.maximintegrated.com/en/ds/MAX30100.pdf
 	char heartrate_config = previous & 0xA0 | 0x43;
 	// Now to set the sample rate... the register we are using has the bits
 	// corresponding to the sample rate at the locations marked by "^"

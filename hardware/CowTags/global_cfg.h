@@ -47,6 +47,17 @@
 #define MAX_EEPROM_ADDRESS 0x7FFF
 #define MIN_EEPROM_ADDRESS 0x0000
 
+// Sample rate in Hz for Accelerometer
+// Allowed Values Are:
+// 1, 10, 25, 50, 100, 200, 400Hz
+#define ACCELEROMETER_SAMPLE_RATE_HZ 10
+
+// Sample rate in Hz for Heart Rate Sensor
+// Allowed Values Are:
+// 50, 100, 167, 200, 400, 600, 800, 1000Hz
+#define HEARTRATE_SAMPLE_RATE_HZ 10
+
+
 /* DEBUG FLAGS */
 
 /*** Print the contents of the packets to a file ***/

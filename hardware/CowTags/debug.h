@@ -38,5 +38,8 @@ static const int verbose_eepromTest = 1;
 /*** ignore sensors ***/
 static const int ignoreSensors = 1 ;
 
+/*** enable/disable eeprom ***/
+static const int usingEeprom = 1;
+
 
 #endif /* DEBUG_H_ */

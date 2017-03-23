@@ -135,8 +135,8 @@ static void betaRadioTestTaskFunction(UArg arg0, UArg arg1)
 				struct sampleData oldSample;
 
 				// check for another stored sample
-				bool noneNext = eeprom_getNext(&oldSample);
-				if (noneNext == false) {
+				bool hasNext = eeprom_getNext(&oldSample);
+				if (hasNext) {
 					results = betaRadioSendData(oldSample);
 					if (results != NodeRadioStatus_Success) {
 						// write back to eeprom is send is a no go
@@ -155,7 +155,7 @@ static void betaRadioTestTaskFunction(UArg arg0, UArg arg1)
 			System_printf("zZzZzZzZzZzZzZzZzZ\n");
 			System_printf("Z going to sleep z\n");
 			System_printf("zZzZzZzZzZzZzZzZzZ\n");
-			Task_sleep(sleepFiveSeconds());
+			Task_sleep(sleepASecond());
 		}
 	}
 }

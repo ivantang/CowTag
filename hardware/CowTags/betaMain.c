@@ -47,7 +47,7 @@ int main(void) {
 	//eventManager_init();
 
 	//if (verbose_main) {System_printf("Initializing sensors...\n");}
-	Sensors_init(); // init i2C
+	Sensors_test(); // init i2C
 
 	//if (verbose_main) {System_printf("Initializing EEPROM...\n");}
 	//eepromTest_init();

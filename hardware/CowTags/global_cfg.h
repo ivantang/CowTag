@@ -16,7 +16,7 @@
 // IF YOU CHANGE THE NAME OF THIS DEFINE YOU NEED TO CHANGE THE SEARCH STRING IN
 // ../../add_timestamp_to_config.c AS WELL
 
-#define TIMESTAMP_AT_BUILDTIME 1490308500
+#define TIMESTAMP_AT_BUILDTIME 1490309729
 // End auto-generated
 
 // [0] = Beta
@@ -55,7 +55,7 @@
 static const int print_packet_to_file_alpha = 0;
 
 /* verbose_betaRadioTest also needs to be set to print packets to file */
-static const int print_packet_to_file_beta = 0;
+static const int print_packet_to_file_beta = 1;
 
 /* verbose_gatewayRadioTest also needs to be set to print packets to file */
 static const int print_packet_to_file_gateway = 0;
@@ -79,7 +79,7 @@ static const int verbose_eeprom = 0;
 static const int verbose_arduinoCom = 0;
 
 /* Alpha send and receive radio */
-static const int verbose_alphaRadio = 1;
+static const int verbose_alphaRadio = 0;
 
 /* Tests suites */
 static const int verbose_serializeTest = 0;

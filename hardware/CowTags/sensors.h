@@ -12,6 +12,7 @@
 #include <ti/drivers/I2C.h> //i2c
 #include <ti/drivers/UART.h> //i2c
 #include <radioProtocol.h>
+#include <betaRadioTest.h>
 /*initialize node task and create TI-RTOS objects*/
 void Sensors_init(void);
 

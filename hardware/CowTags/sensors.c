@@ -50,7 +50,7 @@ Task_Struct task0Struct;
 Char task0Stack[TASKSTACKSIZE];
 
 /*function definition */
-void Sensors_init(void) {
+void Sensors_test(void) {
 	//PIN_init(BoardGpioInitialTable);
 	Task_Params taskParams;
 
@@ -96,10 +96,13 @@ void getAcceleration(struct sampleData *sampleData) {
     	}
     }
 
+    //write to file
     for(i = 0 ; i < 30 ;i++){
-    	System_printf("x:%3d y:%3d z:%3d\n", 	accelerationData[i].accelerometerData.x ,
+    	/*System_printf("x:%3d y:%3d z:%3d\n", 	accelerationData[i].accelerometerData.x ,
     										accelerationData[i].accelerometerData.y,
-											accelerationData[i].accelerometerData.z);
+											accelerationData[i].accelerometerData.z);*/
+    	accelerationData[i].packetType = RADIO_PACKET_TYPE_ACCEL_PACKET;
+    	file_printSampleData(accelerationData[i]);
     }
 
 
@@ -285,9 +288,8 @@ void makeSensorPacket(struct sampleData *sampleData) {
 void testSensors() {
 	struct sampleData sampleData;
 
-	while (1) {
-		makeSensorPacket(&sampleData);
-	}
+	makeSensorPacket(&sampleData);
+
 	System_printf("Tests done\n");
 	System_flush();
 

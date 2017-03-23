@@ -66,7 +66,6 @@ static uint8_t betaRadioTestTaskStack[BETARADIOTEST_TASK_STACK_SIZE];
 /***** Prototypes *****/
 static void betaRadioTestTaskFunction(UArg arg0, UArg arg1);
 void printSampleData(struct sampleData sampleData);
-void file_printSampleData(struct sampleData sampledata);
 
 /***** Function Definitions *****/
 void betaRadioTest_init(void)
@@ -193,12 +192,12 @@ void file_printSampleData(struct sampleData sampledata) {
 
 	fp = fopen("../beta_beta_output.txt", "a");
 
-	fprintf(fp, "BetaRadio: sent packet with CowID = %i, PacketType: %i, "
-			"Timestamp: %i, Error: %i, ",
-			sampledata.cowID,
-			sampledata.packetType,
-			sampledata.timestamp,
-			sampledata.error);
+//	fprintf(fp, "BetaRadio: sent packet with CowID = %i, PacketType: %i, "
+//			"Timestamp: %i, Error: %i, ",
+//			sampledata.cowID,
+//			sampledata.packetType,
+//			sampledata.timestamp,
+//			sampledata.error);
 	if(sampledata.packetType == RADIO_PACKET_TYPE_SENSOR_PACKET){
 		fprintf(fp, "TemperatureCowData = %i.%i, "
 				"AmbientTemperatureData = %i.%i, "
@@ -216,5 +215,7 @@ void file_printSampleData(struct sampleData sampledata) {
 				sampledata.accelerometerData.y,
 				sampledata.accelerometerData.z);
 	}
+
+	fprintf(fp, "-----------------\n");
 	fclose(fp);
 }

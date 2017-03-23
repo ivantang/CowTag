@@ -34,6 +34,7 @@
 #include <debug.h>
 #include <radioProtocol.h>
 #include <betaRadioTest.h>
+#include <stdio.h>
 
 /* XDCtools Header files */
 #include <xdc/runtime/System.h>
@@ -65,6 +66,7 @@ static uint8_t betaRadioTestTaskStack[BETARADIOTEST_TASK_STACK_SIZE];
 /***** Prototypes *****/
 static void betaRadioTestTaskFunction(UArg arg0, UArg arg1);
 void printSampleData(struct sampleData sampleData);
+void file_printSampleData(struct sampleData sampledata);
 
 /***** Function Definitions *****/
 void betaRadioTest_init(void)
@@ -104,7 +106,10 @@ static void betaRadioTestTaskFunction(UArg arg0, UArg arg1)
 			if(verbose_betaRadioTest){System_printf("Packet Created\n");System_flush();}
 		}
 
-		if(verbose_betaRadioTest){printSampleData(sampledata);}
+		if(verbose_betaRadioTest) {
+			printSampleData(sampledata);
+			file_printSampleData(sampledata);
+		}
 		if(verbose_betaRadioTest){System_printf("sending packet...\n");System_flush();}
 		results = betaRadioSendData(sampledata);
 		if(verbose_betaRadioTest){System_printf("packet sent error: %i\n",results);System_flush();}
@@ -144,4 +149,35 @@ void printSampleData(struct sampleData sampledata){
 											sampledata.accelerometerData.y,
 											sampledata.accelerometerData.z);
 	}
+}
+
+void file_printSampleData(struct sampleData sampledata) {
+	FILE *fp;
+
+	fp = fopen("../beta_beta_output.txt", "a");
+
+	fprintf(fp, "BetaRadio: sent packet with CowID = %i, PacketType: %i, "
+			"Timestamp: %i, Error: %i, ",
+			sampledata.cowID,
+			sampledata.packetType,
+			sampledata.timestamp,
+			sampledata.error);
+	if(sampledata.packetType == RADIO_PACKET_TYPE_SENSOR_PACKET){
+		fprintf(fp, "TemperatureCowData = %i.%i, "
+				"AmbientTemperatureData = %i.%i, "
+				"InfraredData = %i.%i\n",
+				sampledata.tempData.temp_h,
+				sampledata.tempData.temp_l,
+				sampledata.heartRateData.temp_h,
+				sampledata.heartRateData.temp_l,
+				sampledata.heartRateData.rate_h,
+				sampledata.heartRateData.rate_l);
+	}
+	else{
+		fprintf(fp, "accelerometerData= x=%i, y=%i, z=%i\n",
+				sampledata.accelerometerData.x,
+				sampledata.accelerometerData.y,
+				sampledata.accelerometerData.z);
+	}
+	fclose(fp);
 }

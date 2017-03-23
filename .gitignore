@@ -41,3 +41,8 @@ Release/
 configPkg
 
 config
+
+# files that output the contents of packets
+alpha_packet_output.txt
+beta_packet_output.txt
+gateway_packet_output.txt

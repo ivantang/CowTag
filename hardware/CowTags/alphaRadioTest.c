@@ -41,6 +41,7 @@
 #include <debug.h>
 #include <alphaRadioTest.h>
 #include <radioProtocol.h>
+#include <stdio.h>
 
 /* XDCtools Header files */
 #include <xdc/std.h>
@@ -80,6 +81,7 @@ static struct sensorPacket latestActivePacket;
 static void alphaRadioTestTaskFunction(UArg arg0, UArg arg1);
 static void packetReceivedCallback(union ConcentratorPacket* packet, int8_t rssi);
 void printSampleData(struct sampleData sampledata);
+void file_printSampleData(struct sampleData sampledata);
 void sendToGateway(struct sampleData sampledata);
 
 /***** Function definitions *****/
@@ -152,6 +154,7 @@ static void packetReceivedCallback(union ConcentratorPacket* packet, int8_t rssi
 	if(verbose_alphaRadioTest) {
 		System_printf("RECEIVE: received a packet.\n");
 		printSampleData(latestActivePacket.sampledata);
+		file_printSampleData(latestActivePacket.sampledata);
 	}
 }
 
@@ -181,6 +184,37 @@ void printSampleData(struct sampleData sampledata){
 				sampledata.accelerometerData.y,
 				sampledata.accelerometerData.z);
 	}
+}
+
+void file_printSampleData(struct sampleData sampledata) {
+	FILE *fp;
+
+	fp = fopen("../alpha_packet_output.txt", "a");
+
+	fprintf(fp, "BetaRadio: sent packet with CowID = %i, PacketType: %i, "
+			"Timestamp: %i, Error: %i, ",
+			sampledata.cowID,
+			sampledata.packetType,
+			sampledata.timestamp,
+			sampledata.error);
+	if(sampledata.packetType == RADIO_PACKET_TYPE_SENSOR_PACKET){
+		fprintf(fp, "TemperatureCowData = %i.%i, "
+				"AmbientTemperatureData = %i.%i, "
+				"InfraredData = %i.%i\n",
+				sampledata.tempData.temp_h,
+				sampledata.tempData.temp_l,
+				sampledata.heartRateData.temp_h,
+				sampledata.heartRateData.temp_l,
+				sampledata.heartRateData.rate_h,
+				sampledata.heartRateData.rate_l);
+	}
+	else{
+		fprintf(fp, "accelerometerData= x=%i, y=%i, z=%i\n",
+				sampledata.accelerometerData.x,
+				sampledata.accelerometerData.y,
+				sampledata.accelerometerData.z);
+	}
+	fclose(fp);
 }
 
 

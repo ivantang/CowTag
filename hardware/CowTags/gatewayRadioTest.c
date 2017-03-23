@@ -36,6 +36,7 @@
 #include <radioProtocol.h>
 #include <serialize.h>
 #include <arduinoCom.h>
+#include <stdio.h>
 
 /* XDCtools Header files */
 #include <xdc/std.h>
@@ -67,6 +68,7 @@ static struct sensorPacket latestActivePacket;
 static void gatewayRadioTestTaskFunction(UArg arg0, UArg arg1);
 static void packetReceivedCallback(union ConcentratorPacket* packet, int8_t rssi);
 static void printSampleData(struct sampleData sampledata);
+static void file_printSampleData(struct sampleData sampledata);
 
 /***** Function definitions *****/
 void gatewayRadioTest_init(void) {
@@ -103,7 +105,11 @@ static void gatewayRadioTestTaskFunction(UArg arg0, UArg arg1)
 			uint8_t buf[SAMPLE_SIZE];
 			unsigned i;
 
-			if(verbose_gatewayRadioTest){printSampleData(latestActivePacket.sampledata);System_flush();}
+			if(verbose_gatewayRadioTest) {
+				printSampleData(latestActivePacket.sampledata);
+				file_printSampleData(latestActivePacket.sampledata);
+				System_flush();
+			}
 
 			if(verbose_gatewayRadioTest){System_printf("serializing packet...\n");System_flush();}
 			serializePacket(&latestActivePacket.sampledata, buf);
@@ -149,6 +155,37 @@ void printSampleData(struct sampleData sampledata){
 											sampledata.accelerometerData.y,
 											sampledata.accelerometerData.z);
 	}
+}
+
+void file_printSampleData(struct sampleData sampledata) {
+	FILE *fp;
+
+	fp = fopen("../gateway_packet_output.txt", "a");
+
+	fprintf(fp, "GatewayRadio: received packet with CowID = %i, PacketType: %i, "
+			"Timestamp: %i, Error: %i, ",
+			sampledata.cowID,
+			sampledata.packetType,
+			sampledata.timestamp,
+			sampledata.error);
+	if(sampledata.packetType == RADIO_PACKET_TYPE_SENSOR_PACKET){
+		fprintf(fp, "TemperatureCowData = %i.%i, "
+				"AmbientTemperatureData = %i.%i, "
+				"InfraredData = %i.%i\n",
+				sampledata.tempData.temp_h,
+				sampledata.tempData.temp_l,
+				sampledata.heartRateData.temp_h,
+				sampledata.heartRateData.temp_l,
+				sampledata.heartRateData.rate_h,
+				sampledata.heartRateData.rate_l);
+	}
+	else{
+		fprintf(fp, "accelerometerData= x=%i, y=%i, z=%i\n",
+				sampledata.accelerometerData.x,
+				sampledata.accelerometerData.y,
+				sampledata.accelerometerData.z);
+	}
+	fclose(fp);
 }
 
 

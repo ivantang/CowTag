@@ -66,28 +66,41 @@ void getAcceleration(struct sampleData *sampleData){
 
 	unsigned int	i;
 
-    writeI2CRegister(Board_LIS3DH_ADDR, LIS3DH_REG_CTRL1, 0x77);    //all axes , normal mode
-    writeI2CRegister(Board_LIS3DH_ADDR, LIS3DH_REG_CTRL4, 0x08);	//high res and BDU and self test off
-    //writeI2CRegister(Board_LIS3DH_ADDR, LIS3DH_REG_CTRL3, 0x10);    //DRDY on INT1
-    writeI2CRegister(Board_LIS3DH_ADDR, LIS3DH_REG_TEMPCFG, 0x80);    //enable adcs
+	struct sampleData accelerationData[30];
+
+    writeI2CRegister(Board_LIS3DH_ADDR, LIS3DH_REG_CTRL1, 0x27);    //all axes , HR/normal mode, 10Hz
+    writeI2CRegister(Board_LIS3DH_ADDR, LIS3DH_REG_CTRL4, 0x0C);	//high res and BDU and self test off +/-2g
+    writeI2CRegister(Board_LIS3DH_ADDR, LIS3DH_REG_CTRL3, 0x10);    //DRDY on INT1
+    //writeI2CRegister(Board_LIS3DH_ADDR, LIS3DH_REG_TEMPCFG, 0x80);    //enable adcs
     //writeI2C(Board_LIS3DH_ADDR, LIS3DH_REG_OUT_X_L | 0x80);    //enable auto increment
 
     //polling status register to check for new set of data
-    for(i = 0 ; i < 30 ; i++){
+    for(i = 0 ; i < 30 ;){
     	if( (readI2CRegister(Board_LIS3DH_ADDR,0x27) & 0x8) >> 3 == 1 ){
     		if( (readI2CRegister(Board_LIS3DH_ADDR,0x27) >> 7) == 1 ){
-    			sampleData->accelerometerData.x = readI2CRegister(Board_LIS3DH_ADDR,0x28) | (readI2CRegister(Board_LIS3DH_ADDR,0x29) << 8);
-    			sampleData->accelerometerData.y = readI2CRegister(Board_LIS3DH_ADDR,0x2A) | (readI2CRegister(Board_LIS3DH_ADDR,0x2B) << 8) ;
-    			sampleData->accelerometerData.z = readI2CRegister(Board_LIS3DH_ADDR,0x2C) | (readI2CRegister(Board_LIS3DH_ADDR,0x2D) << 8) ;
+    			accelerationData[i].accelerometerData.x = readI2CRegister(Board_LIS3DH_ADDR,0x28) | (readI2CRegister(Board_LIS3DH_ADDR,0x29) << 8);
+    			accelerationData[i].accelerometerData.y = readI2CRegister(Board_LIS3DH_ADDR,0x2A) | (readI2CRegister(Board_LIS3DH_ADDR,0x2B) << 8) ;
+    			accelerationData[i].accelerometerData.z = readI2CRegister(Board_LIS3DH_ADDR,0x2C) | (readI2CRegister(Board_LIS3DH_ADDR,0x2D) << 8) ;
 
-    			if(verbose_sensors) System_printf("x:%d y:%d z:%d\n", 	sampleData->accelerometerData.x ,
+    			sampleData->accelerometerData.x = accelerationData[i].accelerometerData.x;
+    			sampleData->accelerometerData.y = accelerationData[i].accelerometerData.y;
+    			sampleData->accelerometerData.z = accelerationData[i].accelerometerData.z;
+
+    			if(verbose_sensors) System_printf("x:%i y:%i z:%i\n", 	sampleData->accelerometerData.x ,
     																	sampleData->accelerometerData.y,
 																		sampleData->accelerometerData.z);
     			System_flush();
-    			break;
+    			i++;
     		}
     	}
     }
+
+    for(i = 0 ; i < 30 ;i++){
+    	System_printf("x:%3d y:%3d z:%3d\n", 	accelerationData[i].accelerometerData.x ,
+    										accelerationData[i].accelerometerData.y,
+											accelerationData[i].accelerometerData.z);
+    }
+
 
     System_flush();
 
@@ -179,11 +192,6 @@ void getHeartRate(struct sampleData *sampleData){
 				 	 MAX30100_REG_INTERRUPT_CONFIGURATION,
 					 previous & 0x0A | 0xA0);	//turn on interrupts
 
-	//clearing FIFO write pointer, overflow counter and read pointer
-//	writeI2CRegister(Board_MAX30100_ADDR, MAX30100_REG_FIFO_OVERFLOW_COUNTER, 0x00);
-//	writeI2CRegister(Board_MAX30100_ADDR, MAX30100_REG_FIFO_WRITE_POINTER, 0x00);
-//	writeI2CRegister(Board_MAX30100_ADDR, MAX30100_REG_FIFO_READ_POINTER, 0x00);
-
 	//start_clock = Clock_getTicks();
 	//end_clock = Clock_getTicks();
 
@@ -193,20 +201,23 @@ void getHeartRate(struct sampleData *sampleData){
 	//while((end_clock-start_clock)/100000 < 5){
 
 		//clear FIFO PTR
-		//writeI2CRegister(Board_MAX30100_ADDR, MAX30100_REG_FIFO_WRITE_POINTER, 0x00);
-		//writeI2CRegister(Board_MAX30100_ADDR, MAX30100_REG_FIFO_READ_POINTER, 0x00);
+		writeI2CRegister(Board_MAX30100_ADDR, MAX30100_REG_FIFO_WRITE_POINTER, 0x00);
+		writeI2CRegister(Board_MAX30100_ADDR, MAX30100_REG_FIFO_READ_POINTER, 0x00);
 
 		//check if hr data is ready
-		/*
+		tempval = readI2CRegister(Board_MAX30100_ADDR, MAX30100_REG_INTERRUPT_STATUS);
+
 		while(!tempval){
 			tempval = readI2CRegister(Board_MAX30100_ADDR, MAX30100_REG_INTERRUPT_STATUS);
 			tempval &= MAX30100_HRDATA_READY;
+			//System_printf(".");
+			//System_flush();
 			if(tempval &= MAX30100_DATA_FULL){
 				System_printf("IM FULL\n");
 				System_flush();
 			}
 		}
-		*/
+
 
 		//fifo data is 16 bits so 4 reads is needed
 		//first 16 bits is IR data, in our case, HR data
@@ -268,16 +279,16 @@ void getHeartRate(struct sampleData *sampleData){
 }
 
 //This function assumes the setup for the chip has been done already
-struct MAX30100Packet getMAX30100Packet{
-	struct MAX30100Packet MAX30100Packet;
-
-	Max30100Packet.hrHigh = readI2CRegister(Board_MAX30100_ADDR,MAX30100_REG_FIFO_DATA);
-	Max30100Packet.hrLow = readI2CRegister(Board_MAX30100_ADDR,MAX30100_REG_FIFO_DATA);
-	Max30100Packet.redHigh = readI2CRegister(Board_MAX30100_ADDR,MAX30100_REG_FIFO_DATA);
-	Max30100Packet.redLow = readI2CRegister(Board_MAX30100_ADDR,MAX30100_REG_FIFO_DATA);
-
-	return MAX30100Packet;
-}
+//struct MAX30100Packet getMAX30100Packet{
+//	struct MAX30100Packet MAX30100Packet;
+//
+//	Max30100Packet.hrHigh = readI2CRegister(Board_MAX30100_ADDR,MAX30100_REG_FIFO_DATA);
+//	Max30100Packet.hrLow = readI2CRegister(Board_MAX30100_ADDR,MAX30100_REG_FIFO_DATA);
+//	Max30100Packet.redHigh = readI2CRegister(Board_MAX30100_ADDR,MAX30100_REG_FIFO_DATA);
+//	Max30100Packet.redLow = readI2CRegister(Board_MAX30100_ADDR,MAX30100_REG_FIFO_DATA);
+//
+//	return MAX30100Packet;
+//};
 
 void getTimestamp(struct sampleData *sampleData){
 	sampleData->timestamp = Timestamp_get32();
@@ -287,13 +298,13 @@ void makeSensorPacket(struct sampleData *sampleData){
 
 	getAcceleration(sampleData);
 
-	getTemp(sampleData);
+//	getTemp(sampleData);
 
-	getHeartRate(sampleData);
+//	getHeartRate(sampleData);
 
-	getTimestamp(sampleData);
+	//getTimestamp(sampleData);
 
-	System_printf(							"TemperatureCowData = %i ,"
+	/*System_printf(							"TemperatureCowData = %i ,"
 											"AmbientTemperatureData = %i ,"
 											"InfraredData = %i\n"
 											"AccelerometerData= x=%i, y=%i, z=%i\n"
@@ -305,18 +316,19 @@ void makeSensorPacket(struct sampleData *sampleData){
 											sampleData->accelerometerData.y,
 											sampleData->accelerometerData.z,
 											sampleData->timestamp);
-
+*/
 	System_flush();
 }
 
 void testSensors(){
 	struct sampleData sampleData;
-	/*
+
 	while(1){
 		makeSensorPacket(&sampleData);
 	}
 	System_printf("Tests done\n");
 	System_flush();
-	*/
-	getHeartRate(&sampleData);
+
+
+//	getHeartRate(&sampleData);
 }

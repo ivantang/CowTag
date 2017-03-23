@@ -27,7 +27,7 @@
 
 /* Board Header files */
 #include <Board.h>
-#include <debug.h>
+#include "global_cfg.h"
 #include "pinTable.h"
 #include <config_parse.h>
 #include <stdlib.h>

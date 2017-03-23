@@ -38,7 +38,7 @@
  */
 
 /***** Includes *****/
-#include <debug.h>
+#include "global_cfg.h"
 #include <alphaRadioTest.h>
 #include <radioProtocol.h>
 #include <stdio.h>

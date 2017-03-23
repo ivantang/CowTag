@@ -31,7 +31,7 @@
  */
 
 /***** Includes *****/
-#include <debug.h>
+#include "global_cfg.h"
 #include <gatewayRadioTest.h>
 #include <radioProtocol.h>
 #include <serialize.h>

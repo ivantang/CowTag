@@ -5,7 +5,7 @@
  */
 
 /***** Includes *****/
-#include <debug.h>
+#include "global_cfg.h"
 #include <RadioSend.h>
 /* XDCtools Header files */
 #include <xdc/runtime/System.h>

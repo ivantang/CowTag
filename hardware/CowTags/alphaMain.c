@@ -6,7 +6,7 @@
  */
 
 /***** Includes *****/
-#include <debug.h>
+#include "global_cfg.h"
 
 /* XDCtools Header files */
 #include <xdc/runtime/System.h>

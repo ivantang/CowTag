@@ -18,7 +18,7 @@
 
 /* Example/Board Header files */
 #include <Board.h>
-#include <debug.h>
+#include "global_cfg.h"
 #include <stdint.h>
 #include <assert.h>
 

@@ -47,7 +47,6 @@
 #include "easylink/EasyLink.h"
 #include "radioProtocol.h"
 #include "RadioReceive.h"
-#include "debug.h"
 #include "pinTable.h"
 #include <config_parse.h>
 

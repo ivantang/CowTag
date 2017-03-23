@@ -126,4 +126,5 @@ SUBDIRS := \
 . \
 easylink \
 smartrf_settings \
+src/sysbios \
 

@@ -28,7 +28,6 @@
 #include "easylink/EasyLink.h"
 #include "radioProtocol.h"
 
-#include <debug.h>
 #include <config_parse.h>
 
 // config file

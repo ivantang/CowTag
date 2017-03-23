@@ -6,7 +6,6 @@
  */
 
 /***** Includes *****/
-#include <debug.h>
 #include "global_cfg.h"
 #include <radioProtocol.h>
 #include <eeprom.h>
@@ -25,7 +24,6 @@
 
 /* Example/Board Header files */
 #include <Board.h>
-#include <debug.h>
 #include <stdint.h>
 #include <stdbool.h>
 #include <assert.h>

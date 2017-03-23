@@ -28,7 +28,7 @@ union ConcentratorPacket {
 /* Initializes the NodeRadioTask and creates all TI-RTOS objects */
 void radioSendReceive_init(void);
 
-typedef void (*ConcentratorRadio_PacketReceivedCallback)(union ConcentratorPacket* packet, int8_t rssi);
+typedef void (*ConcentratorRadio_PacketReceivedCallback)(union ConcentratorPacket* packet);
 
 /* Register the packet received callback */
 void AlphaRadioTask_registerPacketReceivedCallback(ConcentratorRadio_PacketReceivedCallback callback);

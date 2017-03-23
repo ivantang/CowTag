@@ -4,7 +4,7 @@
  *  Created on: Feb 6, 2017
  *      Author: champ
  */
-#include <debug.h>
+#include "global_cfg.h"
 #include <xdc/runtime/System.h>
 #include <radioProtocol.h>
 #include <serialize.h>

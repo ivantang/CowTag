@@ -27,7 +27,7 @@
 
 /* Board Header files */
 #include <Board.h>
-#include <debug.h>
+#include "global_cfg.h"
 #include "pinTable.h"
 #include <config_parse.h>
 #include <stdlib.h>
@@ -72,7 +72,7 @@ static union ConcentratorPacket latestRxPacket;
 static EasyLink_TxPacket txPacket;
 static struct AckPacket ackPacket;
 
-static int8_t latestRssi;
+static int sendReceiveMode = 0; // 0 for receive, 1 for send
 
 //static int sendReceiveMode = 0; // 0 for receive, 1 for send
 
@@ -231,7 +231,7 @@ static void alphaRadioTaskFunction(UArg arg0, UArg arg1)
 			returnRadioOperationStatus(AlphaRadioStatus_ReceivedInvalidPacket);
 		}
 		/* If send fail */
-		else if (events & RADIO_EVENT_INVALID_PACKET_RECEIVED)
+		else if (events & RADIO_EVENT_SEND_FAIL)
 		{
 
 			if(verbose_alphaRadio){
@@ -351,7 +351,7 @@ static void sendAck(uint8_t latestSourceAddress) {
 static void notifyPacketReceived(union ConcentratorPacket* latestRxPacket)
 {
 	if (packetReceivedCallback)
-		packetReceivedCallback(latestRxPacket, latestRssi);
+		packetReceivedCallback(latestRxPacket);
 
 }
 
@@ -397,9 +397,6 @@ static void rxDoneCallbackReceive(EasyLink_RxPacket * rxPacket, EasyLink_Status 
 	/* If we received a packet successfully */
 	if (status == EasyLink_Status_Success)
 	{
-		/* Save the latest RSSI, which is later sent to the receive callback */
-		latestRssi = (int8_t)rxPacket->rssi;
-
 		/* Check that this is a valid packet */
 		tmpRxPacket = (union ConcentratorPacket*)(rxPacket->payload);
 
@@ -432,6 +429,7 @@ static void rxDoneCallbackReceive(EasyLink_RxPacket * rxPacket, EasyLink_Status 
 			}
 
 		}
+
 		else if(tmpRxPacket->header.packetType == RADIO_PACKET_TYPE_ACK_PACKET){
 			//alpha sends now, so it needs ACK packets
 			Event_post(*radioOperationEventHandle, RADIO_EVENT_DATA_ACK_RECEIVED);

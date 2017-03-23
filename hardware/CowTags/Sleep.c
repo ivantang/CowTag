@@ -8,6 +8,7 @@
 #include <Sleep.h>
 #include <ti/sysbios/knl/Clock.h>
 #include "global_cfg.h"
+#include "bootTimestamp.h"
 
 long long int hourSleepTicks = HOUR_SLEEP_TICKS;
 long long int minuteSleepTicks = MINUTE_SLEEP_TICKS;

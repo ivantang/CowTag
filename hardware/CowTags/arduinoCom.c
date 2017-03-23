@@ -6,7 +6,7 @@
  */
 
 /***** Includes *****/
-#include <debug.h>
+#include "global_cfg.h"
 #include <radioProtocol.h>
 #include <arduinoCom.h>
 

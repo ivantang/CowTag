@@ -15,7 +15,7 @@
 // Begin auto-generated
 // IF YOU CHANGE THE NAME OF THIS DEFINE YOU NEED TO CHANGE THE SEARCH STRING IN
 // ../../add_timestamp_to_config.c AS WELL
-#define TIMESTAMP_AT_BUILDTIME 1490241195
+#define TIMESTAMP_AT_BUILDTIME 1490293886
 // End auto-generated
 
 // [0] = Beta
@@ -81,6 +81,9 @@ static const int verbose_uptime = 0;
 
 // Sleep output
 static const int verbose_sleep = 0;
+
+/*** enable/disable eeprom ***/
+static const int usingEeprom = 0;
 
 /*** ignore sensors ***/
 static const int ignoreSensors = 1;

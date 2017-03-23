@@ -17,6 +17,7 @@ C_SRCS += \
 ../Sleep.c \
 ../betaMain.c \
 ../betaRadioTest.c \
+../bootTimestamp.c \
 ../ccfg.c \
 ../config_parse.c \
 ../eeprom.c \
@@ -34,6 +35,7 @@ OBJS += \
 ./Sleep.obj \
 ./betaMain.obj \
 ./betaRadioTest.obj \
+./bootTimestamp.obj \
 ./ccfg.obj \
 ./config_parse.obj \
 ./eeprom.obj \
@@ -51,6 +53,7 @@ C_DEPS += \
 ./Sleep.d \
 ./betaMain.d \
 ./betaRadioTest.d \
+./bootTimestamp.d \
 ./ccfg.d \
 ./config_parse.d \
 ./eeprom.d \
@@ -74,11 +77,11 @@ GEN_FILES += \
 ./configPkg/compiler.opt 
 
 GEN_FILES__QUOTED += \
-"configPkg\linker.cmd" \
-"configPkg\compiler.opt" 
+"configPkg/linker.cmd" \
+"configPkg/compiler.opt" 
 
 GEN_MISC_DIRS__QUOTED += \
-"configPkg\" 
+"configPkg/" 
 
 C_DEPS__QUOTED += \
 "CC1310_LAUNCHXL.d" \
@@ -88,6 +91,7 @@ C_DEPS__QUOTED += \
 "Sleep.d" \
 "betaMain.d" \
 "betaRadioTest.d" \
+"bootTimestamp.d" \
 "ccfg.d" \
 "config_parse.d" \
 "eeprom.d" \
@@ -105,6 +109,7 @@ OBJS__QUOTED += \
 "Sleep.obj" \
 "betaMain.obj" \
 "betaRadioTest.obj" \
+"bootTimestamp.obj" \
 "ccfg.obj" \
 "config_parse.obj" \
 "eeprom.obj" \
@@ -122,6 +127,7 @@ C_SRCS__QUOTED += \
 "../Sleep.c" \
 "../betaMain.c" \
 "../betaRadioTest.c" \
+"../bootTimestamp.c" \
 "../ccfg.c" \
 "../config_parse.c" \
 "../eeprom.c" \

@@ -110,9 +110,43 @@ static void betaRadioTestTaskFunction(UArg arg0, UArg arg1)
 			printSampleData(sampledata);
 			file_printSampleData(sampledata);
 		}
+
+		// send packet or save to eeprom
 		if(verbose_betaRadioTest){System_printf("sending packet...\n");System_flush();}
 		results = betaRadioSendData(sampledata);
-		if(verbose_betaRadioTest){System_printf("packet sent error: %i\n",results);System_flush();}
+		if (usingEeprom) {
+			if (results != NodeRadioStatus_Success) {
+				if(verbose_betaRadioTest){System_printf("packet sent error, saving to eeprom: %i\n",results);System_flush();}
+				eeprom_write(&sampledata);
+			}
+		} else {
+			if(verbose_betaRadioTest){System_printf("packet sent error\n");}
+		}
+
+		// attempt to send saved samples as well
+		if (usingEeprom) {
+			if(verbose_betaRadioTest){System_printf("check for saved samples to send\n");}
+			bool isSending = true;
+			int oldSamplesSent = 0;
+			do {
+				struct sampleData oldSample;
+
+				// check for another stored sample
+				bool noneNext = eeprom_getNext(&oldSample);
+				if (noneNext == false) {
+					results = betaRadioSendData(oldSample);
+					if (results != NodeRadioStatus_Success) {
+						// write back to eeprom is send is a no go
+						if(verbose_betaRadioTest){System_printf("error sending from eeprom, saving back: %i\n",results);System_flush();}
+						eeprom_write(&oldSample);
+						isSending = false;
+					} else {
+						++oldSamplesSent;
+					}
+				}
+			} while (isSending == true);
+			if(verbose_betaRadioTest){System_printf("%d saved samples sent\n", oldSamplesSent);}
+		}
 
 		if (verbose_sleep) {
 			System_printf("zZzZzZzZzZzZzZzZzZ\n");

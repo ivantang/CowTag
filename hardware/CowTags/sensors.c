@@ -79,9 +79,13 @@ void getAcceleration(struct sampleData *sampleData) {
     for(i = 0 ; i < 30 ;){
     	if( (readI2CRegister(Board_LIS3DH_ADDR,0x27) & 0x8) >> 3 == 1 ){
     		if( (readI2CRegister(Board_LIS3DH_ADDR,0x27) >> 7) == 1 ){
-    			accelerationData[i].accelerometerData.x = readI2CRegister(Board_LIS3DH_ADDR,0x28) | (readI2CRegister(Board_LIS3DH_ADDR,0x29) << 8);
-    			accelerationData[i].accelerometerData.y = readI2CRegister(Board_LIS3DH_ADDR,0x2A) | (readI2CRegister(Board_LIS3DH_ADDR,0x2B) << 8) ;
-    			accelerationData[i].accelerometerData.z = readI2CRegister(Board_LIS3DH_ADDR,0x2C) | (readI2CRegister(Board_LIS3DH_ADDR,0x2D) << 8) ;
+    			//accelerationData[i].accelerometerData.x = readI2CRegister(Board_LIS3DH_ADDR,0x28) | (readI2CRegister(Board_LIS3DH_ADDR,0x29) << 8);
+    			//accelerationData[i].accelerometerData.y = readI2CRegister(Board_LIS3DH_ADDR,0x2A) | (readI2CRegister(Board_LIS3DH_ADDR,0x2B) << 8) ;
+    			//accelerationData[i].accelerometerData.z = readI2CRegister(Board_LIS3DH_ADDR,0x2C) | (readI2CRegister(Board_LIS3DH_ADDR,0x2D) << 8) ;
+
+    			accelerationData[i].accelerometerData.x = 12345;
+    			accelerationData[i].accelerometerData.y = 12345;
+    			accelerationData[i].accelerometerData.z = 12345;
 
     			sampleData->accelerometerData.x = accelerationData[i].accelerometerData.x;
     			sampleData->accelerometerData.y = accelerationData[i].accelerometerData.y;
@@ -98,9 +102,9 @@ void getAcceleration(struct sampleData *sampleData) {
 
     //write to file
     for(i = 0 ; i < 30 ;i++){
-    	/*System_printf("x:%3d y:%3d z:%3d\n", 	accelerationData[i].accelerometerData.x ,
+    	System_printf("x:%3d y:%3d z:%3d\n", 	accelerationData[i].accelerometerData.x ,
     										accelerationData[i].accelerometerData.y,
-											accelerationData[i].accelerometerData.z);*/
+											accelerationData[i].accelerometerData.z);
     	accelerationData[i].packetType = RADIO_PACKET_TYPE_ACCEL_PACKET;
     	file_printSampleData(accelerationData[i]);
     }

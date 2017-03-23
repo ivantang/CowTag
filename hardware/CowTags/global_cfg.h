@@ -55,7 +55,7 @@
 // Sample rate in Hz for Heart Rate Sensor
 // Allowed Values Are:
 // 50, 100, 167, 200, 400, 600, 800, 1000Hz
-#define HEARTRATE_SAMPLE_RATE_HZ 10
+#define HEARTRATE_SAMPLE_RATE_HZ 100
 
 
 /* DEBUG FLAGS */

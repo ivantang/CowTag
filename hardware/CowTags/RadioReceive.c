@@ -47,7 +47,6 @@
 #include "easylink/EasyLink.h"
 #include "radioProtocol.h"
 #include "RadioReceive.h"
-#include "debug.h"
 #include "pinTable.h"
 #include <config_parse.h>
 
@@ -141,7 +140,6 @@ static void concentratorRadioTaskFunction(UArg arg0, UArg arg1)
 
 
 	/* Set src address of ACK packet */;
-	//concentratorAddress = ALPHA_ADDRESS;
 	concentratorAddress = GATEWAY_ADDRESS;
 
 	EasyLink_enableRxAddrFilter(NULL, 0, 0); // address filtering is disabled for A and G

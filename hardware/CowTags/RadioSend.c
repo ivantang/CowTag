@@ -28,7 +28,6 @@
 #include "easylink/EasyLink.h"
 #include "radioProtocol.h"
 
-#include <debug.h>
 #include <config_parse.h>
 
 // config file
@@ -128,8 +127,7 @@ static void nodeRadioTaskFunction(UArg arg0, UArg arg1)
 		nodeAddress = BETA_ADDRESS;
 	}*/
 
-	nodeAddress = ALPHA_ADDRESS;
-	//nodeAddress = BETA_ADDRESS;
+	nodeAddress = BETA_ADDRESS;
 
 	/* Set the filter to the generated random address */
 	if (EasyLink_enableRxAddrFilter(&nodeAddress, 1, 1) != EasyLink_Status_Success)

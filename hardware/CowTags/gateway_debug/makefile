@@ -2,16 +2,21 @@
 # Automatically-generated file. Do not edit!
 ################################################################################
 
-CG_TOOL_ROOT := /home/ivan/ti/ccsv6/tools/compiler/arm_15.12.3.LTS
+SHELL = cmd.exe
+
+CG_TOOL_ROOT := C:/ti/ccsv6/tools/compiler/arm_15.12.3.LTS
 
 GEN_OPTS__FLAG := --cmd_file="configPkg/compiler.opt"
 GEN_CMDS__FLAG := -l"configPkg/linker.cmd"
 
 ORDERED_OBJS += \
 "./CC1310_LAUNCHXL.obj" \
+"./EventManager.obj" \
 "./RadioReceive.obj" \
+"./Sleep.obj" \
 "./arduinoCom.obj" \
 "./arduinoComTest.obj" \
+"./bootTimestamp.obj" \
 "./ccfg.obj" \
 "./config_parse.obj" \
 "./gatewayMain.obj" \
@@ -23,13 +28,13 @@ ORDERED_OBJS += \
 "./smartrf_settings/smartrf_settings_predefined.obj" \
 "../CC1310_LAUNCHXL.cmd" \
 $(GEN_CMDS__FLAG) \
--l"/home/ivan/ti/tirtos_cc13xx_cc26xx_2_21_00_06/products/cc13xxware_2_04_03_17272/driverlib/bin/ccs/driverlib.lib" \
+-l"C:/ti/tirtos_cc13xx_cc26xx_2_21_00_06/products/cc13xxware_2_04_03_17272/driverlib/bin/ccs/driverlib.lib" \
 -llibc.a \
 
 -include ../makefile.init
 
-RM := rm -rf
-RMDIR := rm -rf
+RM := DEL /F
+RMDIR := RMDIR /S/Q
 
 # All of the sources participating in the build are defined here
 -include sources.mk
@@ -148,19 +153,24 @@ BIN_OUTPUTS__QUOTED += \
 
 
 # All Target
-all: CowTag.out
+all:
+	@$(MAKE) --no-print-directory pre-build
+	@$(MAKE) --no-print-directory main-build
+
+# Main-build Target
+main-build: CowTag.out
 
 # Tool invocations
 CowTag.out: $(OBJS) $(CMD_SRCS) $(GEN_CMDS)
 	@echo 'Building target: $@'
 	@echo 'Invoking: ARM Linker'
-	"/home/ivan/ti/ccsv6/tools/compiler/arm_15.12.3.LTS/bin/armcl" -mv7M3 --code_state=16 --float_support=vfplib -me -g --define=ccs --display_error_number --diag_warning=225 --diag_warning=255 --diag_wrap=off --gen_func_subsections=on --abi=eabi -z -m"CowTag.map" --heap_size=0 --stack_size=256 -i"/home/ivan/ti/ccsv6/tools/compiler/arm_15.12.3.LTS/lib" -i"/home/ivan/ti/ccsv6/tools/compiler/arm_15.12.3.LTS/include" --reread_libs --warn_sections --display_error_number --diag_wrap=off --xml_link_info="CowTag_linkInfo.xml" --rom_model -o "CowTag.out" $(ORDERED_OBJS)
+	"C:/ti/ccsv6/tools/compiler/arm_15.12.3.LTS/bin/armcl" -mv7M3 --code_state=16 --float_support=vfplib -me -g --define=ccs --diag_warning=225 --diag_warning=255 --diag_wrap=off --display_error_number --gen_func_subsections=on --abi=eabi -z -m"CowTag.map" --stack_size=256 --heap_size=0 -i"C:/ti/ccsv6/tools/compiler/arm_15.12.3.LTS/lib" -i"C:/ti/ccsv6/tools/compiler/arm_15.12.3.LTS/include" --reread_libs --warn_sections --diag_wrap=off --display_error_number --xml_link_info="CowTag_linkInfo.xml" --rom_model -o "CowTag.out" $(ORDERED_OBJS)
 	@echo 'Finished building target: $@'
 	@echo ' '
 
 CowTag.hex: $(EXE_OUTPUTS)
 	@echo 'Invoking: ARM Hex Utility'
-	"/home/ivan/ti/ccsv6/tools/compiler/arm_15.12.3.LTS/bin/armhex" --memwidth=8 --romwidth=8 --intel -o "CowTag.hex" $(EXE_OUTPUTS__QUOTED)
+	"C:/ti/ccsv6/tools/compiler/arm_15.12.3.LTS/bin/armhex" --memwidth=8 --romwidth=8 --intel -o "CowTag.hex" $(EXE_OUTPUTS__QUOTED)
 	@echo 'Finished building: $@'
 	@echo ' '
 
@@ -168,13 +178,19 @@ CowTag.hex: $(EXE_OUTPUTS)
 clean:
 	-$(RM) $(GEN_MISC_FILES__QUOTED)$(EXE_OUTPUTS__QUOTED)$(GEN_FILES__QUOTED)$(BIN_OUTPUTS__QUOTED)$(GEN_OPTS__QUOTED)$(GEN_CMDS__QUOTED)
 	-$(RMDIR) $(GEN_MISC_DIRS__QUOTED)
-	-$(RM) "CC1310_LAUNCHXL.d" "RadioReceive.d" "arduinoCom.d" "arduinoComTest.d" "ccfg.d" "config_parse.d" "gatewayMain.d" "gatewayRadioTest.d" "serialize.d" "uArtEcho.d" "easylink/EasyLink.d" "smartrf_settings/smartrf_settings.d" "smartrf_settings/smartrf_settings_predefined.d" 
-	-$(RM) "CC1310_LAUNCHXL.obj" "RadioReceive.obj" "arduinoCom.obj" "arduinoComTest.obj" "ccfg.obj" "config_parse.obj" "gatewayMain.obj" "gatewayRadioTest.obj" "serialize.obj" "uArtEcho.obj" "easylink/EasyLink.obj" "smartrf_settings/smartrf_settings.obj" "smartrf_settings/smartrf_settings_predefined.obj" 
+	-$(RM) "CC1310_LAUNCHXL.d" "EventManager.d" "RadioReceive.d" "Sleep.d" "arduinoCom.d" "arduinoComTest.d" "bootTimestamp.d" "ccfg.d" "config_parse.d" "gatewayMain.d" "gatewayRadioTest.d" "serialize.d" "uArtEcho.d" "easylink\EasyLink.d" "smartrf_settings\smartrf_settings.d" "smartrf_settings\smartrf_settings_predefined.d" 
+	-$(RM) "CC1310_LAUNCHXL.obj" "EventManager.obj" "RadioReceive.obj" "Sleep.obj" "arduinoCom.obj" "arduinoComTest.obj" "bootTimestamp.obj" "ccfg.obj" "config_parse.obj" "gatewayMain.obj" "gatewayRadioTest.obj" "serialize.obj" "uArtEcho.obj" "easylink\EasyLink.obj" "smartrf_settings\smartrf_settings.obj" "smartrf_settings\smartrf_settings_predefined.obj" 
 	-@echo 'Finished clean'
 	-@echo ' '
 
+pre-build:
+	-@echo 'Build and run the configuration setup. This updates the timestamp in the config file'
+	-gcc C:/Users/annik/Desktop/COWS/72point5/hardware/CowTags/../../add_timestamp_to_config.c -o C:/Users/annik/Desktop/COWS/72point5/hardware/CowTags/../../config
+	-C:/Users/annik/Desktop/COWS/72point5/hardware/CowTags/../../config C:/Users/annik/Desktop/COWS/72point5/hardware/CowTags/global_cfg.h
+	-@echo ' '
+
 .PHONY: all clean dependents
-.SECONDARY:
+.SECONDARY: main-build pre-build
 
 -include ../makefile.targets
 

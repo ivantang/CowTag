@@ -3,7 +3,6 @@
 #include "global_cfg.h"
 #include <stdio.h>
 #include <ti/sysbios/knl/Clock.h>
-#include "debug.h"
 
 // The timestamp returned by Timestamp_get32() / frequency is really just the
 // number of seconds that the tag has been up for. The timestamp is not accurate

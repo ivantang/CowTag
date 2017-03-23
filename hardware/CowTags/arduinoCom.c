@@ -6,7 +6,7 @@
  */
 
 /***** Includes *****/
-#include <debug.h>
+#include "global_cfg.h"
 #include <radioProtocol.h>
 #include <arduinoCom.h>
 
@@ -45,6 +45,8 @@ void writeI2CArduino(uint8_t slaveAddr, uint8_t bytes[]) {
 
 	// init clock speed and synch
 	I2C_Params_init(&t_params);
+
+	if(verbose_arduinoCom){System_printf("Initialized I2C Params\n");}
     t_params.transferMode = I2C_MODE_BLOCKING;
     t_params.bitRate = I2C_100kHz;
 
@@ -68,8 +70,16 @@ void writeI2CArduino(uint8_t slaveAddr, uint8_t bytes[]) {
 		System_abort("Error Initializing I2C for Transmitting\n");
 	}
 
-	while(I2C_transfer(t_handle, &t_i2cTransaction) == NULL);
+	// while error, keep trying
+	if(verbose_arduinoCom){System_printf("Starting transfer\n");}
+	//while(I2C_transfer(t_handle, &t_i2cTransaction) == NULL);
+	if(I2C_transfer(t_handle, &t_i2cTransaction) == NULL){
+		System_printf("Error transferring data to I2C to Arduino\n");
+	}
 
+
+	if(verbose_arduinoCom){System_printf("Closing I2C\n");}
 	I2C_close(t_handle);
+
 	if(verbose_arduinoCom){System_printf("ArduinoCom finished\n");}
 }

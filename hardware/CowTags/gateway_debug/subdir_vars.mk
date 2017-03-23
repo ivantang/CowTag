@@ -11,9 +11,12 @@ CFG_SRCS += \
 
 C_SRCS += \
 ../CC1310_LAUNCHXL.c \
+../EventManager.c \
 ../RadioReceive.c \
+../Sleep.c \
 ../arduinoCom.c \
 ../arduinoComTest.c \
+../bootTimestamp.c \
 ../ccfg.c \
 ../config_parse.c \
 ../gatewayMain.c \
@@ -23,9 +26,12 @@ C_SRCS += \
 
 OBJS += \
 ./CC1310_LAUNCHXL.obj \
+./EventManager.obj \
 ./RadioReceive.obj \
+./Sleep.obj \
 ./arduinoCom.obj \
 ./arduinoComTest.obj \
+./bootTimestamp.obj \
 ./ccfg.obj \
 ./config_parse.obj \
 ./gatewayMain.obj \
@@ -35,9 +41,12 @@ OBJS += \
 
 C_DEPS += \
 ./CC1310_LAUNCHXL.d \
+./EventManager.d \
 ./RadioReceive.d \
+./Sleep.d \
 ./arduinoCom.d \
 ./arduinoComTest.d \
+./bootTimestamp.d \
 ./ccfg.d \
 ./config_parse.d \
 ./gatewayMain.d \
@@ -59,17 +68,20 @@ GEN_FILES += \
 ./configPkg/compiler.opt 
 
 GEN_FILES__QUOTED += \
-"configPkg/linker.cmd" \
-"configPkg/compiler.opt" 
+"configPkg\linker.cmd" \
+"configPkg\compiler.opt" 
 
 GEN_MISC_DIRS__QUOTED += \
-"configPkg/" 
+"configPkg\" 
 
 C_DEPS__QUOTED += \
 "CC1310_LAUNCHXL.d" \
+"EventManager.d" \
 "RadioReceive.d" \
+"Sleep.d" \
 "arduinoCom.d" \
 "arduinoComTest.d" \
+"bootTimestamp.d" \
 "ccfg.d" \
 "config_parse.d" \
 "gatewayMain.d" \
@@ -79,9 +91,12 @@ C_DEPS__QUOTED += \
 
 OBJS__QUOTED += \
 "CC1310_LAUNCHXL.obj" \
+"EventManager.obj" \
 "RadioReceive.obj" \
+"Sleep.obj" \
 "arduinoCom.obj" \
 "arduinoComTest.obj" \
+"bootTimestamp.obj" \
 "ccfg.obj" \
 "config_parse.obj" \
 "gatewayMain.obj" \
@@ -91,9 +106,12 @@ OBJS__QUOTED += \
 
 C_SRCS__QUOTED += \
 "../CC1310_LAUNCHXL.c" \
+"../EventManager.c" \
 "../RadioReceive.c" \
+"../Sleep.c" \
 "../arduinoCom.c" \
 "../arduinoComTest.c" \
+"../bootTimestamp.c" \
 "../ccfg.c" \
 "../config_parse.c" \
 "../gatewayMain.c" \

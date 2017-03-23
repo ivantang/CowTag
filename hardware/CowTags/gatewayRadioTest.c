@@ -107,7 +107,9 @@ static void gatewayRadioTestTaskFunction(UArg arg0, UArg arg1)
 
 			if(verbose_gatewayRadioTest) {
 				printSampleData(latestActivePacket.sampledata);
-				file_printSampleData(latestActivePacket.sampledata);
+				if (print_packet_to_file_gateway) {
+					file_printSampleData(latestActivePacket.sampledata);
+				}
 				System_flush();
 			}
 

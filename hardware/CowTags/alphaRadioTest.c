@@ -154,7 +154,9 @@ static void packetReceivedCallback(union ConcentratorPacket* packet, int8_t rssi
 	if(verbose_alphaRadioTest) {
 		System_printf("RECEIVE: received a packet.\n");
 		printSampleData(latestActivePacket.sampledata);
-		file_printSampleData(latestActivePacket.sampledata);
+		if (print_packet_to_file_alpha) {
+			file_printSampleData(latestActivePacket.sampledata);
+		}
 	}
 }
 

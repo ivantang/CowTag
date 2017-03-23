@@ -15,7 +15,7 @@
 // Begin auto-generated
 // IF YOU CHANGE THE NAME OF THIS DEFINE YOU NEED TO CHANGE THE SEARCH STRING IN
 // ../../add_timestamp_to_config.c AS WELL
-#define TIMESTAMP_AT_BUILDTIME 1490293886
+#define TIMESTAMP_AT_BUILDTIME 1490301824
 // End auto-generated
 
 // [0] = Beta
@@ -48,6 +48,19 @@
 #define MIN_EEPROM_ADDRESS 0x0000
 
 /* DEBUG FLAGS */
+
+/*** Print the contents of the packets to a file ***/
+/* verbose_alphaRadioTest also needs to be set to print packets to file */
+static const int print_packet_to_file_alpha = 0;
+
+/* verbose_betaRadioTest also needs to be set to print packets to file */
+static const int print_packet_to_file_beta = 0;
+
+/* verbose_gatewayRadioTest also needs to be set to print packets to file */
+static const int print_packet_to_file_gateway = 0;
+
+
+
 /*** verbose for printing debug messages trough different threads/Functions ***/
 static const int verbose_main = 1;
 

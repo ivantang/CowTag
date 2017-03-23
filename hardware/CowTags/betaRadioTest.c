@@ -108,7 +108,9 @@ static void betaRadioTestTaskFunction(UArg arg0, UArg arg1)
 
 		if(verbose_betaRadioTest) {
 			printSampleData(sampledata);
-			file_printSampleData(sampledata);
+			if (print_packet_to_file_beta) {
+				file_printSampleData(sampledata);
+			}
 		}
 
 		// send packet or save to eeprom

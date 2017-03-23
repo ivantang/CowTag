@@ -32,6 +32,8 @@
 
 #include <sensors.h>
 #include <IIC.h>
+#include "bootTimestamp.h"
+#include "global_cfg.h"
 
 PIN_Config BoardGpioInitialTable[] = {
 //		Board_I2C0_SDA0 | PIN_GPIO_LOW,
@@ -49,7 +51,7 @@ Task_Struct task0Struct;
 Char task0Stack[TASKSTACKSIZE];
 
 /*function definition */
-void Sensors_init(void){
+void Sensors_init(void) {
 	//PIN_init(BoardGpioInitialTable);
 	Task_Params taskParams;
 
@@ -60,8 +62,8 @@ void Sensors_init(void){
 }
 
 
-void getAcceleration(struct sampleData *sampleData){
-	//if(verbose_sensors)System_printf("\n\nwhoamI: 0x%x \n", readI2CRegister(Board_LIS3DH_ADDR, 15)); //should read 0x33
+void getAcceleration(struct sampleData *sampleData) {
+	//if (verbose_sensors)System_printf("\n\nwhoamI: 0x%x \n", readI2CRegister(Board_LIS3DH_ADDR, 15)); //should read 0x33
 	//System_flush();
 
 	unsigned int	i;
@@ -107,7 +109,7 @@ void getAcceleration(struct sampleData *sampleData){
     return;
 }
 
-void getTemp(struct sampleData *sampleData){
+void getTemp(struct sampleData *sampleData) {
 	uint16_t temp_obj;
 	uint16_t temp_amb;
 
@@ -119,14 +121,14 @@ void getTemp(struct sampleData *sampleData){
 	sampleData->heartRateData.temp_l = temp_amb & 0xFF;
 	sampleData->heartRateData.temp_h = temp_amb >> 8;
 
-	if(verbose_sensors){
+	if (verbose_sensors) {
 		System_printf("temp_obj %d\n", temp_obj);
 	}
 
 	return;
 }
 
-void getTempNoPtr(){
+void getTempNoPtr() {
 	uint16_t temp_obj;
 	uint16_t temp_amb;
 
@@ -140,7 +142,7 @@ void getTempNoPtr(){
 	//sampleData->heartRateData.temp_l = temp_amb & 0xFF;
 	//sampleData->heartRateData.temp_h = temp_amb >> 8;
 
-	if(verbose_sensors){
+	if (verbose_sensors) {
 		System_printf("temp_obj %d\n", temp_obj);
 		System_printf("temp_obj %d\n", temp_amb);
 		System_flush();
@@ -149,10 +151,8 @@ void getTempNoPtr(){
 	return;
 }
 
-void getHeartRate(struct sampleData *sampleData){
-	System_printf("first step\n");
-	System_flush();
 
+void getHeartRate(struct sampleData *sampleData) {
 	int i = 0;
 	int j = 0;
 	uint16_t numValues = 250;
@@ -176,6 +176,7 @@ void getHeartRate(struct sampleData *sampleData){
 		System_flush();
 	}
 
+
 	writeI2CRegister(Board_MAX30100_ADDR, MAX30100_REG_MODE_CONFIGURATION, 0x02);	//enable HR only
 
 	uint8_t previous = readI2CRegister(Board_MAX30100_ADDR, MAX30100_REG_SPO2_CONFIGURATION);
@@ -192,14 +193,9 @@ void getHeartRate(struct sampleData *sampleData){
 				 	 MAX30100_REG_INTERRUPT_CONFIGURATION,
 					 previous & 0x0A | 0xA0);	//turn on interrupts
 
-	//start_clock = Clock_getTicks();
-	//end_clock = Clock_getTicks();
-
 	uint32_t tempval;
 
 	while(i < numValues){
-	//while((end_clock-start_clock)/100000 < 5){
-
 		//clear FIFO PTR
 		writeI2CRegister(Board_MAX30100_ADDR, MAX30100_REG_FIFO_WRITE_POINTER, 0x00);
 		writeI2CRegister(Board_MAX30100_ADDR, MAX30100_REG_FIFO_READ_POINTER, 0x00);
@@ -238,19 +234,6 @@ void getHeartRate(struct sampleData *sampleData){
 
 		if(i!=0) Derivative[i] = (int)(HRData[i] - HRData[i-1]);
 
-		//Timestamp_getFreq(&frequency);
-
-		//if(i == 0){
-		//	start_timestamp = Timestamp_get32();
-		//}
-
-		//Task_sleep(10000 / Clock_tickPeriod);						//adding this to extend measurement to 10 seconds
-		//Task_sleep(100000 / Clock_tickPeriod);						//adding this to extend measurement to 10 seconds
-
-
-		//end_timestamp = Timestamp_get32();
-		//end_clock = Clock_getTicks();
-		//System_flush();
 		i++;
 	}
 
@@ -258,19 +241,10 @@ void getHeartRate(struct sampleData *sampleData){
 		sampleData->heartRateData.rate_l = HRData[0] & 0xFF;
 		sampleData->heartRateData.rate_h = HRData[0] >> 8;
 
-		if(!verbose_sensors){
-		for(j = 0 ; j < i ; j++){
-			System_printf("HR %5d",HRData[j]);
-			System_printf("       RED %5d",RedData[j]);
-			System_printf("       DER %5d\n" , Derivative[j]);
+	if (verbose_sensors) {
+		for (i = 0 ; i < numValues ; i++) {
+			System_printf("%d\n",HRData[i]);
 		}
-
-		System_printf("Timestamp diff: %d\n" , end_timestamp-start_timestamp);
-		System_printf("Frequency %d\n", frequency.hi << 8 | frequency.lo);
-		System_printf("Time elapsed: %d\n" , (end_timestamp-start_timestamp) / (frequency.hi << 8 | frequency.lo));
-
-		System_printf("Clock diff: %d\n" , end_clock-start_clock);
-		System_printf("Time elapsed: %d\n" , (end_clock-start_clock)/100000);
 
 		System_flush();
 	}
@@ -278,23 +252,12 @@ void getHeartRate(struct sampleData *sampleData){
 	return;
 }
 
-//This function assumes the setup for the chip has been done already
-//struct MAX30100Packet getMAX30100Packet{
-//	struct MAX30100Packet MAX30100Packet;
-//
-//	Max30100Packet.hrHigh = readI2CRegister(Board_MAX30100_ADDR,MAX30100_REG_FIFO_DATA);
-//	Max30100Packet.hrLow = readI2CRegister(Board_MAX30100_ADDR,MAX30100_REG_FIFO_DATA);
-//	Max30100Packet.redHigh = readI2CRegister(Board_MAX30100_ADDR,MAX30100_REG_FIFO_DATA);
-//	Max30100Packet.redLow = readI2CRegister(Board_MAX30100_ADDR,MAX30100_REG_FIFO_DATA);
-//
-//	return MAX30100Packet;
-//};
 
-void getTimestamp(struct sampleData *sampleData){
-	sampleData->timestamp = Timestamp_get32();
+void getTimestamp(struct sampleData *sampleData) {
+	sampleData->timestamp = TrueTimestamp();
 }
 
-void makeSensorPacket(struct sampleData *sampleData){
+void makeSensorPacket(struct sampleData *sampleData) {
 
 	getAcceleration(sampleData);
 
@@ -320,10 +283,10 @@ void makeSensorPacket(struct sampleData *sampleData){
 	System_flush();
 }
 
-void testSensors(){
+void testSensors() {
 	struct sampleData sampleData;
 
-	while(1){
+	while (1) {
 		makeSensorPacket(&sampleData);
 	}
 	System_printf("Tests done\n");

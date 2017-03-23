@@ -51,6 +51,10 @@
 #include "pinTable.h"
 #include <config_parse.h>
 
+// Config File
+#include "global_cfg.h"
+
+
 /***** Defines *****/
 #define CONCENTRATORRADIO_TASK_STACK_SIZE 1024
 #define CONCENTRATORRADIO_TASK_PRIORITY   3
@@ -59,8 +63,6 @@
 #define RADIO_EVENT_VALID_PACKET_RECEIVED      (uint32_t)(1 << 0)
 #define RADIO_EVENT_INVALID_PACKET_RECEIVED (uint32_t)(1 << 1)
 
-#define CONCENTRATORRADIO_MAX_RETRIES 6
-#define NORERADIO_ACK_TIMEOUT_TIME_MS (500)
 
 /***** Variable declarations *****/
 static Task_Params concentratorRadioTaskParams;
@@ -120,23 +122,27 @@ static void concentratorRadioTaskFunction(UArg arg0, UArg arg1)
 
 	/* Set src address of ACK packet */
 
-	int buildType;
-	int result = varFromConfigInt("tagType",&buildType);
-	System_printf("buildType = %i\n",buildType);
+	/* int buildType; */
+	/* int result = varFromConfigInt("tagType",&buildType); */
 
-	if(buildType == 1){
-		concentratorAddress = ALPHA_ADDRESS;
-	} else if ( buildType == 3 ){
-		concentratorAddress = GATEWAY_ADDRESS;
-	} else {
-		System_printf("buildType ERROR");
-		concentratorAddress = GATEWAY_ADDRESS;
-	}
+	// tmp
+	/* buildType = TAG_TYPE; */
+
+//	System_printf("buildType = %i\n",buildType);
+//
+//	if(buildType == 1){
+//		concentratorAddress = ALPHA_ADDRESS;
+//	} else if ( buildType == 3 ){
+//		concentratorAddress = GATEWAY_ADDRESS;
+//	} else {
+//		System_printf("buildType ERROR");
+//		concentratorAddress = GATEWAY_ADDRESS;
+//	}*/
 
 
 	/* Set src address of ACK packet */;
-	concentratorAddress = ALPHA_ADDRESS;
-	//concentratorAddress = GATEWAY_ADDRESS;
+	//concentratorAddress = ALPHA_ADDRESS;
+	concentratorAddress = GATEWAY_ADDRESS;
 
 	EasyLink_enableRxAddrFilter(NULL, 0, 0); // address filtering is disabled for A and G
 

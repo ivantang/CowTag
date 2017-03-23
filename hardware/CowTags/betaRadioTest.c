@@ -40,12 +40,14 @@
 
 /* BIOS Header files */
 #include <ti/sysbios/knl/Task.h>
+#include <ti/sysbios/knl/Event.h>
 
 /* Drivers */
 #include <ti/drivers/PIN.h>
 #include <RadioSend.h>
 #include <sensors.h>
 #include <eeprom.h>
+#include <Sleep.h>
 
 /* Board Header files */
 #include <Board.h>
@@ -80,15 +82,13 @@ static void betaRadioTestTaskFunction(UArg arg0, UArg arg1)
 	if(verbose_betaRadioTest){System_printf("Initializing betaRadioTest...\n");System_flush();}
 
 	while(1){
-		int delay = 10000;
 		struct sampleData sampledata;
 		enum NodeRadioOperationStatus results;
-
-		CPUdelay(delay*5000);
 
 		sampledata.cowID = 1;
 		sampledata.packetType = RADIO_PACKET_TYPE_SENSOR_PACKET;
 		sampledata.timestamp = 0x12345678;
+		sampledata.error = 0x0;
 
 		if(ignoreSensors){
 			if(verbose_betaRadioTest){System_printf("Ignoring sensors, making fake packets\n");System_flush();}
@@ -98,7 +98,6 @@ static void betaRadioTestTaskFunction(UArg arg0, UArg arg1)
 			sampledata.heartRateData.rate_l = 0x87;
 			sampledata.heartRateData.temp_h = 0x45;
 			sampledata.heartRateData.temp_l = 0x32;
-			sampledata.error = 0x0;
 		} else {
 			if(verbose_betaRadioTest){System_printf("Creating Packet...\n");System_flush();}
 			makeSensorPacket(&sampledata);
@@ -110,28 +109,12 @@ static void betaRadioTestTaskFunction(UArg arg0, UArg arg1)
 		results = betaRadioSendData(sampledata);
 		if(verbose_betaRadioTest){System_printf("packet sent error: %i\n",results);System_flush();}
 
-		CPUdelay(delay*5000);
-
-		sampledata.cowID = 1;
-		sampledata.packetType = RADIO_PACKET_TYPE_ACCEL_PACKET;
-		sampledata.timestamp = 0x12345678;
-
-		if(ignoreSensors){
-			if(verbose_betaRadioTest){System_printf("Ignoring sensors, making fake packets\n");System_flush();}
-			sampledata.accelerometerData.x=0x12;
-			sampledata.accelerometerData.y=0x34;
-			sampledata.accelerometerData.z=0x56;
-			sampledata.error = 0x0;
-		} else {
-			if(verbose_betaRadioTest){System_printf("Creating Packet...\n");System_flush();}
-			makeSensorPacket(&sampledata);
-			if(verbose_betaRadioTest){System_printf("Packet Created\n");System_flush();}
+		if (verbose_sleep) {
+			System_printf("zZzZzZzZzZzZzZzZzZ\n");
+			System_printf("Z going to sleep z\n");
+			System_printf("zZzZzZzZzZzZzZzZzZ\n");
+			Task_sleep(sleepFiveSeconds());
 		}
-
-		if(verbose_betaRadioTest){printSampleData(sampledata);}
-		if(verbose_betaRadioTest){System_printf("sending packet...\n");System_flush();}
-		results = betaRadioSendData(sampledata);
-		if(verbose_betaRadioTest){System_printf("packet sent error: %i\n",results);System_flush();}
 	}
 }
 

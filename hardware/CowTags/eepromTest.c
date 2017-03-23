@@ -7,7 +7,7 @@
 
 /***** Includes *****/
 #include <debug.h>
-#include <config.h>
+#include "global_cfg.h"
 #include <radioProtocol.h>
 #include <eepromTest.h>
 #include <eeprom.h>

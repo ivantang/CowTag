@@ -123,7 +123,7 @@ static void alphaRadioTestTaskFunction(UArg arg0, UArg arg1){
 
 	while (1) {
 		// -------------------- SENDING -------------------------
-		sampledata.cowID = 3;
+		sampledata.cowID = 1;
 		sampledata.packetType = RADIO_PACKET_TYPE_SENSOR_PACKET;
 		sampledata.timestamp = 0x12345678;
 
@@ -152,9 +152,6 @@ static void alphaRadioTestTaskFunction(UArg arg0, UArg arg1){
 			if(verbose_alphaRadioTest){System_printf("SEND: packet sent error: %i\n",results);System_flush();}
 		}
 
-		System_printf("zZzZzZzZzZzZzZzZzZ\n");
-		Task_sleep(3*sleepASecond());
-
 		// NOTE:
 		// It's not in our requirements to have asynchronous send and receive
 		// rather, we wish to send and receive at different times.
@@ -163,33 +160,29 @@ static void alphaRadioTestTaskFunction(UArg arg0, UArg arg1){
 		// -------------------- Receiving! -------------------------
 
 		AlphaRadioTask_registerPacketReceivedCallback(packetReceivedCallback); // register callback
-		results = alphaRadioReceiveData();	// start listening, obtain radioAccessSem
+//		int numBetas = 2;
+//		int i = 0;
+//		while (i < numBetas) {
+			results = alphaRadioReceiveData();	// start listening, obtain radioAccessSem
+			if (results == AlphaRadioStatus_ReceivedValidPacket) {
+				if(verbose_alphaRadioTest){
+					System_printf("RECEIVE: received a packet.\n");
+				}
+			} else{
+				if(verbose_alphaRadioTest){
+					System_printf("RECEIVE: did not receive packet.\n");System_flush();}
+			}
+//		}
 
-		//uint32_t events = Event_pend(*alphaRadioTestEventHandle, 0, RADIO_EVENT_ALL, 0);
-
-		//if(events & ALPHARADIOTEST_EVENT_NEW_SENSOR_VALUE) {
-		if(results == AlphaRadioStatus_ReceivedValidPacket){
-			if(verbose_alphaRadioTest){
-				System_printf("RECEIVE: received a packet.\n");
-				printSampleData(latestActivePacket.sampledata);}
-		}
-		else{
-			if(verbose_alphaRadioTest){
-				System_printf("RECEIVE: did not receive packet.\n");System_flush();}
-		}
-
-		System_printf("zZzZzZzZzZzZzZzZzZ\n");
-		Task_sleep(3*sleepASecond());
-
+//		Task_sleep(3*sleepASecond());
 	}
 }
 
 /*callback for received sensor packets*/
-void packetReceivedCallback(union ConcentratorPacket* packet, int8_t rssi){
+void packetReceivedCallback(union ConcentratorPacket* packet, int8_t rssi) {
 	latestActivePacket.header = packet->header;
 	latestActivePacket.sampledata = packet->sensorPacket.sampledata;
-	//Event_post(*alphaRadioTestEventHandle, RADIO_EVENT_NEW_SENSOR_PACKET);
-
+	printSampleData(latestActivePacket.sampledata);
 }
 
 /*print the received packet*/

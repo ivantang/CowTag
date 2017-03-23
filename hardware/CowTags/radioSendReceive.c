@@ -96,7 +96,9 @@ void radioSendReceive_init(void) {
 	radioAccessSemHandle = Semaphore_handle(&radioAccessSem);
 
 	/* Create semaphore used for callers to wait for result */
-	Semaphore_construct(&radioResultSem, 0, &semParam);
+	Semaphore_Params semParam2;
+	Semaphore_Params_init(&semParam2);
+	Semaphore_construct(&radioResultSem, 1, &semParam2);
 	radioResultSemHandle = Semaphore_handle(&radioResultSem);
 
 	/* Create event used internally for state changes */
@@ -133,11 +135,6 @@ static void alphaRadioTaskFunction(UArg arg0, UArg arg1)
 
 	EasyLink_enableRxAddrFilter(NULL, 0, 0); // address filtering is disabled for A and G
 
-	/* Wait for sensor packet (and save to memory) */
-	//if(EasyLink_receiveAsync(rxDoneCallbackReceive, 0) != EasyLink_Status_Success) {
-	//System_abort("EasyLink_receiveAsync failed");
-	//}
-
 	/* Enter main task loop */
 	while (1)
 	{
@@ -160,17 +157,6 @@ static void alphaRadioTaskFunction(UArg arg0, UArg arg1)
 			/* Call packet received callback */
 			notifyPacketReceived(&latestRxPacket);
 			returnRadioOperationStatus(AlphaRadioStatus_ReceivedValidPacket);
-
-			if(verbose_alphaRadio){
-				System_printf("RadioReceive: done calling pkt received, going back to RX...\n");
-				System_flush();}
-
-			/* Go back to RX to wait to keep listening for packets */
-			/*if(EasyLink_receiveAsync(rxDoneCallbackReceive, 0) != EasyLink_Status_Success) {
-				if(verbose_alphaRadio){
-					System_printf("EasyLink_receiveAsync failed: ALPHARADIO_EVENT_VALID_PACKET_RECEIVED\n");
-					System_flush();}
-			}*/
 
 			/* toggle Activity LED */
 			PIN_setOutputValue(ledPinHandle, CONCENTRATOR_ACTIVITY_LED,
@@ -254,8 +240,6 @@ enum alphaRadioOperationStatus alphaRadioSendData(struct sampleData data){
 	if(verbose_alphaRadio){
 		System_printf("INSIDE RADIO SEND!!\n");
 		System_flush();}
-
-	//sendReceiveMode = 1;
 
 	/* Save data to send */
 	sampledata = data;
@@ -371,8 +355,6 @@ enum alphaRadioOperationStatus alphaRadioReceiveData(void){
 	if(verbose_alphaRadio){
 		System_printf("INSIDE RADIO RECEIVE!!\n");
 		System_flush();}
-
-	//sendReceiveMode = 0;
 
 	if(EasyLink_receiveAsync(rxDoneCallbackReceive, 0) != EasyLink_Status_Success) {
 		System_printf("EasyLink_receiveAsync failed");

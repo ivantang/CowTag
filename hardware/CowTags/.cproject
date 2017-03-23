@@ -315,12 +315,8 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-<<<<<<< HEAD
 						<entry excluding="RadioSend.c|RadioReceive.c|gatewayRadioTest.c|gatewayMain.c|arduinoComTest.c|arduinoCom.c|betaRadioTest.c|betaMain.c|src" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
-=======
-						<entry excluding="gatewayRadioTest.c|gatewayMain.c|arduinoComTest.c|arduinoCom.c|betaRadioTest.c|betaMain.c|src" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
-						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="src/sysbios"/>
->>>>>>> 134edbde0d8a7372863b505ddfd3f7974c5495ae
+
 					</sourceEntries>
 				</configuration>
 			</storageModule>
@@ -426,12 +422,8 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-<<<<<<< HEAD
 						<entry excluding="radioSendReceive.c|arduinoCom.c|arduinoComTest.c|gatewayMain.c|gatewayRadioTest.c|alphaMain.c|RadioReceive.c|alphaRadioTest.c|src" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
-=======
-						<entry excluding="arduinoCom.c|arduinoComTest.c|gatewayMain.c|gatewayRadioTest.c|alphaMain.c|RadioReceive.c|alphaRadioTest.c|src" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
-						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="src/sysbios"/>
->>>>>>> 134edbde0d8a7372863b505ddfd3f7974c5495ae
+
 					</sourceEntries>
 				</configuration>
 			</storageModule>
@@ -537,12 +529,7 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-<<<<<<< HEAD
 						<entry excluding="radioSendReceive.c|eepromTest.c|sensors.c|RadioSend.c|IIC.c|eeprom.c|alphaMain.c|alphaRadioTest.c|betaRadioTest.c|betaMain.c|src" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
-=======
-						<entry excluding="eepromTest.c|sensors.c|RadioSend.c|IIC.c|eeprom.c|alphaMain.c|alphaRadioTest.c|betaRadioTest.c|betaMain.c|src" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
-						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="src/sysbios"/>
->>>>>>> 134edbde0d8a7372863b505ddfd3f7974c5495ae
 					</sourceEntries>
 				</configuration>
 			</storageModule>

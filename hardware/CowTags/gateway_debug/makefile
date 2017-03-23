@@ -16,6 +16,7 @@ ORDERED_OBJS += \
 "./Sleep.obj" \
 "./arduinoCom.obj" \
 "./arduinoComTest.obj" \
+"./bootTimestamp.obj" \
 "./ccfg.obj" \
 "./config_parse.obj" \
 "./gatewayMain.obj" \
@@ -152,7 +153,12 @@ BIN_OUTPUTS__QUOTED += \
 
 
 # All Target
-all: CowTag.out
+all:
+	@$(MAKE) --no-print-directory pre-build
+	@$(MAKE) --no-print-directory main-build
+
+# Main-build Target
+main-build: CowTag.out
 
 # Tool invocations
 CowTag.out: $(OBJS) $(CMD_SRCS) $(GEN_CMDS)
@@ -172,13 +178,19 @@ CowTag.hex: $(EXE_OUTPUTS)
 clean:
 	-$(RM) $(GEN_MISC_FILES__QUOTED)$(EXE_OUTPUTS__QUOTED)$(GEN_FILES__QUOTED)$(BIN_OUTPUTS__QUOTED)$(GEN_OPTS__QUOTED)$(GEN_CMDS__QUOTED)
 	-$(RMDIR) $(GEN_MISC_DIRS__QUOTED)
-	-$(RM) "CC1310_LAUNCHXL.d" "EventManager.d" "RadioReceive.d" "Sleep.d" "arduinoCom.d" "arduinoComTest.d" "ccfg.d" "config_parse.d" "gatewayMain.d" "gatewayRadioTest.d" "serialize.d" "uArtEcho.d" "easylink\EasyLink.d" "smartrf_settings\smartrf_settings.d" "smartrf_settings\smartrf_settings_predefined.d" 
-	-$(RM) "CC1310_LAUNCHXL.obj" "EventManager.obj" "RadioReceive.obj" "Sleep.obj" "arduinoCom.obj" "arduinoComTest.obj" "ccfg.obj" "config_parse.obj" "gatewayMain.obj" "gatewayRadioTest.obj" "serialize.obj" "uArtEcho.obj" "easylink\EasyLink.obj" "smartrf_settings\smartrf_settings.obj" "smartrf_settings\smartrf_settings_predefined.obj" 
+	-$(RM) "CC1310_LAUNCHXL.d" "EventManager.d" "RadioReceive.d" "Sleep.d" "arduinoCom.d" "arduinoComTest.d" "bootTimestamp.d" "ccfg.d" "config_parse.d" "gatewayMain.d" "gatewayRadioTest.d" "serialize.d" "uArtEcho.d" "easylink\EasyLink.d" "smartrf_settings\smartrf_settings.d" "smartrf_settings\smartrf_settings_predefined.d" 
+	-$(RM) "CC1310_LAUNCHXL.obj" "EventManager.obj" "RadioReceive.obj" "Sleep.obj" "arduinoCom.obj" "arduinoComTest.obj" "bootTimestamp.obj" "ccfg.obj" "config_parse.obj" "gatewayMain.obj" "gatewayRadioTest.obj" "serialize.obj" "uArtEcho.obj" "easylink\EasyLink.obj" "smartrf_settings\smartrf_settings.obj" "smartrf_settings\smartrf_settings_predefined.obj" 
 	-@echo 'Finished clean'
 	-@echo ' '
 
+pre-build:
+	-@echo 'Build and run the configuration setup. This updates the timestamp in the config file'
+	-gcc C:/Users/annik/Desktop/COWS/72point5/hardware/CowTags/../../add_timestamp_to_config.c -o C:/Users/annik/Desktop/COWS/72point5/hardware/CowTags/../../config
+	-C:/Users/annik/Desktop/COWS/72point5/hardware/CowTags/../../config C:/Users/annik/Desktop/COWS/72point5/hardware/CowTags/global_cfg.h
+	-@echo ' '
+
 .PHONY: all clean dependents
-.SECONDARY:
+.SECONDARY: main-build pre-build
 
 -include ../makefile.targets
 

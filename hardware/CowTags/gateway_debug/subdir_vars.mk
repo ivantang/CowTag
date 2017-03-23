@@ -16,6 +16,7 @@ C_SRCS += \
 ../Sleep.c \
 ../arduinoCom.c \
 ../arduinoComTest.c \
+../bootTimestamp.c \
 ../ccfg.c \
 ../config_parse.c \
 ../gatewayMain.c \
@@ -30,6 +31,7 @@ OBJS += \
 ./Sleep.obj \
 ./arduinoCom.obj \
 ./arduinoComTest.obj \
+./bootTimestamp.obj \
 ./ccfg.obj \
 ./config_parse.obj \
 ./gatewayMain.obj \
@@ -44,6 +46,7 @@ C_DEPS += \
 ./Sleep.d \
 ./arduinoCom.d \
 ./arduinoComTest.d \
+./bootTimestamp.d \
 ./ccfg.d \
 ./config_parse.d \
 ./gatewayMain.d \
@@ -78,6 +81,7 @@ C_DEPS__QUOTED += \
 "Sleep.d" \
 "arduinoCom.d" \
 "arduinoComTest.d" \
+"bootTimestamp.d" \
 "ccfg.d" \
 "config_parse.d" \
 "gatewayMain.d" \
@@ -92,6 +96,7 @@ OBJS__QUOTED += \
 "Sleep.obj" \
 "arduinoCom.obj" \
 "arduinoComTest.obj" \
+"bootTimestamp.obj" \
 "ccfg.obj" \
 "config_parse.obj" \
 "gatewayMain.obj" \
@@ -106,6 +111,7 @@ C_SRCS__QUOTED += \
 "../Sleep.c" \
 "../arduinoCom.c" \
 "../arduinoComTest.c" \
+"../bootTimestamp.c" \
 "../ccfg.c" \
 "../config_parse.c" \
 "../gatewayMain.c" \

@@ -9,9 +9,6 @@ CMD_SRCS += \
 CFG_SRCS += \
 ../cowtagOS.cfg 
 
-A_SRCS += \
-../libiniparser.a 
-
 C_SRCS += \
 ../CC1310_LAUNCHXL.c \
 ../EventManager.c \
@@ -133,8 +130,5 @@ C_SRCS__QUOTED += \
 "../sensors.c" \
 "../serialize.c" \
 "../uArtEcho.c" 
-
-A_SRCS__QUOTED += \
-"../libiniparser.a" 
 
 

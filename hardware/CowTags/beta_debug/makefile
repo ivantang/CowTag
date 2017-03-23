@@ -2,13 +2,9 @@
 # Automatically-generated file. Do not edit!
 ################################################################################
 
-<<<<<<< HEAD
 SHELL = cmd.exe
 
 CG_TOOL_ROOT := C:/ti/ccsv6/tools/compiler/arm_15.12.3.LTS
-=======
-CG_TOOL_ROOT := /opt/ti/ccsv6/tools/compiler/arm_15.12.3.LTS
->>>>>>> 134edbde0d8a7372863b505ddfd3f7974c5495ae
 
 GEN_OPTS__FLAG := --cmd_file="configPkg/compiler.opt"
 GEN_CMDS__FLAG := -l"configPkg/linker.cmd"
@@ -32,18 +28,9 @@ ORDERED_OBJS += \
 "./easylink/EasyLink.obj" \
 "./smartrf_settings/smartrf_settings.obj" \
 "./smartrf_settings/smartrf_settings_predefined.obj" \
-"../src/sysbios/m3_Hwi_asm.obj" \
-"../src/sysbios/m3_Hwi_asm_switch.obj" \
-"../src/sysbios/m3_IntrinsicsSupport_asm.obj" \
-"../src/sysbios/m3_TaskSupport_asm.obj" \
-"../src/sysbios/rom_sysbios.obj" \
 "../CC1310_LAUNCHXL.cmd" \
 $(GEN_CMDS__FLAG) \
-<<<<<<< HEAD
 -l"C:/ti/tirtos_cc13xx_cc26xx_2_21_00_06/products/cc13xxware_2_04_03_17272/driverlib/bin/ccs/driverlib.lib" \
-=======
--l"/opt/ti/tirtos_cc13xx_cc26xx_2_21_00_06/products/cc13xxware_2_04_03_17272/driverlib/bin/ccs/driverlib.lib" \
->>>>>>> 134edbde0d8a7372863b505ddfd3f7974c5495ae
 -llibc.a \
 
 -include ../makefile.init
@@ -56,11 +43,9 @@ RMDIR := RMDIR /S/Q
 -include subdir_vars.mk
 -include easylink/subdir_vars.mk
 -include smartrf_settings/subdir_vars.mk
--include src/sysbios/subdir_vars.mk
 -include subdir_rules.mk
 -include easylink/subdir_rules.mk
 -include smartrf_settings/subdir_rules.mk
--include src/sysbios/subdir_rules.mk
 -include objects.mk
 
 ifneq ($(MAKECMDGOALS),clean)
@@ -181,21 +166,13 @@ main-build: CowTag.out
 CowTag.out: $(OBJS) $(CMD_SRCS) $(GEN_CMDS)
 	@echo 'Building target: $@'
 	@echo 'Invoking: ARM Linker'
-<<<<<<< HEAD
 	"C:/ti/ccsv6/tools/compiler/arm_15.12.3.LTS/bin/armcl" -mv7M3 --code_state=16 --float_support=vfplib -me -g --define=ccs --diag_warning=225 --diag_warning=255 --diag_wrap=off --display_error_number --gen_func_subsections=on --abi=eabi -z -m"CowTag.map" --stack_size=256 --heap_size=0 -i"C:/ti/ccsv6/tools/compiler/arm_15.12.3.LTS/lib" -i"C:/ti/ccsv6/tools/compiler/arm_15.12.3.LTS/include" --reread_libs --warn_sections --diag_wrap=off --display_error_number --xml_link_info="CowTag_linkInfo.xml" --rom_model -o "CowTag.out" $(ORDERED_OBJS)
-=======
-	"/opt/ti/ccsv6/tools/compiler/arm_15.12.3.LTS/bin/armcl" -mv7M3 --code_state=16 --float_support=vfplib -me -g --define=ccs --display_error_number --diag_warning=225 --diag_warning=255 --diag_wrap=off --gen_func_subsections=on --abi=eabi -z -m"CowTag.map" --heap_size=0 --stack_size=256 -i"/opt/ti/ccsv6/tools/compiler/arm_15.12.3.LTS/lib" -i"/opt/ti/ccsv6/tools/compiler/arm_15.12.3.LTS/include" --reread_libs --warn_sections --display_error_number --diag_wrap=off --xml_link_info="CowTag_linkInfo.xml" --rom_model -o "CowTag.out" $(ORDERED_OBJS)
->>>>>>> 134edbde0d8a7372863b505ddfd3f7974c5495ae
 	@echo 'Finished building target: $@'
 	@echo ' '
 
 CowTag.hex: $(EXE_OUTPUTS)
 	@echo 'Invoking: ARM Hex Utility'
-<<<<<<< HEAD
 	"C:/ti/ccsv6/tools/compiler/arm_15.12.3.LTS/bin/armhex" --memwidth=8 --romwidth=8 --intel -o "CowTag.hex" $(EXE_OUTPUTS__QUOTED)
-=======
-	"/opt/ti/ccsv6/tools/compiler/arm_15.12.3.LTS/bin/armhex" --memwidth=8 --romwidth=8 --intel -o "CowTag.hex" $(EXE_OUTPUTS__QUOTED)
->>>>>>> 134edbde0d8a7372863b505ddfd3f7974c5495ae
 	@echo 'Finished building: $@'
 	@echo ' '
 
@@ -203,20 +180,15 @@ CowTag.hex: $(EXE_OUTPUTS)
 clean:
 	-$(RM) $(GEN_MISC_FILES__QUOTED)$(EXE_OUTPUTS__QUOTED)$(GEN_FILES__QUOTED)$(BIN_OUTPUTS__QUOTED)$(GEN_OPTS__QUOTED)$(GEN_CMDS__QUOTED)
 	-$(RMDIR) $(GEN_MISC_DIRS__QUOTED)
-<<<<<<< HEAD
-	-$(RM) "CC1310_LAUNCHXL.d" "EventManager.d" "IIC.d" "RadioSend.d" "Sleep.d" "betaMain.d" "betaRadioTest.d" "ccfg.d" "config_parse.d" "eeprom.d" "eepromTest.d" "sensors.d" "serialize.d" "uArtEcho.d" "easylink\EasyLink.d" "smartrf_settings\smartrf_settings.d" "smartrf_settings\smartrf_settings_predefined.d" 
-	-$(RM) "CC1310_LAUNCHXL.obj" "EventManager.obj" "IIC.obj" "RadioSend.obj" "Sleep.obj" "betaMain.obj" "betaRadioTest.obj" "ccfg.obj" "config_parse.obj" "eeprom.obj" "eepromTest.obj" "sensors.obj" "serialize.obj" "uArtEcho.obj" "easylink\EasyLink.obj" "smartrf_settings\smartrf_settings.obj" "smartrf_settings\smartrf_settings_predefined.obj" 
-=======
-	-$(RM) "CC1310_LAUNCHXL.d" "EventManager.d" "IIC.d" "RadioSend.d" "Sleep.d" "betaMain.d" "betaRadioTest.d" "bootTimestamp.d" "ccfg.d" "config_parse.d" "eeprom.d" "eepromTest.d" "radioSendReceive.d" "sensors.d" "serialize.d" "uArtEcho.d" "easylink/EasyLink.d" "smartrf_settings/smartrf_settings.d" "smartrf_settings/smartrf_settings_predefined.d" 
-	-$(RM) "CC1310_LAUNCHXL.obj" "EventManager.obj" "IIC.obj" "RadioSend.obj" "Sleep.obj" "betaMain.obj" "betaRadioTest.obj" "bootTimestamp.obj" "ccfg.obj" "config_parse.obj" "eeprom.obj" "eepromTest.obj" "radioSendReceive.obj" "sensors.obj" "serialize.obj" "uArtEcho.obj" "easylink/EasyLink.obj" "smartrf_settings/smartrf_settings.obj" "smartrf_settings/smartrf_settings_predefined.obj" 
->>>>>>> 134edbde0d8a7372863b505ddfd3f7974c5495ae
+	-$(RM) "CC1310_LAUNCHXL.d" "EventManager.d" "IIC.d" "RadioSend.d" "Sleep.d" "betaMain.d" "betaRadioTest.d" "bootTimestamp.d" "ccfg.d" "config_parse.d" "eeprom.d" "eepromTest.d" "sensors.d" "serialize.d" "uArtEcho.d" "easylink\EasyLink.d" "smartrf_settings\smartrf_settings.d" "smartrf_settings\smartrf_settings_predefined.d" 
+	-$(RM) "CC1310_LAUNCHXL.obj" "EventManager.obj" "IIC.obj" "RadioSend.obj" "Sleep.obj" "betaMain.obj" "betaRadioTest.obj" "bootTimestamp.obj" "ccfg.obj" "config_parse.obj" "eeprom.obj" "eepromTest.obj" "sensors.obj" "serialize.obj" "uArtEcho.obj" "easylink\EasyLink.obj" "smartrf_settings\smartrf_settings.obj" "smartrf_settings\smartrf_settings_predefined.obj" 
 	-@echo 'Finished clean'
 	-@echo ' '
 
 pre-build:
 	-@echo 'Build and run the configuration setup. This updates the timestamp in the config file'
-	-gcc /home/champ/Git/72point5/hardware/CowTags/../../add_timestamp_to_config.c -o /home/champ/Git/72point5/hardware/CowTags/../../config
-	-/home/champ/Git/72point5/hardware/CowTags/../../config /home/champ/Git/72point5/hardware/CowTags/global_cfg.h
+	-gcc C:/Users/annik/Desktop/COWS/72point5/hardware/CowTags/../../add_timestamp_to_config.c -o C:/Users/annik/Desktop/COWS/72point5/hardware/CowTags/../../config
+	-C:/Users/annik/Desktop/COWS/72point5/hardware/CowTags/../../config C:/Users/annik/Desktop/COWS/72point5/hardware/CowTags/global_cfg.h
 	-@echo ' '
 
 .PHONY: all clean dependents

@@ -114,15 +114,19 @@ static void betaRadioTestTaskFunction(UArg arg0, UArg arg1)
 		}
 
 		// send packet or save to eeprom
-		if(verbose_betaRadioTest){System_printf("sending packet...\n");System_flush();}
+		if(verbose_betaRadioTest){System_printf("BetaTest: sending packet...\n");System_flush();}
 		results = betaRadioSendData(sampledata);
-		if (usingEeprom) {
-			if (results != NodeRadioStatus_Success) {
+
+
+		if (results != NodeRadioStatus_Success) {
+
+			if (usingEeprom) {
 				if(verbose_betaRadioTest){System_printf("packet sent error, saving to eeprom: %i\n",results);System_flush();}
 				eeprom_write(&sampledata);
+				//	}
+			} else {
+				if(verbose_betaRadioTest){System_printf("packet sent error, but not saving to eeprom\n");}
 			}
-		} else {
-			if(verbose_betaRadioTest){System_printf("packet sent error\n");}
 		}
 
 
@@ -131,13 +135,16 @@ static void betaRadioTestTaskFunction(UArg arg0, UArg arg1)
 			if(verbose_betaRadioTest){System_printf("check for saved samples to send\n");}
 			bool isSending = true;
 			int oldSamplesSent = 0;
+
 			do {
 				struct sampleData oldSample;
 
 				// check for another stored sample
 				bool hasNext = eeprom_getNext(&oldSample);
 				if (hasNext) {
+					Task_sleep(sleepASecond());
 					results = betaRadioSendData(oldSample);
+
 					if (results != NodeRadioStatus_Success) {
 						// write back to eeprom is send is a no go
 						if(verbose_betaRadioTest){System_printf("error sending from eeprom, saving back: %i\n",results);System_flush();}
@@ -146,10 +153,12 @@ static void betaRadioTestTaskFunction(UArg arg0, UArg arg1)
 					} else {
 						++oldSamplesSent;
 					}
-				}
+				} //end if(hasnext)
 			} while (isSending == true);
+
 			if(verbose_betaRadioTest){System_printf("%d saved samples sent\n", oldSamplesSent);}
 		}
+
 
 		if (verbose_sleep) {
 			System_printf("zZzZzZzZzZzZzZzZzZ\n");
@@ -161,30 +170,30 @@ static void betaRadioTestTaskFunction(UArg arg0, UArg arg1)
 }
 
 void printSampleData(struct sampleData sampledata){
-	System_printf("BetaRadio: sent packet with CowID = %i, "
-											"PacketType: %i, "
-											"Timestamp: %i, "
-											"Error: %i, ",
-											sampledata.cowID,
-											sampledata.packetType,
-											sampledata.timestamp,
-											sampledata.error);
+	System_printf("BetaTest: sent packet with CowID = %i, "
+			"PacketType: %i, "
+			"Timestamp: %i, "
+			"Error: %i, ",
+			sampledata.cowID,
+			sampledata.packetType,
+			sampledata.timestamp,
+			sampledata.error);
 	if(sampledata.packetType == RADIO_PACKET_TYPE_SENSOR_PACKET){
-	System_printf(							"TemperatureCowData = %i.%i, "
-											"AmbientTemperatureData = %i.%i, "
-											"InfraredData = %i.%i\n",
-											sampledata.tempData.temp_h,
-											sampledata.tempData.temp_l,
-											sampledata.heartRateData.temp_h,
-											sampledata.heartRateData.temp_l,
-											sampledata.heartRateData.rate_h,
-											sampledata.heartRateData.rate_l);
+		System_printf(							"TemperatureCowData = %i.%i, "
+				"AmbientTemperatureData = %i.%i, "
+				"InfraredData = %i.%i\n",
+				sampledata.tempData.temp_h,
+				sampledata.tempData.temp_l,
+				sampledata.heartRateData.temp_h,
+				sampledata.heartRateData.temp_l,
+				sampledata.heartRateData.rate_h,
+				sampledata.heartRateData.rate_l);
 	}
 	else{
-	System_printf(							"accelerometerData= x=%i, y=%i, z=%i\n",
-											sampledata.accelerometerData.x,
-											sampledata.accelerometerData.y,
-											sampledata.accelerometerData.z);
+		System_printf(							"accelerometerData= x=%i, y=%i, z=%i\n",
+				sampledata.accelerometerData.x,
+				sampledata.accelerometerData.y,
+				sampledata.accelerometerData.z);
 	}
 }
 

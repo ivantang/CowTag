@@ -105,6 +105,12 @@ void getAcceleration(struct sampleData *sampleData) {
     //writeI2CRegister(Board_LIS3DH_ADDR, LIS3DH_REG_TEMPCFG, 0x80);    //enable adcs
     //writeI2C(Board_LIS3DH_ADDR, LIS3DH_REG_OUT_X_L | 0x80);    //enable auto increment
 
+	//check if registers have correct values
+	System_printf("%x\n", readI2CRegister(Board_LIS3DH_ADDR, LIS3DH_REG_CTRL1));
+	System_printf("%x\n", readI2CRegister(Board_LIS3DH_ADDR, LIS3DH_REG_CTRL4));
+	System_printf("%x\n", readI2CRegister(Board_LIS3DH_ADDR, LIS3DH_REG_CTRL3));
+
+
     //polling status register to check for new set of data
     for(i = 0 ; i < 30 ;){
     	if( (readI2CRegister(Board_LIS3DH_ADDR,0x27) & 0x8) >> 3 == 1 ){
@@ -132,7 +138,7 @@ void getAcceleration(struct sampleData *sampleData) {
     										accelerationData[i].accelerometerData.y,
 											accelerationData[i].accelerometerData.z);
     	accelerationData[i].packetType = RADIO_PACKET_TYPE_ACCEL_PACKET;
-    	file_printSampleData(accelerationData[i]);
+    	//file_printSampleData(accelerationData[i]);
     }
 
 
@@ -262,9 +268,9 @@ void getHeartRate(struct sampleData* sampleData) {
 	int i = 0;
 	int j = 0;
 	uint16_t numValues = 50;
-	uint16_t HRData[50];
 	//uint16_t RedData[250];
 	//int Derivative[75];
+	struct sampleData HRData[50];
 
 	System_printf("Getting heart rate..\n");
 	System_flush();
@@ -283,8 +289,8 @@ void getHeartRate(struct sampleData* sampleData) {
 //					 previous & 0xA0 | 0x47);	//SPO2 cofig reg
 
 	// previous holds the current state of the heartrate configuration
-		uint8_t previous = readI2CRegister(Board_MAX30100_ADDR,
-	                                     MAX30100_REG_SPO2_CONFIGURATION);
+	uint8_t previous = readI2CRegister(Board_MAX30100_ADDR,
+	                                   MAX30100_REG_SPO2_CONFIGURATION);
 
 	// Now we take that previous configuration and "and" it with 0xA0 to keep only
 	// the information that we want to keep from the previous setting. Then "or"
@@ -349,6 +355,13 @@ void getHeartRate(struct sampleData* sampleData) {
 
 	uint32_t tempval;
 
+//	check if registers have correct values
+//	System_printf("%x\n", readI2CRegister(Board_MAX30100_ADDR, MAX30100_REG_SPO2_CONFIGURATION));
+//	System_printf("%x\n", readI2CRegister(Board_MAX30100_ADDR, MAX30100_REG_INTERRUPT_CONFIGURATION));
+//	System_printf("%x\n", readI2CRegister(Board_MAX30100_ADDR, MAX30100_REG_LED_CONFIGURATION));
+//	System_printf("%x\n", readI2CRegister(Board_MAX30100_ADDR, MAX30100_REG_MODE_CONFIGURATION));
+//	System_flush();
+
 	while(i < numValues){
 		//clear FIFO PTR
 		writeI2CRegister(Board_MAX30100_ADDR, MAX30100_REG_FIFO_WRITE_POINTER, 0x00);
@@ -371,11 +384,13 @@ void getHeartRate(struct sampleData* sampleData) {
 
 		//fifo data is 16 bits so 4 reads is needed
 		//first 16 bits is IR data, in our case, HR data
-		HRData[i] = readI2CRegister(Board_MAX30100_ADDR,MAX30100_REG_FIFO_DATA)<<8 + readI2CRegister(Board_MAX30100_ADDR, MAX30100_REG_FIFO_DATA);
+		HRData[i].heartRateData.rate_h = readI2CRegister(Board_MAX30100_ADDR,MAX30100_REG_FIFO_DATA);
+		HRData[i].heartRateData.rate_l = readI2CRegister(Board_MAX30100_ADDR, MAX30100_REG_FIFO_DATA);
 		readI2CRegister(Board_MAX30100_ADDR,MAX30100_REG_FIFO_DATA)<<8 + readI2CRegister(Board_MAX30100_ADDR, MAX30100_REG_FIFO_DATA);
 		//filter out 0 measurements
-		while(HRData[i] == 0){
-			HRData[i] = readI2CRegister(Board_MAX30100_ADDR,MAX30100_REG_FIFO_DATA)<<8 + readI2CRegister(Board_MAX30100_ADDR,MAX30100_REG_FIFO_DATA);
+		while(HRData[i].heartRateData.rate_h << 8 + HRData[i].heartRateData.rate_l == 0){
+			HRData[i].heartRateData.rate_h = readI2CRegister(Board_MAX30100_ADDR,MAX30100_REG_FIFO_DATA);
+			HRData[i].heartRateData.rate_l = readI2CRegister(Board_MAX30100_ADDR, MAX30100_REG_FIFO_DATA);
 			readI2CRegister(Board_MAX30100_ADDR,MAX30100_REG_FIFO_DATA)<<8 + readI2CRegister(Board_MAX30100_ADDR, MAX30100_REG_FIFO_DATA);
 		}
 
@@ -394,7 +409,10 @@ void getHeartRate(struct sampleData* sampleData) {
 
 	if (verbose_sensors) {
 		for (i = 0 ; i < numValues ; i++) {
-			System_printf("%d\n",HRData[i]);
+			System_printf("%i\n",HRData[i].heartRateData.rate_h << 8 + HRData[i].heartRateData.rate_l);
+
+			HRData[i].packetType = RADIO_PACKET_TYPE_SENSOR_PACKET;
+	    	file_printSampleData(HRData[i]);
 		}
 
 		System_flush();

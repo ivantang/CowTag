@@ -16,7 +16,7 @@
 // IF YOU CHANGE THE NAME OF THIS DEFINE YOU NEED TO CHANGE THE SEARCH STRING IN
 // ../../add_timestamp_to_config.c AS WELL
 
-#define TIMESTAMP_AT_BUILDTIME 1490319163
+#define TIMESTAMP_AT_BUILDTIME 1490322884
 // End auto-generated
 
 // [0] = Beta
@@ -56,7 +56,7 @@
 // Sample rate in Hz for Heart Rate Sensor
 // Allowed Values Are:
 // 50, 100, 167, 200, 400, 600, 800, 1000Hz
-#define HEARTRATE_SAMPLE_RATE_HZ 50
+#define HEARTRATE_SAMPLE_RATE_HZ 100
 
 
 /* DEBUG FLAGS */

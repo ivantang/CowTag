@@ -199,15 +199,8 @@ void file_printSampleData(struct sampleData sampledata) {
 //			sampledata.timestamp,
 //			sampledata.error);
 	if(sampledata.packetType == RADIO_PACKET_TYPE_SENSOR_PACKET){
-		fprintf(fp, "TemperatureCowData = %i.%i, "
-				"AmbientTemperatureData = %i.%i, "
-				"InfraredData = %i.%i\n",
-				sampledata.tempData.temp_h,
-				sampledata.tempData.temp_l,
-				sampledata.heartRateData.temp_h,
-				sampledata.heartRateData.temp_l,
-				sampledata.heartRateData.rate_h,
-				sampledata.heartRateData.rate_l);
+		fprintf(fp, "InfraredData = %i\n",
+				sampledata.heartRateData.rate_h <<8 + sampledata.heartRateData.rate_l);
 	}
 	else{
 		fprintf(fp, "accelerometerData= x=%i, y=%i, z=%i\n",

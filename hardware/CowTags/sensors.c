@@ -393,7 +393,9 @@ void makeSensorPacket(struct sampleData *sampleData) {
 void testSensors() {
 	struct sampleData sampleData;
 
-	makeSensorPacket(&sampleData);
+	while(1){
+		makeSensorPacket(&sampleData);
+	}
 
 	System_printf("Tests done\n");
 	System_flush();

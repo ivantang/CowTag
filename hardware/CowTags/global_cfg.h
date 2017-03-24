@@ -16,7 +16,7 @@
 // IF YOU CHANGE THE NAME OF THIS DEFINE YOU NEED TO CHANGE THE SEARCH STRING IN
 // ../../add_timestamp_to_config.c AS WELL
 
-#define TIMESTAMP_AT_BUILDTIME 1490311173
+#define TIMESTAMP_AT_BUILDTIME 1490319163
 // End auto-generated
 
 // [0] = Beta
@@ -48,6 +48,17 @@
 #define MAX_EEPROM_ADDRESS 0x7FFF
 #define MIN_EEPROM_ADDRESS 0x0000
 
+// Sample rate in Hz for Accelerometer
+// Allowed Values Are:
+// 1, 10, 25, 50, 100, 200, 400Hz
+#define ACCELEROMETER_SAMPLE_RATE_HZ 10
+
+// Sample rate in Hz for Heart Rate Sensor
+// Allowed Values Are:
+// 50, 100, 167, 200, 400, 600, 800, 1000Hz
+#define HEARTRATE_SAMPLE_RATE_HZ 50
+
+
 /* DEBUG FLAGS */
 
 /*** Print the contents of the packets to a file ***/
@@ -66,7 +77,7 @@ static const int print_packet_to_file_gateway = 0;
 static const int verbose_main = 1;
 
 /* sensor blocks */
-static const int verbose_sensors = 0;
+static const int verbose_sensors = 1;
 static const int verbose_i2c = 0;
 
 /* Serialization of sensor packets */

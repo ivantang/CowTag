@@ -2,7 +2,7 @@
 # Automatically-generated file. Do not edit!
 ################################################################################
 
-CG_TOOL_ROOT := /home/ivan/ti/ccsv6/tools/compiler/arm_15.12.3.LTS
+CG_TOOL_ROOT := /home/steven/ti/ccsv6/tools/compiler/arm_15.12.3.LTS
 
 GEN_OPTS__FLAG := --cmd_file="configPkg/compiler.opt"
 GEN_CMDS__FLAG := -l"configPkg/linker.cmd"
@@ -28,7 +28,7 @@ ORDERED_OBJS += \
 "./smartrf_settings/smartrf_settings_predefined.obj" \
 "../CC1310_LAUNCHXL.cmd" \
 $(GEN_CMDS__FLAG) \
--l"/home/ivan/ti/tirtos_cc13xx_cc26xx_2_21_00_06/products/cc13xxware_2_04_03_17272/driverlib/bin/ccs/driverlib.lib" \
+-l"/home/steven/ti/tirex-content/tirtos_cc13xx_cc26xx_2_21_00_06/products/cc13xxware_2_04_03_17272/driverlib/bin/ccs/driverlib.lib" \
 -llibc.a \
 
 -include ../makefile.init
@@ -161,16 +161,16 @@ all:
 main-build: CowTag.out
 
 # Tool invocations
-CowTag.out: $(OBJS) $(CMD_SRCS) $(GEN_CMDS)
+CowTag.out: $(OBJS) $(CMD_SRCS) $(A_SRCS) $(GEN_CMDS)
 	@echo 'Building target: $@'
 	@echo 'Invoking: ARM Linker'
-	"/home/ivan/ti/ccsv6/tools/compiler/arm_15.12.3.LTS/bin/armcl" -mv7M3 --code_state=16 --float_support=vfplib -me -g --define=ccs --display_error_number --diag_warning=225 --diag_warning=255 --diag_wrap=off --gen_func_subsections=on --abi=eabi -z -m"CowTag.map" --heap_size=0 --stack_size=256 -i"/home/ivan/ti/ccsv6/tools/compiler/arm_15.12.3.LTS/lib" -i"/home/ivan/ti/ccsv6/tools/compiler/arm_15.12.3.LTS/include" --reread_libs --warn_sections --display_error_number --diag_wrap=off --xml_link_info="CowTag_linkInfo.xml" --rom_model -o "CowTag.out" $(ORDERED_OBJS)
+	"/home/steven/ti/ccsv6/tools/compiler/arm_15.12.3.LTS/bin/armcl" -mv7M3 --code_state=16 --float_support=vfplib -me -g --define=ccs --display_error_number --diag_warning=225 --diag_warning=255 --diag_wrap=off --gen_func_subsections=on --abi=eabi -z -m"CowTag.map" --heap_size=0 --stack_size=256 -i"/home/steven/ti/ccsv6/tools/compiler/arm_15.12.3.LTS/lib" -i"/home/steven/ti/ccsv6/tools/compiler/arm_15.12.3.LTS/include" --reread_libs --warn_sections --display_error_number --diag_wrap=off --xml_link_info="CowTag_linkInfo.xml" --rom_model -o "CowTag.out" $(ORDERED_OBJS) $(A_SRCS)
 	@echo 'Finished building target: $@'
 	@echo ' '
 
 CowTag.hex: $(EXE_OUTPUTS)
 	@echo 'Invoking: ARM Hex Utility'
-	"/home/ivan/ti/ccsv6/tools/compiler/arm_15.12.3.LTS/bin/armhex" --memwidth=8 --romwidth=8 --intel -o "CowTag.hex" $(EXE_OUTPUTS__QUOTED)
+	"/home/steven/ti/ccsv6/tools/compiler/arm_15.12.3.LTS/bin/armhex" --memwidth=8 --romwidth=8 --intel -o "CowTag.hex" $(EXE_OUTPUTS__QUOTED)
 	@echo 'Finished building: $@'
 	@echo ' '
 
@@ -185,8 +185,8 @@ clean:
 
 pre-build:
 	-@echo 'Build and run the configuration setup. This updates the timestamp in the config file'
-	-gcc /home/ivan/Documents/Github/72point5/hardware/CowTags/../../add_timestamp_to_config.c -o /home/ivan/Documents/Github/72point5/hardware/CowTags/../../config
-	-/home/ivan/Documents/Github/72point5/hardware/CowTags/../../config /home/ivan/Documents/Github/72point5/hardware/CowTags/global_cfg.h
+	-gcc /home/steven/Documents/school-assignments/cpen491/72point5/hardware/CowTags/../../add_timestamp_to_config.c -o /home/steven/Documents/school-assignments/cpen491/72point5/hardware/CowTags/../../config
+	-/home/steven/Documents/school-assignments/cpen491/72point5/hardware/CowTags/../../config /home/steven/Documents/school-assignments/cpen491/72point5/hardware/CowTags/global_cfg.h
 	-@echo ' '
 
 .PHONY: all clean dependents

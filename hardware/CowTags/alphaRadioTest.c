@@ -159,8 +159,6 @@ static void alphaRadioTestTaskFunction(UArg arg0, UArg arg1){
 		// rather, we wish to send and receive at different times.
 		// Although it is necessary for the radioSendReceive thread to be able to do both!
 
-		// -------------------- Receiving! -------------------------
-
 		AlphaRadioTask_registerPacketReceivedCallback(packetReceivedCallback); // register callback
 		results = alphaRadioReceiveData();	// start listening, obtain radioAccessSem
 		if (results == AlphaRadioStatus_ReceivedValidPacket) {
@@ -172,7 +170,6 @@ static void alphaRadioTestTaskFunction(UArg arg0, UArg arg1){
 				System_printf("RECEIVE: did not receive packet.\n");System_flush();}
 		}
 
-		Task_sleep(sleepASecond());
 	}
 }
 

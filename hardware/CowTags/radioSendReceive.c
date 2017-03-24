@@ -203,18 +203,16 @@ static void alphaRadioTaskFunction(UArg arg0, UArg arg1)
 			else
 			{
 				/* Else return send fail */
-				returnRadioOperationStatus(AlphaRadioStatus_Failed);
+				Event_post(*radioOperationEventHandle, RADIO_EVENT_SEND_FAIL);
 			}
 		}
-
 		else if (events & RADIO_EVENT_INVALID_PACKET_RECEIVED)
 		{
-
 			if(verbose_alphaRadio){
 				System_printf("RadioSend: Invalid packet received (from other alpha)\n");
 				System_flush();}
 
-			returnRadioOperationStatus(AlphaRadioStatus_ReceivedInvalidPacket);
+			Event_post(*radioOperationEventHandle, RADIO_EVENT_SEND_FAIL);
 		}
 		/* If send fail */
 		else if (events & RADIO_EVENT_SEND_FAIL)
@@ -261,9 +259,6 @@ static void returnRadioOperationStatus(enum alphaRadioOperationStatus result)
 {
 	/* Save result */
 	currentRadioOperation.result = result;
-
-	/* Post result semaphore */
-//	Semaphore_post(radioResultSemHandle);
 
 	/* Return radio access semaphore */
 	Semaphore_post(radioAccessSemHandle);
@@ -368,6 +363,10 @@ enum alphaRadioOperationStatus alphaRadioReceiveData(void){
 
 	Semaphore_post(radioResultSemHandle);
 
+	if (receiveStatus == AlphaRadioStatus_Failed) {
+		Semaphore_post(radioAccessSemHandle);
+	}
+
 	return receiveStatus;
 }
 
@@ -400,6 +399,10 @@ static void rxDoneCallbackReceive(EasyLink_RxPacket * rxPacket, EasyLink_Status 
 		else if(tmpRxPacket->header.packetType == RADIO_PACKET_TYPE_ACK_PACKET){
 			//alpha sends now, so it needs ACK packets
 			Event_post(*radioOperationEventHandle, RADIO_EVENT_DATA_ACK_RECEIVED);
+		}
+
+		else {
+			Event_post(*radioOperationEventHandle, RADIO_EVENT_SEND_FAIL);
 		}
 
 	} else if(status == EasyLink_Status_Rx_Timeout) {

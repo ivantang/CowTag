@@ -127,16 +127,16 @@ static void concentratorRadioTaskFunction(UArg arg0, UArg arg1)
 	// tmp
 	/* buildType = TAG_TYPE; */
 
-//	System_printf("buildType = %i\n",buildType);
-//
-//	if(buildType == 1){
-//		concentratorAddress = ALPHA_ADDRESS;
-//	} else if ( buildType == 3 ){
-//		concentratorAddress = GATEWAY_ADDRESS;
-//	} else {
-//		System_printf("buildType ERROR");
-//		concentratorAddress = GATEWAY_ADDRESS;
-//	}*/
+	//	System_printf("buildType = %i\n",buildType);
+	//
+	//	if(buildType == 1){
+	//		concentratorAddress = ALPHA_ADDRESS;
+	//	} else if ( buildType == 3 ){
+	//		concentratorAddress = GATEWAY_ADDRESS;
+	//	} else {
+	//		System_printf("buildType ERROR");
+	//		concentratorAddress = GATEWAY_ADDRESS;
+	//	}*/
 
 
 	/* Set src address of ACK packet */;
@@ -236,19 +236,6 @@ static void rxDoneCallback(EasyLink_RxPacket * rxPacket, EasyLink_Status status)
 		/* If this is a known packet */
 		if (tmpRxPacket->header.packetType == RADIO_PACKET_TYPE_SENSOR_PACKET)
 		{
-
-			//System_printf("my address 0x%x; ", concentratorAddress);
-			//System_printf("source address 0x%x\n", tmpRxPacket->header.sourceAddress);
-
-			// alpha check
-			if( (concentratorAddress & 0x3) == ALPHA_ADDRESS){ // IF I AM AN ALPHA
-				if((tmpRxPacket->header.sourceAddress & 0x1) == 1){ // IF THE SOURCE IS ANOTHER CONCENTRATOR
-					// ignore the alpha packet
-					Event_post(radioOperationEventHandle, RADIO_EVENT_INVALID_PACKET_RECEIVED);
-					return;
-				}
-			}
-
 			// both alpha(passed check) and gateway do this
 			/* Save packet */
 			memcpy((void*)&latestRxPacket, &rxPacket->payload, sizeof(struct sensorPacket));
@@ -257,23 +244,12 @@ static void rxDoneCallback(EasyLink_RxPacket * rxPacket, EasyLink_Status status)
 
 		}else if(tmpRxPacket->header.packetType == RADIO_PACKET_TYPE_ACCEL_PACKET){
 
-			//System_printf("my address 0x%x; ", concentratorAddress);
-						//System_printf("source address 0x%x\n", tmpRxPacket->header.sourceAddress);
 
-						// alpha check
-						if( (concentratorAddress & 0x3) == ALPHA_ADDRESS){ // IF I AM AN ALPHA
-							if((tmpRxPacket->header.sourceAddress & 0x1) == 1){ // IF THE SOURCE IS ANOTHER CONCENTRATOR
-								// ignore the alpha packet
-								Event_post(radioOperationEventHandle, RADIO_EVENT_INVALID_PACKET_RECEIVED);
-								return;
-							}
-						}
-
-						// both alpha(passed check) and gateway do this
-						/* Save packet */
-						memcpy((void*)&latestRxPacket, &rxPacket->payload, sizeof(struct sensorPacket));
-						/* Signal packet received */
-						Event_post(radioOperationEventHandle, RADIO_EVENT_VALID_PACKET_RECEIVED);
+			// both alpha(passed check) and gateway do this
+			/* Save packet */
+			memcpy((void*)&latestRxPacket, &rxPacket->payload, sizeof(struct sensorPacket));
+			/* Signal packet received */
+			Event_post(radioOperationEventHandle, RADIO_EVENT_VALID_PACKET_RECEIVED);
 		}
 		else{
 			// ignore unknown packet or ACK packet

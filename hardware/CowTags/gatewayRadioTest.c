@@ -160,9 +160,14 @@ void printSampleData(struct sampleData sampledata){
 }
 
 void file_printSampleData(struct sampleData sampledata) {
-	FILE *fp;
+	static bool file_is_initialized = false;
+	static FILE *fp;
 
-	fp = fopen("../gateway_packet_output.txt", "a");
+	if (!file_is_initialized) {
+		fp = fopen("../gateway_packet_output.txt", "w");
+		file_is_initialized = true;
+	}
+
 
 	fprintf(fp, "GatewayRadio: received packet with CowID = %i, PacketType: %i, "
 			"Timestamp: %i, Error: %i, ",
@@ -187,7 +192,6 @@ void file_printSampleData(struct sampleData sampledata) {
 				sampledata.accelerometerData.y,
 				sampledata.accelerometerData.z);
 	}
-	fclose(fp);
 }
 
 

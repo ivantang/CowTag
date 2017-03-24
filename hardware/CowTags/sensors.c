@@ -428,11 +428,11 @@ void getTimestamp(struct sampleData *sampleData) {
 
 void makeSensorPacket(struct sampleData *sampleData) {
 
-//	getAcceleration(sampleData);
+	getAcceleration(sampleData);
 
 //	getTemp(sampleData);
 
-	getHeartRate(sampleData);
+	/* getHeartRate(sampleData); */
 
 	//getTimestamp(sampleData);
 

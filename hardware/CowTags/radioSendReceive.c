@@ -209,10 +209,12 @@ static void alphaRadioTaskFunction(UArg arg0, UArg arg1)
 		else if (events & RADIO_EVENT_INVALID_PACKET_RECEIVED)
 		{
 			if(verbose_alphaRadio){
-				System_printf("RadioSend: Invalid packet received (from other alpha)\n");
+				System_printf("RadioSend: Invalid packet received!\n");
 				System_flush();}
 
-			Event_post(*radioOperationEventHandle, RADIO_EVENT_SEND_FAIL);
+			// do nothing
+			//Event_post(*radioOperationEventHandle, RADIO_EVENT_ACK_TIMEOUT);
+			//returnRadioOperationStatus(AlphaRadioStatus_ReceivedInvalidPacket);
 		}
 		/* If send fail */
 		else if (events & RADIO_EVENT_SEND_FAIL)
@@ -283,9 +285,7 @@ static void sendAlphaPacket(struct sensorPacket bp, uint8_t maxNumberOfRetries, 
 	/* Send packet  */
 	if (EasyLink_transmit(&currentRadioOperation.easyLinkTxPacket) != EasyLink_Status_Success)
 	{
-		if(verbose_alphaRadio){
-			System_printf("EasyLink_transmit failed: failed to send packet\n");
-			System_flush();}
+		System_printf("EasyLink_transmit failed: failed to send packet\n");
 	}
 
 	if(EasyLink_receiveAsync(rxDoneCallbackReceive, 0) != EasyLink_Status_Success) {
@@ -402,7 +402,7 @@ static void rxDoneCallbackReceive(EasyLink_RxPacket * rxPacket, EasyLink_Status 
 		}
 
 		else {
-			Event_post(*radioOperationEventHandle, RADIO_EVENT_SEND_FAIL);
+			Event_post(*radioOperationEventHandle, RADIO_EVENT_SEND_FAIL);//RADIO_EVENT_INVALID_PACKET_RECEIVED
 		}
 
 	} else if(status == EasyLink_Status_Rx_Timeout) {

@@ -39,6 +39,8 @@
 /* XDCtools Header files */
 #include <xdc/runtime/System.h>
 
+#include <xdc/runtime/Timestamp.h>
+
 /* BIOS Header files */
 #include <ti/sysbios/knl/Task.h>
 #include <ti/sysbios/knl/Event.h>
@@ -113,6 +115,9 @@ static void betaRadioTestTaskFunction(UArg arg0, UArg arg1)
 
 		// send packet or save to eeprom
 		if(verbose_betaRadioTest){System_printf("BetaTest: sending packet...\n");System_flush();}
+
+		while(Timestamp_get32()%2 != 0);
+
 		results = betaRadioSendData(sampledata);
 
 

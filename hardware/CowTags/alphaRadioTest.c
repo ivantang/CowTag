@@ -46,6 +46,7 @@
 /* XDCtools Header files */
 #include <xdc/std.h>
 #include <xdc/runtime/System.h>
+#include <xdc/runtime/Timestamp.h>
 
 /* BIOS Header files */
 #include <ti/sysbios/BIOS.h>
@@ -93,6 +94,7 @@ static uint8_t alphaRadioTestTaskStack[ALPHARADIOTEST_TASK_STACK_SIZE];
 Event_Struct alphaRadioTestEvent;  /* not static so you can see in ROV */
 static Event_Handle *alphaRadioTestEventHandle;
 static struct sensorPacket latestActivePacket;
+static int received = 0;
 
 /***** Prototypes *****/
 static void alphaRadioTestTaskFunction(UArg arg0, UArg arg1);
@@ -121,11 +123,14 @@ static void alphaRadioTestTaskFunction(UArg arg0, UArg arg1){
 	enum alphaRadioOperationStatus results;
 	if(verbose_alphaRadioTest){System_printf("Initializing alphaRadioTest...\n");}
 
-	Task_sleep(2 * sleepASecond());
+	// wait for the radio task for initialize...
+	//Task_sleep(2 * sleepASecond());
 
 	while (1) {
+		received = 0;
+		Task_sleep(2 * sleepASecond());
 		// -------------------- SENDING -------------------------
-		sampledata.cowID = 1;
+		sampledata.cowID = 2;
 		sampledata.packetType = RADIO_PACKET_TYPE_SENSOR_PACKET;
 		sampledata.timestamp = 0x12345678;
 
@@ -159,13 +164,18 @@ static void alphaRadioTestTaskFunction(UArg arg0, UArg arg1){
 		// rather, we wish to send and receive at different times.
 		// Although it is necessary for the radioSendReceive thread to be able to do both!
 
+		Task_sleep(2 * sleepASecond());
+
 		AlphaRadioTask_registerPacketReceivedCallback(packetReceivedCallback); // register callback
+		while(Timestamp_get32()%2 != 0);
 		results = alphaRadioReceiveData();	// start listening, obtain radioAccessSem
-		if (results == AlphaRadioStatus_ReceivedValidPacket) {
+		if (results == AlphaRadioStatus_ReceivedValidPacket||
+				received == 1) {
 			if(verbose_alphaRadioTest){
 				System_printf("RECEIVE: received a packet.\n");
+				printSampleData(latestActivePacket.sampledata);
 			}
-		} else{
+		}  else{
 			if(verbose_alphaRadioTest){
 				System_printf("RECEIVE: did not receive packet.\n");System_flush();}
 		}
@@ -177,7 +187,8 @@ static void alphaRadioTestTaskFunction(UArg arg0, UArg arg1){
 void packetReceivedCallback(union ConcentratorPacket* packet, int8_t rssi) {
 	latestActivePacket.header = packet->header;
 	latestActivePacket.sampledata = packet->sensorPacket.sampledata;
-	printSampleData(latestActivePacket.sampledata);
+	//printSampleData(latestActivePacket.sampledata);
+	received = 1;
 }
 
 /*print the received packet*/

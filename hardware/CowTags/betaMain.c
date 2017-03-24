@@ -27,6 +27,7 @@
 #include <EventManager.h>
 #include "bootTimestamp.h"
 #include <xdc/runtime/Types.h>
+#include <sensors.h>
 
 /* Global PIN_Config table */
 PIN_State ledPinState;

@@ -20,6 +20,9 @@
 #define RADIO_PACKET_TYPE_ACK_PACKET             0
 #define RADIO_PACKET_TYPE_SENSOR_PACKET    		 3
 #define RADIO_PACKET_TYPE_ACCEL_PACKET           4
+//delete RADIO_PACKET_TYPE_TEMP_PACKET afterwards, just using this for the farm demo :)
+#define RADIO_PACKET_TYPE_TEMP_PACKET           5
+
 
 #define SAMPLE_SIZE 13
 

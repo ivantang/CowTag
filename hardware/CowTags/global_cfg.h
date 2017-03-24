@@ -16,7 +16,7 @@
 // IF YOU CHANGE THE NAME OF THIS DEFINE YOU NEED TO CHANGE THE SEARCH STRING IN
 // ../../add_timestamp_to_config.c AS WELL
 
-#define TIMESTAMP_AT_BUILDTIME 1490323135
+#define TIMESTAMP_AT_BUILDTIME 1490329013
 // End auto-generated
 
 // [0] = Beta
@@ -56,20 +56,20 @@
 // Sample rate in Hz for Heart Rate Sensor
 // Allowed Values Are:
 // 50, 100, 167, 200, 400, 600, 800, 1000Hz
-#define HEARTRATE_SAMPLE_RATE_HZ 100
+#define HEARTRATE_SAMPLE_RATE_HZ 50
 
 
 /* DEBUG FLAGS */
 
 /*** Print the contents of the packets to a file ***/
 /* verbose_alphaRadioTest also needs to be set to print packets to file */
-static const int print_packet_to_file_alpha = 0;
+static const int verbose_beta_log = 1;
 
 /* verbose_betaRadioTest also needs to be set to print packets to file */
-static const int print_packet_to_file_beta = 1;
+static const int verbose_alpha_log = 0;
 
 /* verbose_gatewayRadioTest also needs to be set to print packets to file */
-static const int print_packet_to_file_gateway = 0;
+static const int verbose_gateway_log = 0;
 
 
 

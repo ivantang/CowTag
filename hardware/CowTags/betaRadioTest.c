@@ -107,7 +107,7 @@ static void betaRadioTestTaskFunction(UArg arg0, UArg arg1)
 
 		if(verbose_betaRadioTest) {
 			printSampleData(sampledata);
-			if (print_packet_to_file_beta) {
+			if (verbose_beta_log) {
 				file_printSampleData(sampledata);
 			}
 		}
@@ -204,13 +204,18 @@ void file_printSampleData(struct sampleData sampledata) {
 //			sampledata.timestamp,
 //			sampledata.error);
 	if(sampledata.packetType == RADIO_PACKET_TYPE_SENSOR_PACKET){
-		fprintf(fp, "InfraredData = %i\n",
-				sampledata.heartRateData.rate_h <<8 + sampledata.heartRateData.rate_l);
+		fprintf(fp, "InfraredData = %u\n",
+				sampledata.heartRateData.rate_h << 8 | sampledata.heartRateData.rate_l);
 	}
-	else{
+	else if(sampledata.packetType == RADIO_PACKET_TYPE_ACCEL_PACKET){
 		fprintf(fp, "accelerometerData= x=%i, y=%i, z=%i\n",
 				sampledata.accelerometerData.x,
 				sampledata.accelerometerData.y,
 				sampledata.accelerometerData.z);
+	}
+	else if(sampledata.packetType == RADIO_PACKET_TYPE_TEMP_PACKET){
+		fprintf(fp, "ambient temperature= %i, object temperature= %i\n",
+				sampledata.heartRateData.temp_h << 8 | sampledata.heartRateData.temp_l,
+				sampledata.tempData.temp_h << 8 | sampledata.tempData.temp_l);
 	}
 }

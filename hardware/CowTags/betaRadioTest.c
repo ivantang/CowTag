@@ -220,6 +220,4 @@ void file_printSampleData(struct sampleData sampledata) {
 				sampledata.accelerometerData.y,
 				sampledata.accelerometerData.z);
 	}
-
-	fprintf(fp, "-----------------\n");
 }

@@ -106,11 +106,9 @@ static void betaRadioTestTaskFunction(UArg arg0, UArg arg1)
 			if(verbose_betaRadioTest){System_printf("Packet Created\n");System_flush();}
 		}
 
-		if(verbose_betaRadioTest) {
-			printSampleData(sampledata);
-			if (print_packet_to_file_beta) {
-				file_printSampleData(sampledata);
-			}
+		// print data to external file regardless of successful send
+		if (print_packet_to_file_beta) {
+			file_printSampleData(sampledata);
 		}
 
 		// send packet or save to eeprom
@@ -126,6 +124,12 @@ static void betaRadioTestTaskFunction(UArg arg0, UArg arg1)
 				//	}
 			} else {
 				if(verbose_betaRadioTest){System_printf("packet sent error, but not saving to eeprom\n");}
+			}
+		} else{
+
+			// print sent data
+			if(verbose_betaRadioTest) {
+				printSampleData(sampledata);
 			}
 		}
 

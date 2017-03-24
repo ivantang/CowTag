@@ -87,7 +87,7 @@ static void betaRadioTestTaskFunction(UArg arg0, UArg arg1)
 		struct sampleData sampledata;
 		enum NodeRadioOperationStatus results;
 
-		sampledata.cowID = 0;
+		sampledata.cowID = 5;
 		sampledata.packetType = RADIO_PACKET_TYPE_SENSOR_PACKET;
 		sampledata.timestamp = 0x12345678;
 		sampledata.error = 0x0;
@@ -155,8 +155,8 @@ static void betaRadioTestTaskFunction(UArg arg0, UArg arg1)
 			System_printf("zZzZzZzZzZzZzZzZzZ\n");
 			System_printf("Z going to sleep z\n");
 			System_printf("zZzZzZzZzZzZzZzZzZ\n");
-			Task_sleep(sleepASecond());
 		}
+		Task_sleep(sleepASecond());
 	}
 }
 

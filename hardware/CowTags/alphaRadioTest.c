@@ -121,6 +121,8 @@ static void alphaRadioTestTaskFunction(UArg arg0, UArg arg1){
 	enum alphaRadioOperationStatus results;
 	if(verbose_alphaRadioTest){System_printf("Initializing alphaRadioTest...\n");}
 
+	Task_sleep(2 * sleepASecond());
+
 	while (1) {
 		// -------------------- SENDING -------------------------
 		sampledata.cowID = 1;
@@ -160,21 +162,17 @@ static void alphaRadioTestTaskFunction(UArg arg0, UArg arg1){
 		// -------------------- Receiving! -------------------------
 
 		AlphaRadioTask_registerPacketReceivedCallback(packetReceivedCallback); // register callback
-//		int numBetas = 2;
-//		int i = 0;
-//		while (i < numBetas) {
-			results = alphaRadioReceiveData();	// start listening, obtain radioAccessSem
-			if (results == AlphaRadioStatus_ReceivedValidPacket) {
-				if(verbose_alphaRadioTest){
-					System_printf("RECEIVE: received a packet.\n");
-				}
-			} else{
-				if(verbose_alphaRadioTest){
-					System_printf("RECEIVE: did not receive packet.\n");System_flush();}
+		results = alphaRadioReceiveData();	// start listening, obtain radioAccessSem
+		if (results == AlphaRadioStatus_ReceivedValidPacket) {
+			if(verbose_alphaRadioTest){
+				System_printf("RECEIVE: received a packet.\n");
 			}
-//		}
+		} else{
+			if(verbose_alphaRadioTest){
+				System_printf("RECEIVE: did not receive packet.\n");System_flush();}
+		}
 
-//		Task_sleep(3*sleepASecond());
+		Task_sleep(sleepASecond());
 	}
 }
 

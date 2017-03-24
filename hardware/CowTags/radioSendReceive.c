@@ -31,6 +31,7 @@
 #include "pinTable.h"
 #include <config_parse.h>
 #include <stdlib.h>
+#include <Sleep.h>
 #include <EventManager.h>
 #include <driverlib/trng.h>
 #include <driverlib/aon_batmon.h>
@@ -38,7 +39,7 @@
 /***** Defines *****/
 #define ALPHARADIO_TASK_STACK_SIZE 1024
 #define ALPHARADIO_TASK_PRIORITY   3
-#define ALPHARADIO_MAX_RETRIES 6
+#define ALPHARADIO_MAX_RETRIES 3
 #define ALPHARADIO_ACK_TIMEOUT_TIME_MS (500)
 
 /***** Type declarations *****/
@@ -156,6 +157,7 @@ static void alphaRadioTaskFunction(UArg arg0, UArg arg1)
 
 			/* Call packet received callback */
 			notifyPacketReceived(&latestRxPacket);
+
 			returnRadioOperationStatus(AlphaRadioStatus_ReceivedValidPacket);
 
 			/* toggle Activity LED */
@@ -179,12 +181,11 @@ static void alphaRadioTaskFunction(UArg arg0, UArg arg1)
 		/* If we get an ACK from the concentrator */
 		else if (events & RADIO_EVENT_DATA_ACK_RECEIVED)
 		{
-			returnRadioOperationStatus(AlphaRadioStatus_Success);
-
 			if(verbose_alphaRadio){
 				System_printf("RadioSend: ACK RECEIVED! Transmission successful.\n");
 				System_flush();}
 
+			returnRadioOperationStatus(AlphaRadioStatus_Success);
 		}
 
 		/* If we get an ACK timeout */
@@ -198,7 +199,6 @@ static void alphaRadioTaskFunction(UArg arg0, UArg arg1)
 				if(verbose_alphaRadio){
 					System_printf("RadioSend: Timed out! resending for the %d th time\n", currentRadioOperation.retriesDone);
 					System_flush();}
-
 			}
 			else
 			{
@@ -231,7 +231,6 @@ static void alphaRadioTaskFunction(UArg arg0, UArg arg1)
 
 /*top level send function*/
 enum alphaRadioOperationStatus alphaRadioSendData(struct sampleData data){
-
 	enum alphaRadioOperationStatus status;
 
 	/* Get radio access semaphore */
@@ -253,8 +252,7 @@ enum alphaRadioOperationStatus alphaRadioSendData(struct sampleData data){
 	/* Get result */
 	status = currentRadioOperation.result;
 
-	/* Return radio access semaphore */
-	Semaphore_post(radioAccessSemHandle);
+	Semaphore_post(radioResultSemHandle);
 
 	return status;
 }
@@ -265,7 +263,10 @@ static void returnRadioOperationStatus(enum alphaRadioOperationStatus result)
 	currentRadioOperation.result = result;
 
 	/* Post result semaphore */
-	Semaphore_post(radioResultSemHandle);
+//	Semaphore_post(radioResultSemHandle);
+
+	/* Return radio access semaphore */
+	Semaphore_post(radioAccessSemHandle);
 }
 
 static void sendAlphaPacket(struct sensorPacket bp, uint8_t maxNumberOfRetries, uint32_t ackTimeoutMs){
@@ -291,6 +292,7 @@ static void sendAlphaPacket(struct sensorPacket bp, uint8_t maxNumberOfRetries, 
 			System_printf("EasyLink_transmit failed: failed to send packet\n");
 			System_flush();}
 	}
+
 	if(EasyLink_receiveAsync(rxDoneCallbackReceive, 0) != EasyLink_Status_Success) {
 		System_printf("EasyLink_receiveAsync failed");
 	}
@@ -305,7 +307,7 @@ static void resendPacket()
 	}
 
 	if(EasyLink_receiveAsync(rxDoneCallbackReceive, 0) != EasyLink_Status_Success) {
-		System_abort("EasyLink_receiveAsync failed");
+		System_printf("EasyLink_receiveAsync failed");
 	}
 
 	/* Increase retries by one */
@@ -319,7 +321,7 @@ static void sendAck(uint8_t latestSourceAddress) {
 	txPacket.dstAddr[0] = latestSourceAddress;
 
 	/* Copy ACK packet to payload, skipping the destination adress byte.
-	 * Note that the EasyLink API will implicitly both add the length byte and the destination address byte. */
+	 * Note that the EaAFTERsyLink API will implicitly both add the length byte and the destination address byte. */
 	memcpy(txPacket.payload, &ackPacket.header, sizeof(ackPacket));
 	txPacket.len = sizeof(ackPacket);
 
@@ -336,7 +338,6 @@ static void notifyPacketReceived(union ConcentratorPacket* latestRxPacket)
 {
 	if (packetReceivedCallback)
 		packetReceivedCallback(latestRxPacket);
-
 }
 
 // configure the callback to alpha or gateway
@@ -365,7 +366,7 @@ enum alphaRadioOperationStatus alphaRadioReceiveData(void){
 	/* Get result */
 	receiveStatus = currentRadioOperation.result;
 
-	Semaphore_post(radioAccessSemHandle);
+	Semaphore_post(radioResultSemHandle);
 
 	return receiveStatus;
 }
@@ -373,7 +374,6 @@ enum alphaRadioOperationStatus alphaRadioReceiveData(void){
 /*callback for receive: wait for sensor packet, and check for src address of packet (for Alphas only)*/
 static void rxDoneCallbackReceive(EasyLink_RxPacket * rxPacket, EasyLink_Status status)
 {
-
 	union ConcentratorPacket* tmpRxPacket;
 
 	/* If we received a packet successfully */
@@ -386,27 +386,12 @@ static void rxDoneCallbackReceive(EasyLink_RxPacket * rxPacket, EasyLink_Status 
 		if ((tmpRxPacket->header.packetType == RADIO_PACKET_TYPE_SENSOR_PACKET) ||
 				(tmpRxPacket->header.packetType == RADIO_PACKET_TYPE_ACCEL_PACKET))
 		{
-			// alpha check
-			//if( (concentratorAddress & 0x3) == ALPHA_ADDRESS) // IF I AM AN ALPHA
-			//	&& ((tmpRxPacket->header.sourceAddress & 0x1) == 1) ){ // IF THE SOURCE IS ANOTHER CONCENTRATOR
-
 			// ignore the alpha packet
 			if((tmpRxPacket->header.sourceAddress & 0x1) == 1){
-
-				/*if(verbose_alphaRadio){
-					System_printf("ANOTHER ALPHA! IGNORING...\n");
-					System_flush();}
-				 */
-
-				//Event_post(*radioOperationEventHandle, RADIO_EVENT_SEND_FAIL);
 				Event_post(*radioOperationEventHandle, RADIO_EVENT_INVALID_PACKET_RECEIVED);
-				//return;
 
 			}else{ // source is beta
-				// both alpha(passed check) and gateway do this
-				/* Save packet */
 				memcpy((void*)&latestRxPacket, &rxPacket->payload, sizeof(struct sensorPacket));
-				/* Signal packet received */
 				Event_post(*radioOperationEventHandle, RADIO_EVENT_VALID_PACKET_RECEIVED);
 			}
 
@@ -415,7 +400,6 @@ static void rxDoneCallbackReceive(EasyLink_RxPacket * rxPacket, EasyLink_Status 
 		else if(tmpRxPacket->header.packetType == RADIO_PACKET_TYPE_ACK_PACKET){
 			//alpha sends now, so it needs ACK packets
 			Event_post(*radioOperationEventHandle, RADIO_EVENT_DATA_ACK_RECEIVED);
-
 		}
 
 	} else if(status == EasyLink_Status_Rx_Timeout) {

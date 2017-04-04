@@ -27,10 +27,13 @@ void serializePacket(struct sampleData *data, uint8_t *buffer) {
 		buffer[12] = data->error = 0;
 
 	} else if (data->packetType == RADIO_PACKET_TYPE_ACCEL_PACKET) {
-		buffer[6] = data->accelerometerData.x;
-		buffer[7] = data->accelerometerData.y;
-		buffer[8] = data->accelerometerData.z;
-		buffer[9] = data->error = 0;
+		buffer[6] = data->accelerometerData.x_h;
+		buffer[7] = data->accelerometerData.x_l;
+		buffer[8] = data->accelerometerData.y_h;
+		buffer[9] = data->accelerometerData.y_l;
+		buffer[10] = data->accelerometerData.z_h;
+		buffer[11] = data->accelerometerData.z_l;
+		buffer[12] = data->error = 0;
 
 	} else {
 		if(verbose_serialize){System_printf("ERR: unrecognized packet type when serializing: %d\n", data->cowID);}
@@ -57,10 +60,13 @@ void unserializePacket(struct sampleData *data, uint8_t *buffer) {
 		data->error = buffer[12];
 
 	} else if (data->packetType == RADIO_PACKET_TYPE_ACCEL_PACKET) {
-		data->accelerometerData.x = buffer[6];
-		data->accelerometerData.y = buffer[7];
-		data->accelerometerData.z = buffer[8];
-		data->error = buffer[9];
+		data->accelerometerData.x_h = buffer[6];
+		data->accelerometerData.x_l = buffer[7];
+		data->accelerometerData.y_h = buffer[8];
+		data->accelerometerData.y_l = buffer[9];
+		data->accelerometerData.z_h = buffer[10];
+		data->accelerometerData.z_l = buffer[11];
+		data->error = buffer[12];
 
 	} else {
 		if(verbose_serialize){System_printf("ERR: unrecognized packet type when unserializing: %d\n", data->cowID);}

@@ -90,9 +90,13 @@ void serializeTestSerializeAccelerometer() {
 	sampledata.cowID = 1;
 	sampledata.packetType = RADIO_PACKET_TYPE_ACCEL_PACKET;
 	sampledata.timestamp = 0x12345678;
-	sampledata.accelerometerData.x = 0x78;
-	sampledata.accelerometerData.y = 0x89;
-	sampledata.accelerometerData.z = 0x90;
+	sampledata.accelerometerData.x_h = 0x78;
+	sampledata.accelerometerData.x_l = 0x78;
+	sampledata.accelerometerData.y_h = 0x89;
+	sampledata.accelerometerData.y_l = 0x89;
+	sampledata.accelerometerData.z_h = 0x90;
+	sampledata.accelerometerData.z_l = 0x90;
+
 	sampledata.error = 0x0;
 
 
@@ -106,9 +110,13 @@ void serializeTestSerializeAccelerometer() {
 	bool success = (sampledata.cowID == sample2.cowID);
 	success = (sampledata.packetType == sample2.packetType);
 	success = (sampledata.timestamp == sample2.timestamp);
-	success = (sampledata.accelerometerData.x == sample2.accelerometerData.x);
-	success = (sampledata.accelerometerData.y == sample2.accelerometerData.y);
-	success = (sampledata.accelerometerData.z == sample2.accelerometerData.z);
+	success = (sampledata.accelerometerData.x_h == sample2.accelerometerData.x_h);
+	success = (sampledata.accelerometerData.x_l == sample2.accelerometerData.x_l);
+	success = (sampledata.accelerometerData.y_h == sample2.accelerometerData.y_h);
+	success = (sampledata.accelerometerData.y_l == sample2.accelerometerData.y_l);
+	success = (sampledata.accelerometerData.z_h == sample2.accelerometerData.z_h);
+	success = (sampledata.accelerometerData.z_l == sample2.accelerometerData.z_l);
+
 	success = (sampledata.error == sample2.error);
 
 	if (success) {

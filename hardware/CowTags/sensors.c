@@ -65,8 +65,8 @@ void getAcceleration(struct sampleData *sampleData) {
 	//if (verbose_sensors)System_printf("\n\nwhoamI: 0x%x \n", readI2CRegister(Board_LIS3DH_ADDR, 15)); //should read 0x33
 	//System_flush();
 
-	System_printf("Getting acceleration..\n");
-	System_flush();
+	//System_printf("Getting acceleration..\n");
+	//System_flush();
 
 	unsigned int	i;
 	char accelerometer_state = 0x00;
@@ -374,11 +374,9 @@ void makeSensorPacket(struct sampleData *sampleData) {
 
 	getHeartRate(sampleData);
 
+	getTimestamp(sampleData);
 
-
-	//getTimestamp(sampleData);
-
-	/*System_printf(							"TemperatureCowData = %i ,"
+	System_printf(							"TemperatureCowData = %i ,"
 											"AmbientTemperatureData = %i ,"
 											"InfraredData = %i\n"
 											"AccelerometerData= x=%i, y=%i, z=%i\n"
@@ -386,11 +384,11 @@ void makeSensorPacket(struct sampleData *sampleData) {
 											sampleData->tempData.temp_h << 8 | sampleData->tempData.temp_l,
 											sampleData->heartRateData.temp_h << 8 | sampleData->heartRateData.temp_l,
 											sampleData->heartRateData.rate_h << 8 | sampleData->heartRateData.rate_l,
-											sampleData->accelerometerData.x,
-											sampleData->accelerometerData.y,
-											sampleData->accelerometerData.z,
+											sampleData->accelerometerData.x_h << 8 | sampleData->accelerometerData.x_l,
+											sampleData->accelerometerData.y_h << 8 | sampleData->accelerometerData.y_l,
+											sampleData->accelerometerData.z_h << 8 | sampleData->accelerometerData.z_l,
 											sampleData->timestamp);
-*/
+
 }
 
 void testSensors() {

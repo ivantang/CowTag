@@ -156,43 +156,6 @@ bool eeprom_getNext(struct sampleData *data) {
 	return false;  // NOT DONE
 }
 
-/* TODO:
- * Sets the address pointer on EEPROM to addrHigh and addrLow
- * Returns the value in addrHigh addrLow as well as the next readNum #'s of values in array
- * Increments address pointer to next entry after the last read
- *
-static void eeprom_readPage(uint8_t addrHigh, uint8_t addrLow, uint8_t rxBuffer[]) {
-	uint8_t			txBuffer[2];
-
-	txBuffer[0] = addrHigh;
-	txBuffer[1] = addrLow;
-
-	I2C_Transaction i2cTransaction;
-	I2C_Handle handle;
-	I2C_Params params;
-
-	I2C_Params_init(&params);
-	params.transferMode = I2C_MODE_BLOCKING;
-	params.bitRate = I2C_400kHz;
-
-	i2cTransaction.writeBuf = txBuffer;
-	i2cTransaction.writeCount = 2;
-	i2cTransaction.readBuf = rxBuffer;
-	i2cTransaction.readCount = 6;//sizeof(*rxBuffer) / sizeof(rxBuffer[0]);
-	i2cTransaction.slaveAddress = BOARD_24LC256;
-
-	handle = I2C_open(Board_I2C, &params);
-	if (handle == NULL) {
-		System_abort("Error Initializing I2C\n");
-	}
-
-	if(I2C_transfer(handle, &i2cTransaction) == NULL){
-		System_abort("I2C Transfer Failed at Read Random\n");
-	}
-
-	I2C_close(handle);
-}*/
-
 void eeprom_reset() {
 	if(verbose_eeprom){System_printf("Reseting EEPROM\n");System_flush();}
 	eeprom_currentAddress = MIN_EEPROM_ADDRESS;

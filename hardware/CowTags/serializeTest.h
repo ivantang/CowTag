@@ -41,6 +41,7 @@ bool serializeTestStart() {
 	return true;
 }
 
+// create fake Normal sample data, then read and write from eeprom. Confirm data is retrieved correctly
 void serializeTestSerializeNormal() {
 	if(verbose_serializeTest){System_printf("[serializeTestSerializeNormal]\n");}
 
@@ -82,6 +83,7 @@ void serializeTestSerializeNormal() {
 	}
 }
 
+// create fake Accelerometer sample data, then read and write from eeprom. Confirm data is retrieved correctly
 void serializeTestSerializeAccelerometer() {
 	if(verbose_serializeTest){System_printf("[serializeTestSerializeAccelerometer]\n");}
 

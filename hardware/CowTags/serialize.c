@@ -9,6 +9,7 @@
 #include <radioProtocol.h>
 #include <serialize.h>
 
+// convert sampleData struct into byte array for storage
 void serializePacket(struct sampleData *data, uint8_t *buffer) {
 	buffer[0] = data->cowID;
 	buffer[1] = data->packetType;
@@ -38,6 +39,7 @@ void serializePacket(struct sampleData *data, uint8_t *buffer) {
 	}
 }
 
+// convert byte data into sampleData struct
 void unserializePacket(struct sampleData *data, uint8_t *buffer) {
 	data->cowID = buffer[0];
 	data->packetType = buffer[1];

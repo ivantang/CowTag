@@ -186,7 +186,7 @@ void getHeartRate(struct sampleData *sampleData) {
                                      MAX30100_REG_SPO2_CONFIGURATION);
 	// Now we take that previous configuration and "and" it with 0xA0 to keep only
 	// the information that we want to keep from the previous setting. Then "or"
-	// it with 0x46 to set our own global settings
+	// it with 0x43 to set our own global settings
 	// The register is now set like so: x1x0 0011 (x denotes, does not matter)
 	// This sets high res on ------------^     ^^
 	// and LED Pulse width to 1600 us ---------^^

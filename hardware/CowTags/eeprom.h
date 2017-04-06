@@ -1,6 +1,9 @@
 /*
  * eeprom.h
  *
+ * This driver interacts with the 24LC256 eeprom chip.
+ * It can read/write and function as a generator.
+ *
  *  Created on: Jan 24, 2017
  *      Author: Ivan
  */

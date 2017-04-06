@@ -1,6 +1,10 @@
 /*
  * serialize.h
  *
+ * This driver converts data samples from C structs to
+ * raw byte data. This raw data can be sent between tags,
+ * or stored into the eeprom with this format.
+ *
  *  Created on: Feb 6, 2017
  *      Author: champ
  */

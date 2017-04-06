@@ -1,6 +1,8 @@
 /*
  * Sleep.h
  *
+ * Simple helper functions to define wait/sleep periods.
+ *
  *  Created on: Mar 3, 2017
  *      Author: champ
  */

@@ -1,6 +1,10 @@
 /*
  * alphaTask.h
  *
+ * This is a test usage of the Gateway tag configuration.
+ * The Gateway uses RadioReceive.h to simple listen for
+ * any incoming data samples from nearby Alphas and Betas.
+ *
  *  Created on: Nov 17, 2016
  *      Author: annik
  */

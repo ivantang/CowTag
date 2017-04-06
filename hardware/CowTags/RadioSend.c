@@ -72,7 +72,6 @@ static void nodeRadioTaskFunction(UArg arg0, UArg arg1);
 static void returnRadioOperationStatus(enum NodeRadioOperationStatus status);
 static void resendPacket();
 static void rxDoneCallback(EasyLink_RxPacket * rxPacket, EasyLink_Status status);
-
 static void sendBetaPacket(struct sensorPacket betaPacket, uint8_t maxNumberOfRetries, uint32_t ackTimeoutMs);
 
 /***** Function definitions *****/
@@ -108,24 +107,6 @@ static void nodeRadioTaskFunction(UArg arg0, UArg arg1)
 	}
 
 	System_printf("Starting Radio Send\n");
-
-	/*
-	int buildType;
-	int result = varFromConfigInt("tagType",&buildType);
-
-	//tmp
-	buildType = TAG_TYPE;
-
-	System_printf("buildType = %i\n",buildType);
-
-	if(buildType == 0){
-		nodeAddress = BETA_ADDRESS;
-	} else if ( buildType == 1 ){
-		nodeAddress = ALPHA_ADDRESS;
-	} else {
-		System_printf("buildType ERROR");
-		nodeAddress = BETA_ADDRESS;
-	}*/
 
 	nodeAddress = BETA_ADDRESS;
 
@@ -173,7 +154,6 @@ static void nodeRadioTaskFunction(UArg arg0, UArg arg1)
 				uint32_t nextTimeout = RADIO_SEND_ACK_TIMEOUT_TIME_MS * currentRadioOperation.retriesDone;
 				EasyLink_setCtrl(EasyLink_Ctrl_AsyncRx_TimeOut, EasyLink_ms_To_RadioTime(nextTimeout));
 
-				System_printf("Next: %d, Ack: %d, Retries: %d\n", nextTimeout, currentRadioOperation.ackTimeoutMs, currentRadioOperation.retriesDone);
 				System_printf("Timed out: resending for the %d th time, with timeout = %d\n", currentRadioOperation.retriesDone, nextTimeout);
 				resendPacket();
 			}
@@ -228,15 +208,8 @@ static void returnRadioOperationStatus(enum NodeRadioOperationStatus result)
 
 
 
-static void sendBetaPacket(struct sensorPacket bp, uint8_t maxNumberOfRetries, uint32_t ackTimeoutMs){
-
-	//sends to alpha and gateway
-	/*
-	if( Timestamp_get32() % 2 ){
-		currentRadioOperation.easyLinkTxPacket.dstAddr[0] = 0x01;
-	}else{
-		currentRadioOperation.easyLinkTxPacket.dstAddr[0] = 0x02;
-	}*/
+static void sendBetaPacket(struct sensorPacket bp, uint8_t maxNumberOfRetries, uint32_t ackTimeoutMs)
+{
 	System_printf("sending to alpha's or gateway\n");
 	currentRadioOperation.easyLinkTxPacket.dstAddr[0] = GATEWAY_ADDRESS;
 

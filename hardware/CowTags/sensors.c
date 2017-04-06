@@ -109,31 +109,56 @@ void getAcceleration(struct sampleData *sampleData) {
     //writeI2C(Board_LIS3DH_ADDR, LIS3DH_REG_OUT_X_L | 0x80);    //enable auto increment
 
     //polling status register to check for new set of data
-    for(i = 0 ; i < 30 ;){
+    if(!grabOnlyOne){
+		for(i = 0 ; i < 30 ;){
+			if( (readI2CRegister(Board_LIS3DH_ADDR,0x27) & 0x8) >> 3 == 1 ){
+				if( (readI2CRegister(Board_LIS3DH_ADDR,0x27) >> 7) == 1 ){
+					accelerationData[i].accelerometerData.x_h = readI2CRegister(Board_LIS3DH_ADDR,0x28);
+					accelerationData[i].accelerometerData.x_l = readI2CRegister(Board_LIS3DH_ADDR,0x29);
+					accelerationData[i].accelerometerData.y_h = readI2CRegister(Board_LIS3DH_ADDR,0x2A);
+					accelerationData[i].accelerometerData.y_l = readI2CRegister(Board_LIS3DH_ADDR,0x2B);
+					accelerationData[i].accelerometerData.z_h = readI2CRegister(Board_LIS3DH_ADDR,0x2C);
+					accelerationData[i].accelerometerData.z_l = readI2CRegister(Board_LIS3DH_ADDR,0x2D);
+
+					sampleData->accelerometerData.x_h = accelerationData[i].accelerometerData.x_h;
+					sampleData->accelerometerData.x_l = accelerationData[i].accelerometerData.x_l;
+					sampleData->accelerometerData.y_h = accelerationData[i].accelerometerData.y_h;
+					sampleData->accelerometerData.y_l = accelerationData[i].accelerometerData.y_l;
+					sampleData->accelerometerData.z_h = accelerationData[i].accelerometerData.z_h;
+					sampleData->accelerometerData.z_l = accelerationData[i].accelerometerData.z_l;
+
+					System_flush();
+					i++;
+				}
+			}
+		}
+    }
+
+    if(grabOnlyOne){
     	if( (readI2CRegister(Board_LIS3DH_ADDR,0x27) & 0x8) >> 3 == 1 ){
-    		if( (readI2CRegister(Board_LIS3DH_ADDR,0x27) >> 7) == 1 ){
-    			accelerationData[i].accelerometerData.x_h = readI2CRegister(Board_LIS3DH_ADDR,0x28);
+			if( (readI2CRegister(Board_LIS3DH_ADDR,0x27) >> 7) == 1 ){
+				accelerationData[i].accelerometerData.x_h = readI2CRegister(Board_LIS3DH_ADDR,0x28);
 				accelerationData[i].accelerometerData.x_l = readI2CRegister(Board_LIS3DH_ADDR,0x29);
-    			accelerationData[i].accelerometerData.y_h = readI2CRegister(Board_LIS3DH_ADDR,0x2A);
+				accelerationData[i].accelerometerData.y_h = readI2CRegister(Board_LIS3DH_ADDR,0x2A);
 				accelerationData[i].accelerometerData.y_l = readI2CRegister(Board_LIS3DH_ADDR,0x2B);
-    			accelerationData[i].accelerometerData.z_h = readI2CRegister(Board_LIS3DH_ADDR,0x2C);
+				accelerationData[i].accelerometerData.z_h = readI2CRegister(Board_LIS3DH_ADDR,0x2C);
 				accelerationData[i].accelerometerData.z_l = readI2CRegister(Board_LIS3DH_ADDR,0x2D);
 
-    			sampleData->accelerometerData.x_h = accelerationData[i].accelerometerData.x_h;
-    			sampleData->accelerometerData.x_l = accelerationData[i].accelerometerData.x_l;
-    			sampleData->accelerometerData.y_h = accelerationData[i].accelerometerData.y_h;
-    			sampleData->accelerometerData.y_l = accelerationData[i].accelerometerData.y_l;
-    			sampleData->accelerometerData.z_h = accelerationData[i].accelerometerData.z_h;
-    			sampleData->accelerometerData.z_l = accelerationData[i].accelerometerData.z_l;
+				sampleData->accelerometerData.x_h = accelerationData[i].accelerometerData.x_h;
+				sampleData->accelerometerData.x_l = accelerationData[i].accelerometerData.x_l;
+				sampleData->accelerometerData.y_h = accelerationData[i].accelerometerData.y_h;
+				sampleData->accelerometerData.y_l = accelerationData[i].accelerometerData.y_l;
+				sampleData->accelerometerData.z_h = accelerationData[i].accelerometerData.z_h;
+				sampleData->accelerometerData.z_l = accelerationData[i].accelerometerData.z_l;
 
-    			System_flush();
-    			i++;
-    		}
-    	}
+				System_flush();
+				i++;
+			}
+		}
     }
 
     //write to file
-    for(i = 0 ; i < 30 ;i++){
+    //for(i = 0 ; i < 30 ;i++){
     	/*System_printf("x:%3d y:%3d z:%3d\n", 	accelerationData[i].accelerometerData.x ,
     										accelerationData[i].accelerometerData.y,
 											accelerationData[i].accelerometerData.z);*/
@@ -141,7 +166,7 @@ void getAcceleration(struct sampleData *sampleData) {
 			accelerationData[i].packetType = RADIO_PACKET_TYPE_ACCEL_PACKET;
 			file_printSampleData(accelerationData[i]);
     	}
-    }
+    //}
 
 
     System_flush();
@@ -297,7 +322,54 @@ void getHeartRate(struct sampleData* sampleData) {
 //	System_printf("%x\n", readI2CRegister(Board_MAX30100_ADDR, MAX30100_REG_MODE_CONFIGURATION));
 //	System_flush();
 
-	while(i < numValues){
+	if(!grabOnlyOne){
+		while(i < numValues){
+			//clear FIFO PTR
+			writeI2CRegister(Board_MAX30100_ADDR, MAX30100_REG_FIFO_WRITE_POINTER, 0x00);
+			writeI2CRegister(Board_MAX30100_ADDR, MAX30100_REG_FIFO_READ_POINTER, 0x00);
+
+			//check if hr data is ready
+			//tempval = readI2CRegister(Board_MAX30100_ADDR, MAX30100_REG_INTERRUPT_STATUS);
+
+			while(!tempval){
+				tempval = readI2CRegister(Board_MAX30100_ADDR, MAX30100_REG_INTERRUPT_STATUS);
+				tempval &= MAX30100_HRDATA_READY;
+				//System_printf(".");
+				//System_flush();
+				if(tempval &= MAX30100_DATA_FULL){
+					System_printf("IM FULL\n");
+					System_flush();
+				}
+			}
+
+
+			//fifo data is 16 bits so 4 reads is needed
+			//first 16 bits is IR data, in our case, HR data
+			HRData[i].heartRateData.rate_h = readI2CRegister(Board_MAX30100_ADDR,MAX30100_REG_FIFO_DATA);
+			HRData[i].heartRateData.rate_l = readI2CRegister(Board_MAX30100_ADDR, MAX30100_REG_FIFO_DATA);
+			readI2CRegister(Board_MAX30100_ADDR,MAX30100_REG_FIFO_DATA)<<8 + readI2CRegister(Board_MAX30100_ADDR, MAX30100_REG_FIFO_DATA);
+			//filter out 0 measurements
+			while(HRData[i].heartRateData.rate_h << 8 + HRData[i].heartRateData.rate_l == 0){
+				HRData[i].heartRateData.rate_h = readI2CRegister(Board_MAX30100_ADDR,MAX30100_REG_FIFO_DATA);
+				HRData[i].heartRateData.rate_l = readI2CRegister(Board_MAX30100_ADDR, MAX30100_REG_FIFO_DATA);
+				readI2CRegister(Board_MAX30100_ADDR,MAX30100_REG_FIFO_DATA)<<8 + readI2CRegister(Board_MAX30100_ADDR, MAX30100_REG_FIFO_DATA);
+			}
+
+			/*if(HRData[i] < 40000 || HRData[i] > 60000){
+				if(i != 0)
+				HRData[i] = HRData[i-1];
+			}*/
+
+			//next 16 bits is useless data red led data
+			//RedData[i] = readI2CRegister(Board_MAX30100_ADDR,MAX30100_REG_FIFO_DATA)<<8 + readI2CRegister(Board_MAX30100_ADDR,MAX30100_REG_FIFO_DATA);
+
+			//if(i!=0) Derivative[i] = (int)(HRData[i] - HRData[i-1]);
+
+			i++;
+		}
+	}
+
+	if(grabOnlyOne){
 		//clear FIFO PTR
 		writeI2CRegister(Board_MAX30100_ADDR, MAX30100_REG_FIFO_WRITE_POINTER, 0x00);
 		writeI2CRegister(Board_MAX30100_ADDR, MAX30100_REG_FIFO_READ_POINTER, 0x00);
@@ -311,11 +383,10 @@ void getHeartRate(struct sampleData* sampleData) {
 			//System_printf(".");
 			//System_flush();
 			if(tempval &= MAX30100_DATA_FULL){
-				System_printf("IM FULL\n");
+				System_printf("MAX30100 FIFO is full\n");
 				System_flush();
 			}
 		}
-
 
 		//fifo data is 16 bits so 4 reads is needed
 		//first 16 bits is IR data, in our case, HR data
@@ -329,18 +400,10 @@ void getHeartRate(struct sampleData* sampleData) {
 			readI2CRegister(Board_MAX30100_ADDR,MAX30100_REG_FIFO_DATA)<<8 + readI2CRegister(Board_MAX30100_ADDR, MAX30100_REG_FIFO_DATA);
 		}
 
-		/*if(HRData[i] < 40000 || HRData[i] > 60000){
-			if(i != 0)
-			HRData[i] = HRData[i-1];
-		}*/
-
-		//next 16 bits is useless data red led data
-		//RedData[i] = readI2CRegister(Board_MAX30100_ADDR,MAX30100_REG_FIFO_DATA)<<8 + readI2CRegister(Board_MAX30100_ADDR,MAX30100_REG_FIFO_DATA);
-
-		//if(i!=0) Derivative[i] = (int)(HRData[i] - HRData[i-1]);
-
-		i++;
 	}
+
+	sampleData->heartRateData.rate_h = HRData[i].heartRateData.rate_h;
+	sampleData->heartRateData.rate_l = HRData[i].heartRateData.rate_l;
 
 	if (verbose_sensors) {
 		for (i = 0 ; i < numValues ; i++) {

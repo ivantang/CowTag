@@ -170,7 +170,7 @@ static void nodeRadioTaskFunction(UArg arg0, UArg arg1)
 				currentRadioOperation.retriesDone++;
 
 				/* generate increasing timeouts for greater resend success */
-				uint32_t nextTimeout = currentRadioOperation.ackTimeoutMs * currentRadioOperation.retriesDone;
+				uint32_t nextTimeout = RADIO_SEND_ACK_TIMEOUT_TIME_MS * currentRadioOperation.retriesDone;
 				EasyLink_setCtrl(EasyLink_Ctrl_AsyncRx_TimeOut, EasyLink_ms_To_RadioTime(nextTimeout));
 
 				System_printf("Next: %d, Ack: %d, Retries: %d\n", nextTimeout, currentRadioOperation.ackTimeoutMs, currentRadioOperation.retriesDone);

@@ -133,6 +133,7 @@ static void gatewayRadioTestTaskFunction(UArg arg0, UArg arg1)
 	}
 }
 
+// display incoming samples in STDOUT
 void printSampleData(struct sampleData sampledata){
 	System_printf("gatewayRadio: received packet with CowID = %i, "
 											"PacketType: %i, "
@@ -161,6 +162,7 @@ void printSampleData(struct sampleData sampledata){
 	}
 }
 
+// write samples to a file instead of STDOUT
 void file_printSampleData(struct sampleData sampledata) {
 	FILE *fp;
 

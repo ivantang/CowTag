@@ -105,8 +105,10 @@ static void gatewayRadioTestTaskFunction(UArg arg0, UArg arg1)
 			uint8_t buf[SAMPLE_SIZE];
 			unsigned i;
 
+			// show results
+			printSampleData(latestActivePacket.sampledata);
+
 			if(verbose_gatewayRadioTest) {
-				printSampleData(latestActivePacket.sampledata);
 				if (print_packet_to_file_gateway) {
 					file_printSampleData(latestActivePacket.sampledata);
 				}

@@ -114,30 +114,6 @@ static void concentratorRadioTaskFunction(UArg arg0, UArg arg1)
 	}
 
 	System_printf("Starting Radio Receive!\n");
-	/* If you wish to use a frequency other than the default use
-	 * the below API
-	 * EasyLink_setFrequency(868000000);
-	 */
-
-	/* Set src address of ACK packet */
-
-	/* int buildType; */
-	/* int result = varFromConfigInt("tagType",&buildType); */
-
-	// tmp
-	/* buildType = TAG_TYPE; */
-
-	//	System_printf("buildType = %i\n",buildType);
-	//
-	//	if(buildType == 1){
-	//		concentratorAddress = ALPHA_ADDRESS;
-	//	} else if ( buildType == 3 ){
-	//		concentratorAddress = GATEWAY_ADDRESS;
-	//	} else {
-	//		System_printf("buildType ERROR");
-	//		concentratorAddress = GATEWAY_ADDRESS;
-	//	}*/
-
 
 	/* Set src address of ACK packet */;
 	concentratorAddress = GATEWAY_ADDRESS;
@@ -158,16 +134,11 @@ static void concentratorRadioTaskFunction(UArg arg0, UArg arg1)
 
 		/* If valid packet received */
 		if(events & RADIO_EVENT_VALID_PACKET_RECEIVED) {
-
-			//System_printf("Valid Packet, sending ACK...\n");
-
 			/* Send the ack packet */
 			sendAck(latestRxPacket.header.sourceAddress);
 
 			/* Call packet received callback */
 			notifyPacketReceived(&latestRxPacket);
-
-			//System_printf("ACK sent. Back to listening\n");
 
 			/* Go back to RX (to wait to sensor packet) */
 			if(EasyLink_receiveAsync(rxDoneCallback, 0) != EasyLink_Status_Success) {

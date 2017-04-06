@@ -18,7 +18,7 @@
 // setup to build and run automatically before the main project builds,
 // therefore IF YOU CHANGE THE NAME OF THIS DEFINE YOU NEED TO CHANGE THE SEARCH
 // STRING IN ../../add_timestamp_to_config.c AS WELL
-#define TIMESTAMP_AT_BUILDTIME 1491501002
+#define TIMESTAMP_AT_BUILDTIME 1491504559
 // ********************
 // End auto-generated *
 // ********************
@@ -106,7 +106,7 @@ static const int verbose_alphaRadio = 1;
 static const int verbose_serializeTest = 0;
 static const int verbose_betaRadioTest = 1;
 static const int verbose_alphaRadioTest = 1;
-static const int verbose_gatewayRadioTest = 1;
+static const int verbose_gatewayRadioTest = 0;
 static const int verbose_arduinoComTest = 0;
 static const int verbose_eepromTest = 1;
 

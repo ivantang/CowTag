@@ -6,7 +6,7 @@
  */
 /***** Includes *****/
 #include "global_cfg.h"
-#include <radioReceive.h>
+#include <RadioReceive.h>
 /* XDCtools Header files */
 #include <xdc/runtime/System.h>
 #include <ti/sysbios/knl/Task.h>

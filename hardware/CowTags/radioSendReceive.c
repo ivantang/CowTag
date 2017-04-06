@@ -175,7 +175,7 @@ static void alphaRadioTaskFunction(UArg arg0, UArg arg1)
 				System_printf("RadioSend: sending data...\n");
 				System_flush();}
 
-			sendAlphaPacket(sensorPacket, ALPHARADIO_MAX_RETRIES, ALPHARADIO_ACK_TIMEOUT_TIME_MS);
+			sendAlphaPacket(sensorPacket, RADIO_SEND_MAX_RETRIES, RADIO_SEND_ACK_TIMEOUT_TIME_MS);
 		}
 
 		/* If we get an ACK from the concentrator */
@@ -236,10 +236,6 @@ enum alphaRadioOperationStatus alphaRadioSendData(struct sampleData data){
 
 	/* Get radio access semaphore */
 	Semaphore_pend(radioAccessSemHandle, BIOS_WAIT_FOREVER);
-
-	if(verbose_alphaRadio){
-		System_printf("INSIDE RADIO SEND!!\n");
-		System_flush();}
 
 	/* Save data to send */
 	sampledata = data;
@@ -345,10 +341,6 @@ enum alphaRadioOperationStatus alphaRadioReceiveData(void){
 	enum alphaRadioOperationStatus receiveStatus = AlphaRadioStatus_Failed;
 
 	Semaphore_pend(radioAccessSemHandle, BIOS_WAIT_FOREVER);
-
-	if(verbose_alphaRadio){
-		System_printf("INSIDE RADIO RECEIVE!!\n");
-		System_flush();}
 
 	if(EasyLink_receiveAsync(rxDoneCallbackReceive, 0) != EasyLink_Status_Success) {
 		System_printf("EasyLink_receiveAsync failed");

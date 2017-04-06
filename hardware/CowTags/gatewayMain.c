@@ -37,14 +37,15 @@ int main(void){
 	//if(verbose_main){System_printf("Initializing serialization thread...\n");}
 	//serialize_testStart();
 
+	//if(verbose_main){System_printf("Initializing Arduino communication...\n");}
+	//arduinoComTest_init();
+
 	//if(verbose_main){System_printf("Initializing radio antenna...\n");}
 	radioReceive_init();
 
 	//if(verbose_main){System_printf("Initializing gateway tasks...\n");}
 	gatewayRadioTest_init();
 
-	//if(verbose_main){System_printf("Initializing Arduino communication...\n");}
-	//arduinoComTest_init();
 
 	System_flush();
 

@@ -61,7 +61,7 @@ static Semaphore_Handle radioResultSemHandle;
 
 static struct RadioOperation currentRadioOperation;
 static uint8_t nodeAddress = 0; // ending in 0
-static uint8_t concentratorAddress;
+static uint8_t alphaAddress;
 
 static struct sensorPacket sensorPacket;
 static struct sampleData sampledata;
@@ -119,13 +119,13 @@ static void alphaRadioTaskFunction(UArg arg0, UArg arg1)
 		System_flush();}
 
 	nodeAddress = ALPHA_ADDRESS;
-	concentratorAddress = ALPHA_ADDRESS;
+	alphaAddress = ALPHA_ADDRESS;
 
 	/* Setup header */
 	sensorPacket.header.sourceAddress = nodeAddress;
 
 	/* Set up Ack packet */
-	ackPacket.header.sourceAddress = concentratorAddress;
+	ackPacket.header.sourceAddress = alphaAddress;
 	ackPacket.header.packetType = RADIO_PACKET_TYPE_ACK_PACKET;
 
 	EasyLink_enableRxAddrFilter(NULL, 0, 0); // address filtering is disabled for A and G
@@ -171,8 +171,9 @@ static void alphaRadioTaskFunction(UArg arg0, UArg arg1)
 			sendAlphaPacket(sensorPacket, RADIO_SEND_MAX_RETRIES, RADIO_SEND_ACK_TIMEOUT_TIME_MS);
 		}
 
-		/* If we get an ACK from the concentrator */
-		else if (events & RADIO_EVENT_DATA_ACK_RECEIVED) {
+		/* If we get an ACK from the alpha */
+		else if (events & RADIO_EVENT_DATA_ACK_RECEIVED)
+		{
 			if(verbose_alphaRadio){
 				System_printf("RadioSend: ACK RECEIVED! Transmission successful.\n");
 				System_flush();

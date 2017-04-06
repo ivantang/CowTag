@@ -87,8 +87,8 @@ static const int print_packet_to_file_gateway = 0;
 static const int verbose_main = 1;
 
 /* sensor blocks */
-static const int verbose_sensors = 0;
-static const int verbose_i2c     = 0;
+static const int verbose_sensors = 1;
+static const int verbose_i2c = 0;
 
 /* Serialization of sensor packets */
 static const int verbose_serialize = 0;
@@ -121,7 +121,7 @@ static const int verbose_sleep = 0;
 static const int usingEeprom = 0;
 
 /*** ignore sensors ***/
-static const int ignoreSensors = 1;
+static const int ignoreSensors = 0;
 
 #endif // GLOBAL_CFG_H
 

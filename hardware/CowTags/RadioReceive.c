@@ -64,9 +64,9 @@
 
 
 /***** Variable declarations *****/
-static Task_Params concentratorRadioTaskParams;
-Task_Struct concentratorRadioTask; /* not static so you can see in ROV */
-static uint8_t concentratorRadioTaskStack[CONCENTRATORRADIO_TASK_STACK_SIZE];
+static Task_Params gatewayRadioTaskParams;
+Task_Struct gatewayRadioTask; /* not static so you can see in ROV */
+static uint8_t gatewayRadioTaskStack[CONCENTRATORRADIO_TASK_STACK_SIZE];
 Event_Struct radioOperationEvent;  /* not static so you can see in ROV */
 static Event_Handle radioOperationEventHandle;
 
@@ -74,12 +74,12 @@ static ConcentratorRadio_PacketReceivedCallback packetReceivedCallback;
 static union ConcentratorPacket latestRxPacket;
 static EasyLink_TxPacket txPacket;
 static struct AckPacket ackPacket;
-static uint8_t concentratorAddress;
+static uint8_t gatewayAddress;
 static int8_t latestRssi;
 
 
 /***** Prototypes *****/
-static void concentratorRadioTaskFunction(UArg arg0, UArg arg1);
+static void gatewayRadioTaskFunction(UArg arg0, UArg arg1);
 static void rxDoneCallback(EasyLink_RxPacket * rxPacket, EasyLink_Status status);
 static void notifyPacketReceived(union ConcentratorPacket* latestRxPacket);
 static void sendAck(uint8_t latestSourceAddress);
@@ -93,12 +93,12 @@ void radioReceive_init(void) {
 	Event_construct(&radioOperationEvent, &eventParam);
 	radioOperationEventHandle = Event_handle(&radioOperationEvent);
 
-	/* Create the concentrator radio protocol task */
-	Task_Params_init(&concentratorRadioTaskParams);
-	concentratorRadioTaskParams.stackSize = CONCENTRATORRADIO_TASK_STACK_SIZE;
-	concentratorRadioTaskParams.priority = CONCENTRATORRADIO_TASK_PRIORITY;
-	concentratorRadioTaskParams.stack = &concentratorRadioTaskStack;
-	Task_construct(&concentratorRadioTask, concentratorRadioTaskFunction, &concentratorRadioTaskParams, NULL);
+	/* Create the gateway radio protocol task */
+	Task_Params_init(&gatewayRadioTaskParams);
+	gatewayRadioTaskParams.stackSize = CONCENTRATORRADIO_TASK_STACK_SIZE;
+	gatewayRadioTaskParams.priority = CONCENTRATORRADIO_TASK_PRIORITY;
+	gatewayRadioTaskParams.stack = &gatewayRadioTaskStack;
+	Task_construct(&gatewayRadioTask, gatewayRadioTaskFunction, &gatewayRadioTaskParams, NULL);
 }
 
 // configure the callback to alpha or gateway
@@ -106,7 +106,7 @@ void ConcentratorRadioTask_registerPacketReceivedCallback(ConcentratorRadio_Pack
 	packetReceivedCallback = callback;
 }
 
-static void concentratorRadioTaskFunction(UArg arg0, UArg arg1)
+static void gatewayRadioTaskFunction(UArg arg0, UArg arg1)
 {
 	/* Initialize EasyLink */
 	if(EasyLink_init(RADIO_EASYLINK_MODULATION) != EasyLink_Status_Success) {
@@ -116,12 +116,12 @@ static void concentratorRadioTaskFunction(UArg arg0, UArg arg1)
 	System_printf("Starting Radio Receive!\n");
 
 	/* Set src address of ACK packet */;
-	concentratorAddress = GATEWAY_ADDRESS;
+	gatewayAddress = GATEWAY_ADDRESS;
 
 	EasyLink_enableRxAddrFilter(NULL, 0, 0); // address filtering is disabled for A and G
 
 	/* Set up Ack packet */
-	ackPacket.header.sourceAddress = concentratorAddress;
+	ackPacket.header.sourceAddress = gatewayAddress;
 	ackPacket.header.packetType = RADIO_PACKET_TYPE_ACK_PACKET;
 
 	/* Wait for sensor packet (and save to memory) */

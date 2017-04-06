@@ -298,7 +298,9 @@ void getTimestamp(struct sampleData *sampleData) {
 void makeSensorPacket(struct sampleData *sampleData) {
 	getAcceleration(sampleData);
 	getTemp(sampleData);
-	getHeartRate(sampleData);
+
+	//getHeartRate(sampleData);
+
 	getTimestamp(sampleData);
 
 	System_printf("TemperatureCowData = %i ,"
@@ -323,6 +325,4 @@ void testSensors() {
 	while (1) {
 		makeSensorPacket(&sampleData);
 	}
-	System_printf("Tests done\n");
-	System_flush();
 }

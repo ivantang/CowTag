@@ -49,9 +49,9 @@ struct RadioOperation {
 
 
 /***** Variable declarations *****/
-static Task_Params nodeRadioTaskParams;
-Task_Struct nodeRadioTask;        /* not static so you can see in ROV */
-static uint8_t nodeRadioTaskStack[NODERADIO_TASK_STACK_SIZE];
+static Task_Params betaRadioTaskParams;
+Task_Struct betaRadioTask;        /* not static so you can see in ROV */
+static uint8_t betaRadioTaskStack[NODERADIO_TASK_STACK_SIZE];
 Semaphore_Struct radioAccessSem;  /* not static so you can see in ROV */
 static Semaphore_Handle radioAccessSemHandle;
 Semaphore_Struct radioResultSem;  /* not static so you can see in ROV */
@@ -59,7 +59,7 @@ static Semaphore_Handle radioResultSemHandle;
 static Event_Handle * eventHandle;
 
 static struct RadioOperation currentRadioOperation;
-static uint8_t nodeAddress = 0; // ending in 0
+static uint8_t betaAddress = 0; // ending in 0
 
 static struct sensorPacket sensorPacket;
 static struct sampleData sampledata;
@@ -68,7 +68,7 @@ static struct sampleData sampledata;
 extern PIN_Handle ledPinHandle;
 
 /***** Prototypes *****/
-static void nodeRadioTaskFunction(UArg arg0, UArg arg1);
+static void betaRadioTaskFunction(UArg arg0, UArg arg1);
 static void returnRadioOperationStatus(enum NodeRadioOperationStatus status);
 static void resendPacket();
 static void rxDoneCallback(EasyLink_RxPacket * rxPacket, EasyLink_Status status);
@@ -91,14 +91,15 @@ void radioSend_init() {
 	eventHandle = getEventHandle();
 
 	/* Create the radio protocol task */
-	Task_Params_init(&nodeRadioTaskParams);
-	nodeRadioTaskParams.stackSize = NODERADIO_TASK_STACK_SIZE;
-	nodeRadioTaskParams.priority = NODERADIO_TASK_PRIORITY;
-	nodeRadioTaskParams.stack = &nodeRadioTaskStack;
-	Task_construct(&nodeRadioTask, nodeRadioTaskFunction, &nodeRadioTaskParams, NULL);
+	Task_Params_init(&betaRadioTaskParams);
+	betaRadioTaskParams.stackSize = NODERADIO_TASK_STACK_SIZE;
+	betaRadioTaskParams.priority = NODERADIO_TASK_PRIORITY;
+	betaRadioTaskParams.stack = &betaRadioTaskStack;
+	Task_construct(&betaRadioTask, betaRadioTaskFunction, &betaRadioTaskParams, NULL);
 }
 
-static void nodeRadioTaskFunction(UArg arg0, UArg arg1) {
+static void betaRadioTaskFunction(UArg arg0, UArg arg1)
+{
 	/* Initialize EasyLink */
 	if(EasyLink_init(RADIO_EASYLINK_MODULATION) != EasyLink_Status_Success) {
 		System_abort("EasyLink_init failed");
@@ -106,15 +107,16 @@ static void nodeRadioTaskFunction(UArg arg0, UArg arg1) {
 
 	System_printf("Starting Radio Send\n");
 
-	nodeAddress = BETA_ADDRESS;
+	betaAddress = BETA_ADDRESS;
 
 	/* Set the filter to the generated random address */
-	if (EasyLink_enableRxAddrFilter(&nodeAddress, 1, 1) != EasyLink_Status_Success) {
+	if (EasyLink_enableRxAddrFilter(&betaAddress, 1, 1) != EasyLink_Status_Success)
+	{
 		System_abort("EasyLink_enableRxAddrFilter failed");
 	}
 
 	/* Setup header */
-	sensorPacket.header.sourceAddress = nodeAddress;
+	sensorPacket.header.sourceAddress = betaAddress;
 
 	/* Enter main task loop */
 	while (1) {

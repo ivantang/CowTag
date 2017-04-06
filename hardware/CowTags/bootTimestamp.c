@@ -1,3 +1,11 @@
+/*
+ * bootTimestamp.c
+ *
+ *  Created on: March 16th, 2017
+ *      Author: Steven Hall
+ *
+ */
+
 #include <stdint.h>
 #include "bootTimestamp.h"
 #include "global_cfg.h"

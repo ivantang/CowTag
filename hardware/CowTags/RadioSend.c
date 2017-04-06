@@ -70,7 +70,7 @@ extern PIN_Handle ledPinHandle;
 /***** Prototypes *****/
 static void nodeRadioTaskFunction(UArg arg0, UArg arg1);
 static void returnRadioOperationStatus(enum NodeRadioOperationStatus status);
-static void resendPacket();
+static void resendPacket(uint32_t newAckTimeout);
 static void rxDoneCallback(EasyLink_RxPacket * rxPacket, EasyLink_Status status);
 
 static void sendBetaPacket(struct sensorPacket betaPacket, uint8_t maxNumberOfRetries, uint32_t ackTimeoutMs);
@@ -166,8 +166,16 @@ static void nodeRadioTaskFunction(UArg arg0, UArg arg1)
 			/* If we haven't resent it the maximum number of times yet, then resend packet */
 			if (currentRadioOperation.retriesDone < currentRadioOperation.maxNumberOfRetries)
 			{
-				resendPacket();
-				System_printf("Timed out: resending for the %d th time\n", currentRadioOperation.retriesDone);
+				/* Increase retries by one */
+				currentRadioOperation.retriesDone++;
+
+				/* generate increasing timeouts for greater resend success */
+				uint32_t nextTimeout = currentRadioOperation.ackTimeoutMs * currentRadioOperation.retriesDone;
+				EasyLink_setCtrl(EasyLink_Ctrl_AsyncRx_TimeOut, EasyLink_ms_To_RadioTime(nextTimeout));
+
+				System_printf("Next: %d, Ack: %d, Retries: %d\n", nextTimeout, currentRadioOperation.ackTimeoutMs, currentRadioOperation.retriesDone);
+				System_printf("Timed out: resending for the %d th time, with timeout = %d\n", currentRadioOperation.retriesDone, nextTimeout);
+				resendPacket(nextTimeout);
 			}
 			else
 			{
@@ -257,8 +265,11 @@ static void sendBetaPacket(struct sensorPacket bp, uint8_t maxNumberOfRetries, u
 }
 
 
-static void resendPacket()
+static void resendPacket(uint32_t newAckTimeout)
 {
+	/* set increasing timeout */
+	currentRadioOperation.ackTimeoutMs = newAckTimeout;
+
 	/* Send packet  */
 	if (EasyLink_transmit(&currentRadioOperation.easyLinkTxPacket) != EasyLink_Status_Success)
 	{
@@ -270,9 +281,6 @@ static void resendPacket()
 	{
 		System_abort("EasyLink_receiveAsync failed");
 	}
-
-	/* Increase retries by one */
-	currentRadioOperation.retriesDone++;
 }
 
 /*callback for send: wait for ACK packet*/

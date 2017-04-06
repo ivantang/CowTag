@@ -18,7 +18,7 @@
 // setup to build and run automatically before the main project builds,
 // therefore IF YOU CHANGE THE NAME OF THIS DEFINE YOU NEED TO CHANGE THE SEARCH
 // STRING IN ../../add_timestamp_to_config.c AS WELL
-#define TIMESTAMP_AT_BUILDTIME 1490328628
+#define TIMESTAMP_AT_BUILDTIME 1491500291
 // ********************
 // End auto-generated *
 // ********************
@@ -32,11 +32,11 @@
 
 // Specifies the number of retries for send
 // Original value: 6
-#define RADIO_SEND_MAX_RETRIES 6
+#define RADIO_SEND_MAX_RETRIES 4
 
 // Specifies the number of retries for receive
 // Original value: 6
-#define RADIO_RECEIVE_MAX_RETRIES 6
+#define RADIO_RECEIVE_MAX_RETRIES 4
 
 // Specifies the timeout for send and receive in milliseconds
 // Original value: (500)
@@ -118,7 +118,7 @@ static const int verbose_uptime = 0;
 static const int verbose_sleep = 0;
 
 /*** enable/disable eeprom ***/
-static const int usingEeprom = 1;
+static const int usingEeprom = 0;
 
 /*** ignore sensors ***/
 static const int ignoreSensors = 1;

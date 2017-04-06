@@ -18,7 +18,7 @@
 // setup to build and run automatically before the main project builds,
 // therefore IF YOU CHANGE THE NAME OF THIS DEFINE YOU NEED TO CHANGE THE SEARCH
 // STRING IN ../../add_timestamp_to_config.c AS WELL
-#define TIMESTAMP_AT_BUILDTIME 1491504559
+#define TIMESTAMP_AT_BUILDTIME 1491506399
 // ********************
 // End auto-generated *
 // ********************

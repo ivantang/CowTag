@@ -39,8 +39,6 @@
 /***** Defines *****/
 #define ALPHARADIO_TASK_STACK_SIZE 1024
 #define ALPHARADIO_TASK_PRIORITY   3
-#define ALPHARADIO_MAX_RETRIES 3
-#define ALPHARADIO_ACK_TIMEOUT_TIME_MS (500)
 
 /***** Type declarations *****/
 struct RadioOperation {
@@ -72,10 +70,6 @@ static ConcentratorRadio_PacketReceivedCallback packetReceivedCallback;
 static union ConcentratorPacket latestRxPacket;
 static EasyLink_TxPacket txPacket;
 static struct AckPacket ackPacket;
-
-static int sendReceiveMode = 0; // 0 for receive, 1 for send
-
-//static int sendReceiveMode = 0; // 0 for receive, 1 for send
 
 /***** Prototypes *****/
 static void alphaRadioTaskFunction(UArg arg0, UArg arg1);
@@ -201,7 +195,6 @@ static void alphaRadioTaskFunction(UArg arg0, UArg arg1)
 				uint32_t nextTimeout = RADIO_SEND_ACK_TIMEOUT_TIME_MS * currentRadioOperation.retriesDone;
 				EasyLink_setCtrl(EasyLink_Ctrl_AsyncRx_TimeOut, EasyLink_ms_To_RadioTime(nextTimeout));
 
-				System_printf("Next: %d, Ack: %d, Retries: %d\n", nextTimeout, currentRadioOperation.ackTimeoutMs, currentRadioOperation.retriesDone);
 				System_printf("Timed out: resending for the %d th time, with timeout = %d\n", currentRadioOperation.retriesDone, nextTimeout);
 				resendPacket();
 			}
@@ -317,7 +310,6 @@ static void sendAck(uint8_t latestSourceAddress) {
 	/* Send packet  */
 	if (EasyLink_transmit(&txPacket) != EasyLink_Status_Success)
 	{
-		//System_abort("EasyLink_transmit failed: failed to send ACK");
 		System_printf("EasyLink_transmit failed: failed to send ACK\n");
 	}
 }
@@ -383,7 +375,6 @@ static void rxDoneCallbackReceive(EasyLink_RxPacket * rxPacket, EasyLink_Status 
 				memcpy((void*)&latestRxPacket, &rxPacket->payload, sizeof(struct sensorPacket));
 				Event_post(*radioOperationEventHandle, RADIO_EVENT_VALID_PACKET_RECEIVED);
 			}
-
 		}
 
 		else if(tmpRxPacket->header.packetType == RADIO_PACKET_TYPE_ACK_PACKET){

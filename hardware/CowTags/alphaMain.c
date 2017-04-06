@@ -39,10 +39,7 @@ int main(void) {
 	// boot_timestamp is in bootTimestamp.h
 	Types_FreqHz frequency;
 	Timestamp_getFreq(&frequency);
-//	boot_timestamp = Timestamp_get32() / (frequency.lo / 1000000000000.0);
-	/* boot_timestamp = Timestamp_get32() / (frequency.hi << 8 | frequency.lo); */
 	boot_timestamp = Clock_getTicks();
-	/* boot_timestamp = Timestamp_get32(); */
 
 	if (verbose_main) {System_printf("Initializing tasks...\n");}
 

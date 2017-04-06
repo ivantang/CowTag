@@ -65,20 +65,7 @@
 #include <Sleep.h>
 #include <EventManager.h>
 
-/***** Defines *****/
-//#define ALPHARADIOTEST_TASK_STACK_SIZE 1024
-//#define ALPHARADIOTEST_TASK_PRIORITY   3
-//#define ALPHARADIOTEST_MAX_NODES 7
-//#define ALPHARADIOTEST_DISPLAY_LINES 8
-//
-///***** Variable declarations *****/
-//static Task_Params alphaRadioTestTaskParams;
-//Task_Struct alphaRadioTestTask;    /* not static so you can see in ROV */
-//static uint8_t alphaRadioTestTaskStack[ALPHARADIOTEST_TASK_STACK_SIZE];
-//static Event_Handle *alphaRadioTestEventHandle;
-//static struct sensorPacket latestActivePacket;
 
-////
 /***** Defines *****/
 #define ALPHARADIOTEST_TASK_STACK_SIZE 1024
 #define ALPHARADIOTEST_TASK_PRIORITY   3
@@ -122,9 +109,6 @@ static void alphaRadioTestTaskFunction(UArg arg0, UArg arg1){
 	struct sampleData sampledata;
 	enum alphaRadioOperationStatus results;
 	if(verbose_alphaRadioTest){System_printf("Initializing alphaRadioTest...\n");}
-
-	// wait for the radio task for initialize...
-	//Task_sleep(2 * sleepASecond());
 
 	while (1) {
 		received = 0;

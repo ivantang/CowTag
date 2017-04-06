@@ -43,26 +43,25 @@ void serializePacket(struct sampleData *data, uint8_t *buffer) {
 void unserializePacket(struct sampleData *data, uint8_t *buffer) {
 	data->cowID = buffer[0];
 	data->packetType = buffer[1];
-	data->timestamp =
-			(buffer[2] << 24) |
-			(buffer[3] << 16) |
-			(buffer[4] << 8) |
-			buffer[5];
+	data->timestamp = (buffer[2] << 24) |
+                    (buffer[3] << 16) |
+                    (buffer[4] << 8) |
+                    buffer[5];
 
 	if (data->packetType == RADIO_PACKET_TYPE_SENSOR_PACKET) {
-		data->tempData.temp_h = buffer[6];
-		data->tempData.temp_l = buffer[7];
+		data->tempData.temp_h      = buffer[6];
+		data->tempData.temp_l      = buffer[7];
 		data->heartRateData.rate_h = buffer[8];
 		data->heartRateData.rate_l = buffer[9];
 		data->heartRateData.temp_h = buffer[10];
 		data->heartRateData.temp_l = buffer[11];
-		data->error = buffer[12];
+		data->error                = buffer[12];
 
 	} else if (data->packetType == RADIO_PACKET_TYPE_ACCEL_PACKET) {
 		data->accelerometerData.x = buffer[6];
 		data->accelerometerData.y = buffer[7];
 		data->accelerometerData.z = buffer[8];
-		data->error = buffer[9];
+		data->error               = buffer[9];
 
 	} else {
 		if(verbose_serialize){System_printf("ERR: unrecognized packet type when unserializing: %d\n", data->cowID);}

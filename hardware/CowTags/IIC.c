@@ -31,32 +31,32 @@
  */
 void writeI2CEEPROM(uint8_t slaveAddr, uint8_t bytes[]) {
 	// 3 bytes per request
-	uint8_t			txBuffer[3];
-	uint8_t         rxBuffer[1];
+	uint8_t txBuffer[3];
+	uint8_t rxBuffer[1];
 
 	I2C_Transaction i2cTransaction;
-	I2C_Handle 		handle;
-	I2C_Params		params;
+	I2C_Handle handle;
+	I2C_Params params;
 
 	// init clock speed and synch
 	I2C_Params_init(&params);
-    params.transferMode = I2C_MODE_BLOCKING;
-    params.bitRate = I2C_100kHz;
+	params.transferMode = I2C_MODE_BLOCKING;
+	params.bitRate = I2C_100kHz;
 
-    assert(sizeof(bytes) > 0);
+	assert(sizeof(bytes) > 0);
 
-    // load data
-    int i;
-    int arrayLen = sizeof(bytes);
-    for (i = 0; i < arrayLen; i++){
-    	txBuffer[i] = bytes[i];
-    }
+	// load data
+	int i;
+	int arrayLen = sizeof(bytes);
+	for (i = 0; i < arrayLen; i++){
+		txBuffer[i] = bytes[i];
+	}
 
-    i2cTransaction.writeBuf = txBuffer;
-    i2cTransaction.writeCount = 3;
-    i2cTransaction.readBuf = rxBuffer;
-    i2cTransaction.readCount = 0;
-    i2cTransaction.slaveAddress = slaveAddr;
+		i2cTransaction.writeBuf = txBuffer;
+		i2cTransaction.writeCount = 3;
+		i2cTransaction.readBuf = rxBuffer;
+		i2cTransaction.readCount = 0;
+		i2cTransaction.slaveAddress = slaveAddr;
 
 	handle = I2C_open(Board_I2C, &params);
 	if (handle == NULL) {
@@ -76,8 +76,8 @@ void writeI2CEEPROM(uint8_t slaveAddr, uint8_t bytes[]) {
 }
 
 uint8_t readI2CEEPROM(uint8_t slaveaddr, uint8_t addrHigh, uint8_t addrLow) {
-	uint8_t			txBuffer[2];
-	uint8_t			rxBuffer[1];
+	uint8_t txBuffer[2];
+	uint8_t rxBuffer[1];
 
 	txBuffer[0] = addrHigh;
 	txBuffer[1] = addrLow;
@@ -120,26 +120,26 @@ uint8_t readI2CEEPROM(uint8_t slaveaddr, uint8_t addrHigh, uint8_t addrLow) {
 //first 8 bits in txbuffer is address on hardware we want to write to
 //seconds 8 bits in txbuffer is value we want to write
 void writeI2CRegister(uint8_t board_address, uint8_t destination, uint8_t value){
-	uint8_t			txBuffer[2];
-	uint8_t         rxBuffer[1];
+	uint8_t txBuffer[2];
+	uint8_t rxBuffer[1];
 
 	I2C_Transaction i2cTransaction;
-	I2C_Handle 		handle;
-	I2C_Params		params;
+	I2C_Handle handle;
+	I2C_Params params;
 
 	I2C_Params_init(&params);
-    params.transferMode = I2C_MODE_BLOCKING;
-    params.bitRate = I2C_400kHz;
+	params.transferMode = I2C_MODE_BLOCKING;
+	params.bitRate = I2C_400kHz;
 
-    /*prepare data to send*/
-    txBuffer[0] = destination;
-    txBuffer[1] = value;
+	/*prepare data to send*/
+	txBuffer[0] = destination;
+	txBuffer[1] = value;
 
-    i2cTransaction.writeBuf = txBuffer;
-    i2cTransaction.writeCount = 2;
-    i2cTransaction.readBuf = rxBuffer;
-    i2cTransaction.readCount = 0;
-    i2cTransaction.slaveAddress = board_address; //0x18
+	i2cTransaction.writeBuf = txBuffer;
+	i2cTransaction.writeCount = 2;
+	i2cTransaction.readBuf = rxBuffer;
+	i2cTransaction.readCount = 0;
+	i2cTransaction.slaveAddress = board_address; //0x18
 
 
 	handle = I2C_open(Board_I2C, &params);
@@ -167,39 +167,32 @@ void writeI2CRegister(uint8_t board_address, uint8_t destination, uint8_t value)
 
 //similar to writeI2CRegister but instead takes arrays as arguments
 void writeI2CRegisters(int8_t board_address, uint8_t destination[], uint8_t value[]){
-	unsigned int 	i;
-	uint8_t			txBuffer[sizeof(destination)+sizeof(value) + 2];
-	uint8_t         rxBuffer[1];
+	unsigned int i;
+	uint8_t txBuffer[sizeof(destination)+sizeof(value) + 2];
+	uint8_t rxBuffer[1];
 
 	I2C_Transaction i2cTransaction;
-	I2C_Handle 		handle;
-	I2C_Params		params;
+	I2C_Handle handle;
+	I2C_Params params;
 
 	I2C_Params_init(&params);
-    params.transferMode = I2C_MODE_BLOCKING;
-    params.bitRate = I2C_400kHz;
+	params.transferMode = I2C_MODE_BLOCKING;
+	params.bitRate = I2C_400kHz;
 
-    /*check if destination and value arrays are same size*/
-    assert(sizeof(destination) == sizeof(value));
+	/*check if destination and value arrays are same size*/
+	assert(sizeof(destination) == sizeof(value));
 
-    /*prepare data to send*/
-    for(i = 0; i < sizeof(destination) + 1; i++){
-    	txBuffer[2 * i + 0] = destination[i];
+	/*prepare data to send*/
+	for(i = 0; i < sizeof(destination) + 1; i++){
+		txBuffer[2 * i + 0] = destination[i];
 		txBuffer[2 * i + 1] = value[i];
-    }
+	}
 
-//print out tx details
-
-//    for(i = 0; i < 10; i++)
-//    	System_printf("%x ",txBuffer[i]);
-//    System_printf("\ndestination %i\n",sizeof(destination));
-//    System_printf("value %i\n",sizeof(value));
-
-    i2cTransaction.writeBuf = txBuffer;
-    i2cTransaction.writeCount = (sizeof(txBuffer) + 1)*2;	//sizeof array gets -1 of actual size
-    i2cTransaction.readBuf = rxBuffer;
-    i2cTransaction.readCount = 0;
-    i2cTransaction.slaveAddress = board_address; //0x18
+	i2cTransaction.writeBuf = txBuffer;
+	i2cTransaction.writeCount = (sizeof(txBuffer) + 1)*2; //sizeof array gets -1 of actual size
+	i2cTransaction.readBuf = rxBuffer;
+	i2cTransaction.readCount = 0;
+	i2cTransaction.slaveAddress = board_address; //0x18
 
 
 	handle = I2C_open(Board_I2C, &params);
@@ -229,8 +222,8 @@ void writeI2CRegisters(int8_t board_address, uint8_t destination[], uint8_t valu
 //100kHz is compatible with SMBUS
 //this function is written to be used for the MLX90614 read format
 uint32_t readI2CWord100kHz(uint8_t board_address, uint8_t address){
-	uint8_t			txBuffer[1];
-	uint8_t			rxBuffer[2];
+	uint8_t txBuffer[1];
+	uint8_t rxBuffer[2];
 
 	I2C_Transaction i2cTransaction;
 	I2C_Handle handle;
@@ -239,14 +232,14 @@ uint32_t readI2CWord100kHz(uint8_t board_address, uint8_t address){
 	//load txBuffer
 	txBuffer[0] = address;
 
-    I2C_Params_init(&params);
-    params.transferMode = I2C_MODE_BLOCKING;
-    params.bitRate = I2C_100kHz;
+	I2C_Params_init(&params);
+	params.transferMode = I2C_MODE_BLOCKING;
+	params.bitRate = I2C_100kHz;
 
-    i2cTransaction.writeBuf = txBuffer;
-	i2cTransaction.writeCount = 1;
-	i2cTransaction.readBuf = rxBuffer;
-	i2cTransaction.readCount = 2;
+	i2cTransaction.writeBuf     = txBuffer;
+	i2cTransaction.writeCount   = 1;
+	i2cTransaction.readBuf      = rxBuffer;
+	i2cTransaction.readCount    = 2;
 	i2cTransaction.slaveAddress = board_address;
 
 	handle = I2C_open(Board_I2C, &params);
@@ -264,28 +257,28 @@ uint32_t readI2CWord100kHz(uint8_t board_address, uint8_t address){
 	}
 	I2C_close(handle);
 
-    //First byte is lower 8 bits, second byte is high 8 bits
-    return ((rxBuffer[0]) + (rxBuffer[1] <<8));
+	//First byte is lower 8 bits, second byte is high 8 bits
+	return ((rxBuffer[0]) + (rxBuffer[1] <<8));
 }
 
 //input board address and address of register you want to read
 //returns 8bit value in the register
 uint8_t readI2CRegister(uint8_t board_address, uint8_t address){
-	uint8_t			txBuffer[1] = {address};
-	uint8_t			rxBuffer[1];
+	uint8_t txBuffer[1] = {address};
+	uint8_t rxBuffer[1];
 
 	I2C_Transaction i2cTransaction;
 	I2C_Handle handle;
 	I2C_Params params;
 
-    I2C_Params_init(&params);
-    params.transferMode = I2C_MODE_BLOCKING;
-    params.bitRate = I2C_400kHz;
+	I2C_Params_init(&params);
+	params.transferMode = I2C_MODE_BLOCKING;
+	params.bitRate = I2C_400kHz;
 
-    i2cTransaction.writeBuf = txBuffer;
-	i2cTransaction.writeCount = 1;
-	i2cTransaction.readBuf = rxBuffer;
-	i2cTransaction.readCount = 1;
+	i2cTransaction.writeBuf     = txBuffer;
+	i2cTransaction.writeCount   = 1;
+	i2cTransaction.readBuf      = rxBuffer;
+	i2cTransaction.readCount    = 1;
 	i2cTransaction.slaveAddress = board_address;
 
 	handle = I2C_open(Board_I2C, &params);
@@ -302,7 +295,7 @@ uint8_t readI2CRegister(uint8_t board_address, uint8_t address){
 		}
 	}
 
-    I2C_close(handle);
+	I2C_close(handle);
 
 	return rxBuffer[0];
 }

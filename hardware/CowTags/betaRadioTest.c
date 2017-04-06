@@ -126,7 +126,6 @@ static void betaRadioTestTaskFunction(UArg arg0, UArg arg1)
 			if (usingEeprom) {
 				if(verbose_betaRadioTest){System_printf("packet sent error, saving to eeprom: %i\n",results);System_flush();}
 				eeprom_write(&sampledata);
-				//	}
 			} else {
 				if(verbose_betaRadioTest){System_printf("packet sent error, but not saving to eeprom\n");}
 			}

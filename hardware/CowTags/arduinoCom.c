@@ -36,12 +36,12 @@
  */
 void writeI2CArduino(uint8_t slaveAddr, uint8_t bytes[]) {
 	if(verbose_arduinoCom){System_printf("Starting arduinoCom\n");}
-	uint8_t			txBuffer[SAMPLE_SIZE];
-	uint8_t         rxBuffer[1];
+	uint8_t txBuffer[SAMPLE_SIZE];
+	uint8_t rxBuffer[1];
 
 	I2C_Transaction t_i2cTransaction;
-	I2C_Handle 		t_handle;
-	I2C_Params		t_params;
+	I2C_Handle t_handle;
+	I2C_Params t_params;
 
 	// init clock speed and synch
 	I2C_Params_init(&t_params);
@@ -72,7 +72,6 @@ void writeI2CArduino(uint8_t slaveAddr, uint8_t bytes[]) {
 
 	// while error, keep trying
 	if(verbose_arduinoCom){System_printf("Starting transfer\n");}
-	//while(I2C_transfer(t_handle, &t_i2cTransaction) == NULL);
 	if(I2C_transfer(t_handle, &t_i2cTransaction) == NULL){
 		System_printf("Error transferring data to I2C to Arduino\n");
 	}

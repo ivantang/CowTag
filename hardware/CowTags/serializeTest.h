@@ -19,7 +19,7 @@
 #include <ti/sysbios/knl/Task.h>
 
 /*constants*/
-#define TASKSTACKSIZE		1024	//i2c
+#define TASKSTACKSIZE 1024 //i2c
 
 /***** structures *****/
 Task_Struct task0Struct;
@@ -47,16 +47,16 @@ void serializeTestSerializeNormal() {
 
 	// test packet
 	struct sampleData sampledata;
-	sampledata.cowID = 1;
-	sampledata.packetType = RADIO_PACKET_TYPE_SENSOR_PACKET;
-	sampledata.timestamp = 0x12345678;
-	sampledata.tempData.temp_h = 0x78;
-	sampledata.tempData.temp_l = 0x65;
+	sampledata.cowID                = 1;
+	sampledata.packetType           = RADIO_PACKET_TYPE_SENSOR_PACKET;
+	sampledata.timestamp            = 0x12345678;
+	sampledata.tempData.temp_h      = 0x78;
+	sampledata.tempData.temp_l      = 0x65;
 	sampledata.heartRateData.rate_h = 0x90;
 	sampledata.heartRateData.rate_l = 0x87;
 	sampledata.heartRateData.temp_h = 0x45;
 	sampledata.heartRateData.temp_l = 0x32;
-	sampledata.error = 0x0;
+	sampledata.error                = 0x0;
 
 	uint8_t buffer[SAMPLE_SIZE];
 	serializePacket(&sampledata, buffer);
@@ -89,13 +89,13 @@ void serializeTestSerializeAccelerometer() {
 
 	// test packet
 	struct sampleData sampledata;
-	sampledata.cowID = 1;
-	sampledata.packetType = RADIO_PACKET_TYPE_ACCEL_PACKET;
-	sampledata.timestamp = 0x12345678;
+	sampledata.cowID               = 1;
+	sampledata.packetType          = RADIO_PACKET_TYPE_ACCEL_PACKET;
+	sampledata.timestamp           = 0x12345678;
 	sampledata.accelerometerData.x = 0x78;
 	sampledata.accelerometerData.y = 0x89;
 	sampledata.accelerometerData.z = 0x90;
-	sampledata.error = 0x0;
+	sampledata.error               = 0x0;
 
 
 	uint8_t buffer[SAMPLE_SIZE];

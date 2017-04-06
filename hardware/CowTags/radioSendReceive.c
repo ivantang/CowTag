@@ -160,8 +160,7 @@ static void alphaRadioTaskFunction(UArg arg0, UArg arg1)
 		}
 
 		/* If we should send data */
-		else if (events & RADIO_EVENT_SEND_DATA)
-		{
+		else if (events & RADIO_EVENT_SEND_DATA) {
 			sensorPacket.sampledata = sampledata;
 			sensorPacket.header.packetType = sampledata.packetType;
 
@@ -173,21 +172,19 @@ static void alphaRadioTaskFunction(UArg arg0, UArg arg1)
 		}
 
 		/* If we get an ACK from the concentrator */
-		else if (events & RADIO_EVENT_DATA_ACK_RECEIVED)
-		{
+		else if (events & RADIO_EVENT_DATA_ACK_RECEIVED) {
 			if(verbose_alphaRadio){
 				System_printf("RadioSend: ACK RECEIVED! Transmission successful.\n");
-				System_flush();}
+				System_flush();
+			}
 
 			returnRadioOperationStatus(AlphaRadioStatus_Success);
 		}
 
 		/* If we get an ACK timeout */
-		else if (events & RADIO_EVENT_ACK_TIMEOUT)
-		{
+		else if (events & RADIO_EVENT_ACK_TIMEOUT) {
 			/* If we haven't resent it the maximum number of times yet, then resend packet */
-			if (currentRadioOperation.retriesDone < currentRadioOperation.maxNumberOfRetries)
-			{
+			if (currentRadioOperation.retriesDone < currentRadioOperation.maxNumberOfRetries) {
 				/* Increase retries by one */
 				currentRadioOperation.retriesDone++;
 
@@ -198,21 +195,18 @@ static void alphaRadioTaskFunction(UArg arg0, UArg arg1)
 				System_printf("Timed out: resending for the %d th time, with timeout = %d\n", currentRadioOperation.retriesDone, nextTimeout);
 				resendPacket();
 			}
-			else
-			{
+			else {
 				/* Else return send fail */
 				Event_post(*radioOperationEventHandle, RADIO_EVENT_SEND_FAIL);
 			}
 		}
-		else if (events & RADIO_EVENT_INVALID_PACKET_RECEIVED)
-		{
+		else if (events & RADIO_EVENT_INVALID_PACKET_RECEIVED) {
 			if(verbose_alphaRadio){
 				System_printf("RadioSend: Invalid packet received!\n");
 				System_flush();}
 		}
 		/* If send fail */
-		else if (events & RADIO_EVENT_SEND_FAIL)
-		{
+		else if (events & RADIO_EVENT_SEND_FAIL) {
 
 			if(verbose_alphaRadio){
 				System_printf("RadioSend: Send failed\n");
@@ -273,8 +267,7 @@ static void sendAlphaPacket(struct sensorPacket bp, uint8_t maxNumberOfRetries, 
 	EasyLink_setCtrl(EasyLink_Ctrl_AsyncRx_TimeOut, EasyLink_ms_To_RadioTime(ackTimeoutMs));
 
 	/* Send packet  */
-	if (EasyLink_transmit(&currentRadioOperation.easyLinkTxPacket) != EasyLink_Status_Success)
-	{
+	if (EasyLink_transmit(&currentRadioOperation.easyLinkTxPacket) != EasyLink_Status_Success) {
 		System_printf("EasyLink_transmit failed: failed to send packet\n");
 	}
 
@@ -286,8 +279,7 @@ static void sendAlphaPacket(struct sensorPacket bp, uint8_t maxNumberOfRetries, 
 static void resendPacket()
 {
 	/* Send packet  */
-	if (EasyLink_transmit(&currentRadioOperation.easyLinkTxPacket) != EasyLink_Status_Success)
-	{
+	if (EasyLink_transmit(&currentRadioOperation.easyLinkTxPacket) != EasyLink_Status_Success) {
 		System_printf("EasyLink_transmit failed: failed to RESEND packet\n");
 	}
 
@@ -298,7 +290,6 @@ static void resendPacket()
 
 /*send an ACK packet to the src addr of the RX'd sensor packet*/
 static void sendAck(uint8_t latestSourceAddress) {
-
 	/* Set destinationAdress */
 	txPacket.dstAddr[0] = latestSourceAddress;
 
@@ -308,8 +299,7 @@ static void sendAck(uint8_t latestSourceAddress) {
 	txPacket.len = sizeof(ackPacket);
 
 	/* Send packet  */
-	if (EasyLink_transmit(&txPacket) != EasyLink_Status_Success)
-	{
+	if (EasyLink_transmit(&txPacket) != EasyLink_Status_Success) {
 		System_printf("EasyLink_transmit failed: failed to send ACK\n");
 	}
 }
@@ -317,8 +307,9 @@ static void sendAck(uint8_t latestSourceAddress) {
 /*the callback is shared; defined elsewhere*/
 static void notifyPacketReceived(union ConcentratorPacket* latestRxPacket)
 {
-	if (packetReceivedCallback)
+	if (packetReceivedCallback) {
 		packetReceivedCallback(latestRxPacket);
+	}
 }
 
 // configure the callback to alpha or gateway
@@ -358,15 +349,13 @@ static void rxDoneCallbackReceive(EasyLink_RxPacket * rxPacket, EasyLink_Status 
 	union ConcentratorPacket* tmpRxPacket;
 
 	/* If we received a packet successfully */
-	if (status == EasyLink_Status_Success)
-	{
+	if (status == EasyLink_Status_Success) {
 		/* Check that this is a valid packet */
 		tmpRxPacket = (union ConcentratorPacket*)(rxPacket->payload);
 
 		/* If this is a known packet */
 		if ((tmpRxPacket->header.packetType == RADIO_PACKET_TYPE_SENSOR_PACKET) ||
-				(tmpRxPacket->header.packetType == RADIO_PACKET_TYPE_ACCEL_PACKET))
-		{
+				(tmpRxPacket->header.packetType == RADIO_PACKET_TYPE_ACCEL_PACKET)) {
 			// ignore the alpha packet
 			if((tmpRxPacket->header.sourceAddress & 0x1) == 1){
 				Event_post(*radioOperationEventHandle, RADIO_EVENT_INVALID_PACKET_RECEIVED);

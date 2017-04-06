@@ -98,9 +98,7 @@ void radioSend_init() {
 	Task_construct(&nodeRadioTask, nodeRadioTaskFunction, &nodeRadioTaskParams, NULL);
 }
 
-//static uint16_t i = 0;
-static void nodeRadioTaskFunction(UArg arg0, UArg arg1)
-{
+static void nodeRadioTaskFunction(UArg arg0, UArg arg1) {
 	/* Initialize EasyLink */
 	if(EasyLink_init(RADIO_EASYLINK_MODULATION) != EasyLink_Status_Success) {
 		System_abort("EasyLink_init failed");
@@ -111,8 +109,7 @@ static void nodeRadioTaskFunction(UArg arg0, UArg arg1)
 	nodeAddress = BETA_ADDRESS;
 
 	/* Set the filter to the generated random address */
-	if (EasyLink_enableRxAddrFilter(&nodeAddress, 1, 1) != EasyLink_Status_Success)
-	{
+	if (EasyLink_enableRxAddrFilter(&nodeAddress, 1, 1) != EasyLink_Status_Success) {
 		System_abort("EasyLink_enableRxAddrFilter failed");
 	}
 
@@ -120,33 +117,27 @@ static void nodeRadioTaskFunction(UArg arg0, UArg arg1)
 	sensorPacket.header.sourceAddress = nodeAddress;
 
 	/* Enter main task loop */
-	while (1)
-	{
+	while (1) {
 		/* Wait for an event */
 		uint32_t events = Event_pend(*eventHandle, 0, RADIO_EVENT_ALL, BIOS_WAIT_FOREVER);
 
 		/* If we should send data */
-		if (events & RADIO_EVENT_SEND_DATA)
-		{
+		if (events & RADIO_EVENT_SEND_DATA) {
 			sensorPacket.sampledata = sampledata;
 			sensorPacket.header.packetType = sampledata.packetType;
 			sendBetaPacket(sensorPacket, RADIO_SEND_MAX_RETRIES, RADIO_SEND_ACK_TIMEOUT_TIME_MS);
-
 		}
 
 		/* If we get an ACK from the concentrator */
-		if (events & RADIO_EVENT_DATA_ACK_RECEIVED)
-		{
+		if (events & RADIO_EVENT_DATA_ACK_RECEIVED) {
 			returnRadioOperationStatus(NodeRadioStatus_Success);
 			System_printf("ACK RECEIVED! Transmission successful.\n");
 		}
 
 		/* If we get an ACK timeout */
-		if (events & RADIO_EVENT_ACK_TIMEOUT)
-		{
+		if (events & RADIO_EVENT_ACK_TIMEOUT) {
 			/* If we haven't resent it the maximum number of times yet, then resend packet */
-			if (currentRadioOperation.retriesDone < currentRadioOperation.maxNumberOfRetries)
-			{
+			if (currentRadioOperation.retriesDone < currentRadioOperation.maxNumberOfRetries) {
 				/* Increase retries by one */
 				currentRadioOperation.retriesDone++;
 
@@ -157,23 +148,21 @@ static void nodeRadioTaskFunction(UArg arg0, UArg arg1)
 				System_printf("Timed out: resending for the %d th time, with timeout = %d\n", currentRadioOperation.retriesDone, nextTimeout);
 				resendPacket();
 			}
-			else
-			{
+			else {
 				/* Else return send fail */
 				returnRadioOperationStatus(NodeRadioStatus_Failed);
 			}
 		}
 
 		/* If send fail */
-		if (events & RADIO_EVENT_SEND_FAIL)
-		{
+		if (events & RADIO_EVENT_SEND_FAIL) {
 			returnRadioOperationStatus(NodeRadioStatus_FailedNotConnected);
 		}
 	}
 }
 
 
-enum NodeRadioOperationStatus betaRadioSendData(struct sampleData data){
+enum NodeRadioOperationStatus betaRadioSendData(struct sampleData data) {
 	enum NodeRadioOperationStatus status;
 
 	/* Get radio access semaphore */
@@ -197,8 +186,7 @@ enum NodeRadioOperationStatus betaRadioSendData(struct sampleData data){
 	return status;
 }
 
-static void returnRadioOperationStatus(enum NodeRadioOperationStatus result)
-{
+static void returnRadioOperationStatus(enum NodeRadioOperationStatus result) {
 	/* Save result */
 	currentRadioOperation.result = result;
 
@@ -208,8 +196,7 @@ static void returnRadioOperationStatus(enum NodeRadioOperationStatus result)
 
 
 
-static void sendBetaPacket(struct sensorPacket bp, uint8_t maxNumberOfRetries, uint32_t ackTimeoutMs)
-{
+static void sendBetaPacket(struct sensorPacket bp, uint8_t maxNumberOfRetries, uint32_t ackTimeoutMs) {
 	System_printf("sending to alpha's or gateway\n");
 	currentRadioOperation.easyLinkTxPacket.dstAddr[0] = GATEWAY_ADDRESS;
 
@@ -225,14 +212,12 @@ static void sendBetaPacket(struct sensorPacket bp, uint8_t maxNumberOfRetries, u
 	EasyLink_setCtrl(EasyLink_Ctrl_AsyncRx_TimeOut, EasyLink_ms_To_RadioTime(ackTimeoutMs));
 
 	/* Send packet  */
-	if (EasyLink_transmit(&currentRadioOperation.easyLinkTxPacket) != EasyLink_Status_Success)
-	{
+	if (EasyLink_transmit(&currentRadioOperation.easyLinkTxPacket) != EasyLink_Status_Success) {
 		System_abort("EasyLink_transmit failed");
 	}
 
 	/* Enter RX */
-	if (EasyLink_receiveAsync(rxDoneCallback, 0) != EasyLink_Status_Success)
-	{
+	if (EasyLink_receiveAsync(rxDoneCallback, 0) != EasyLink_Status_Success) {
 		System_abort("EasyLink_receiveAsync failed");
 	}
 }
@@ -241,50 +226,42 @@ static void sendBetaPacket(struct sensorPacket bp, uint8_t maxNumberOfRetries, u
 static void resendPacket()
 {
 	/* Send packet  */
-	if (EasyLink_transmit(&currentRadioOperation.easyLinkTxPacket) != EasyLink_Status_Success)
-	{
+	if (EasyLink_transmit(&currentRadioOperation.easyLinkTxPacket) != EasyLink_Status_Success) {
 		System_abort("EasyLink_transmit failed");
 	}
 
 	/* Enter RX and wait for ACK with timeout */
-	if (EasyLink_receiveAsync(rxDoneCallback, 0) != EasyLink_Status_Success)
-	{
+	if (EasyLink_receiveAsync(rxDoneCallback, 0) != EasyLink_Status_Success) {
 		System_abort("EasyLink_receiveAsync failed");
 	}
 }
 
 /*callback for send: wait for ACK packet*/
-static void rxDoneCallback(EasyLink_RxPacket * rxPacket, EasyLink_Status status)
-{
+static void rxDoneCallback(EasyLink_RxPacket * rxPacket, EasyLink_Status status) {
 	struct PacketHeader* packetHeader;
 
 	/* If this callback is called because of a packet received */
-	if (status == EasyLink_Status_Success)
-	{
+	if (status == EasyLink_Status_Success) {
 		/* Check the payload header */
 		packetHeader = (struct PacketHeader*)rxPacket->payload;
 
 		/* Check if this is an ACK packet */
-		if (packetHeader->packetType == RADIO_PACKET_TYPE_ACK_PACKET)
-		{
+		if (packetHeader->packetType == RADIO_PACKET_TYPE_ACK_PACKET) {
 			/* Signal ACK packet received */
 			Event_post(*eventHandle, RADIO_EVENT_DATA_ACK_RECEIVED);
 		}
-		else
-		{
+		else {
 			/* Packet Error, treat as a Timeout and Post a RADIO_EVENT_ACK_TIMEOUT
                event */
 			Event_post(*eventHandle, RADIO_EVENT_ACK_TIMEOUT);
 		}
 	}
 	/* did the Rx timeout */
-	else if(status == EasyLink_Status_Rx_Timeout)
-	{
+	else if(status == EasyLink_Status_Rx_Timeout) {
 		/* Post a RADIO_EVENT_ACK_TIMEOUT event */
 		Event_post(*eventHandle, RADIO_EVENT_ACK_TIMEOUT);
 	}
-	else
-	{
+	else {
 		/* The Ack reception may have been corrupted causing an error.
 		 * Treat this as a timeout
 		 */

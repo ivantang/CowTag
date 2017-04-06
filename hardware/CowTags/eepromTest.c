@@ -182,13 +182,13 @@ void eepromTestWriteReadAccelerometer() {
 
 	// test packet
 	struct sampleData sample;
-	sample.cowID = 1;
-	sample.packetType = RADIO_PACKET_TYPE_ACCEL_PACKET;
-	sample.timestamp = 0x12345678;
+	sample.cowID               = 1;
+	sample.packetType          = RADIO_PACKET_TYPE_ACCEL_PACKET;
+	sample.timestamp           = 0x12345678;
 	sample.accelerometerData.x = 0x78;
 	sample.accelerometerData.y = 0x89;
 	sample.accelerometerData.z = 0x90;
-	sample.error = 0x0;
+	sample.error               = 0x0;
 
 	eeprom_reset();
 	eeprom_write(&sample);
@@ -233,16 +233,16 @@ void eepromTestValidateMemory() {
 	unsigned badReads = 0;
 
 	// test packet
-	sampledata.cowID = 1;
-	sampledata.packetType = RADIO_PACKET_TYPE_SENSOR_PACKET;
-	sampledata.timestamp = 0x12345678;
-	sampledata.tempData.temp_h = 0x78;
-	sampledata.tempData.temp_l = 0x65;
+	sampledata.cowID                = 1;
+	sampledata.packetType           = RADIO_PACKET_TYPE_SENSOR_PACKET;
+	sampledata.timestamp            = 0x12345678;
+	sampledata.tempData.temp_h      = 0x78;
+	sampledata.tempData.temp_l      = 0x65;
 	sampledata.heartRateData.rate_h = 0x90;
 	sampledata.heartRateData.rate_l = 0x87;
 	sampledata.heartRateData.temp_h = 0x45;
 	sampledata.heartRateData.temp_l = 0x32;
-	sampledata.error = 0x0;
+	sampledata.error                = 0x0;
 
 	// reset memory pointer
 	eeprom_reset();

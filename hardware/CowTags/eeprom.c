@@ -110,7 +110,7 @@ bool eeprom_write(struct sampleData *data) {
 /* Sets the address pointer on EEPROM to addrHigh and addrLow
  * Returns the value in addrHigh addrLow
  * Increments address pointer to next entry
- * */
+ */
 void eeprom_readAddress(uint8_t addrHigh, uint8_t addrLow, int numBytes, uint8_t *buf) {
 	assertAddress(eeprom_currentAddress);
 	assertSemaphore();

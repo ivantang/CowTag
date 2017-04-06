@@ -31,7 +31,6 @@ void echoFxn(UArg arg0, UArg arg1)
     UART_Handle uart;
     UART_Params uartParams;
     const char echoPrompt[] = "Echoing characters:\r\n";
-    //const char newLine[] = "\n";
 
     /* Create a UART with data processing off. */
     UART_Params_init(&uartParams);

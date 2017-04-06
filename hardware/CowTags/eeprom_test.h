@@ -11,7 +11,7 @@
 #include "eeprom.h"
 
 /*constants*/
-#define TASKSTACKSIZE		1024	//i2c
+#define TASKSTACKSIZE 1024 //i2c
 
 /*test prototypes*/
 bool eeprom_testStart();
@@ -98,11 +98,11 @@ void eeprom_testGetNextWithWrap() {
 
 	// test packet
 	struct sampleData sampledata;
-	sampledata.cowID = 1;
-	sampledata.packetType = RADIO_PACKET_TYPE_SENSOR_PACKET;
-	sampledata.timestamp = 0x12345678;
-	sampledata.tempData.temp_h = 0x5678;
-	sampledata.tempData.temp_l = 0x8765;
+	sampledata.cowID                = 1;
+	sampledata.packetType           = RADIO_PACKET_TYPE_SENSOR_PACKET;
+	sampledata.timestamp            = 0x12345678;
+	sampledata.tempData.temp_h      = 0x5678;
+	sampledata.tempData.temp_l      = 0x8765;
 	sampledata.heartRateData.rate_h = 0x7890;
 	sampledata.heartRateData.rate_l = 0x0987;
 	sampledata.heartRateData.temp_h = 0x2345;

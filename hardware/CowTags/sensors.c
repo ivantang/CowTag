@@ -35,15 +35,13 @@
 #include "global_cfg.h"
 
 PIN_Config BoardGpioInitialTable[] = {
-//	Board_I2C0_SDA0 | PIN_GPIO_LOW,
-//	Board_I2C0_SCL0	| PIN_GPIO_HIGH,
 	PIN_TERMINATE
 };
 
 PIN_State pinState;
 
 /**constants*/
-#define TASKSTACKSIZE		1024	//i2c
+#define TASKSTACKSIZE 1024 //i2c
 
 /**structures*/
 Task_Struct task0Struct;
@@ -62,10 +60,7 @@ void Sensors_init(void) {
 
 
 void getAcceleration(struct sampleData *sampleData) {
-	//if (verbose_sensors)System_printf("\n\nwhoamI: 0x%x \n", readI2CRegister(Board_LIS3DH_ADDR, 15)); //should read 0x33
-	//System_flush();
-
-	unsigned int	i;
+	unsigned int i;
 
 	// 7 specifies that all x, y, and z axes are enabled
 	// See pg35: http://www.st.com/content/ccc/resource/technical/document/datasheet/3c/ae/50/85/d6/b1/46/fe/CD00274221.pdf/files/CD00274221.pdf/jcr:content/translations/en.CD00274221.pdf
@@ -102,10 +97,8 @@ void getAcceleration(struct sampleData *sampleData) {
 	}
 
 	writeI2CRegister(Board_LIS3DH_ADDR, LIS3DH_REG_CTRL1, 0x77);    //all axes , normal mode
-	writeI2CRegister(Board_LIS3DH_ADDR, LIS3DH_REG_CTRL4, 0x08);	//high res and BDU and self test off
-	//writeI2CRegister(Board_LIS3DH_ADDR, LIS3DH_REG_CTRL3, 0x10);    //DRDY on INT1
-	writeI2CRegister(Board_LIS3DH_ADDR, LIS3DH_REG_TEMPCFG, 0x80);    //enable adcs
-	//writeI2C(Board_LIS3DH_ADDR, LIS3DH_REG_OUT_X_L | 0x80);    //enable auto increment
+	writeI2CRegister(Board_LIS3DH_ADDR, LIS3DH_REG_CTRL4, 0x08);    //high res and BDU and self test off
+	writeI2CRegister(Board_LIS3DH_ADDR, LIS3DH_REG_TEMPCFG, 0x80);  //enable adcs
 
 	//polling status register to check for new set of data
 	for (i = 0 ; i < 30 ; i++) {
@@ -155,13 +148,8 @@ void getTempNoPtr() {
 
 
 	temp_obj =  readI2CWord100kHz(Board_MIKROE1362_ADDR,0x07)*0.02 - 273.15;
-	//sampleData->tempData.temp_l = temp_obj & 0xFF;
-	//sampleData->tempData.temp_h = temp_obj >> 8;
-
 
 	temp_amb =  readI2CWord100kHz(Board_MIKROE1362_ADDR,0x06)*0.02 - 273.15;
-	//sampleData->heartRateData.temp_l = temp_amb & 0xFF;
-	//sampleData->heartRateData.temp_h = temp_amb >> 8;
 
 	if (verbose_sensors) {
 		System_printf("temp_obj %d\n", temp_obj);
@@ -234,13 +222,6 @@ void getHeartRate(struct sampleData *sampleData) {
 
 
 	Types_FreqHz frequency;
-	//Types_FreqHz *frequency_p = &frequency;
-
-	//check if device is connected
-//	if (readI2CRegister(Board_MAX30100_ADDR,0xFF) != 0x11) {
-//		System_printf("Hardware is not the MAX30100 : 0x%x\n",readI2CRegister(Board_MAX30100_ADDR,0xFF));
-//		System_flush();
-//	}
 
 	//enable HR only
 	writeI2CRegister(Board_MAX30100_ADDR, MAX30100_REG_MODE_CONFIGURATION, 0x02);
@@ -258,23 +239,16 @@ void getHeartRate(struct sampleData *sampleData) {
                    heartrate_config);
 
 
-	writeI2CRegister(Board_MAX30100_ADDR, 0x01, 0xE0);	//turn on interrupts
-
-	//clearing FIFO write pointer, overflow counter and read pointer
-//	writeI2CRegister(Board_MAX30100_ADDR, MAX30100_REG_FIFO_WRITE_POINTER, 0x00);
-//	writeI2CRegister(Board_MAX30100_ADDR, MAX30100_REG_FIFO_OVERFLOW_COUNTER, 0x00);
-//	writeI2CRegister(Board_MAX30100_ADDR, MAX30100_REG_FIFO_READ_POINTER, 0x00);
+	writeI2CRegister(Board_MAX30100_ADDR, 0x01, 0xE0); //turn on interrupts
 
 	start_clock = Clock_getTicks();
 	end_clock = Clock_getTicks();
 	while (i < numValues) {
-	//while ((end_clock-start_clock)/100000 < 5) {
 		while ((readI2CRegister(Board_MAX30100_ADDR, 0x00) & 0x20) != 0x20) {
 			//check if hr data is ready
 		}
 		//fifo data is 16 bits so 4 reads is needed
 		//first 16 bits is IR data, in our case, HR data
-		//HRData[i] = readI2CRegister(Board_MAX30100_ADDR,MAX30100_REG_FIFO_DATA);
 		HRData[i] = readI2CRegister(Board_MAX30100_ADDR,MAX30100_REG_FIFO_DATA)<<8 +
                 readI2CRegister(Board_MAX30100_ADDR,MAX30100_REG_FIFO_DATA);
 		while (HRData[i] == 0) {
@@ -293,7 +267,6 @@ void getHeartRate(struct sampleData *sampleData) {
 		end_timestamp = TrueTimestamp();
 		end_clock = Clock_getTicks();
 
-		//System_printf("%d\n" , HRData[i]);
 		i++;
 	}
 
@@ -323,13 +296,9 @@ void getTimestamp(struct sampleData *sampleData) {
 }
 
 void makeSensorPacket(struct sampleData *sampleData) {
-
 	getAcceleration(sampleData);
-
 	getTemp(sampleData);
-
 	getHeartRate(sampleData);
-
 	getTimestamp(sampleData);
 
 	System_printf("TemperatureCowData = %i ,"

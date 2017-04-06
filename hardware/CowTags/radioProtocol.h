@@ -12,26 +12,25 @@
 #include <easylink/EasyLink.h>
 
 
-#define RADIO_CONCENTRATOR_ADDRESS     0x00
-//#define RADIO_NODE_ADDRESS				0x10
+#define RADIO_CONCENTRATOR_ADDRESS 0x00
 
-#define RADIO_EASYLINK_MODULATION     EasyLink_Phy_Custom
+#define RADIO_EASYLINK_MODULATION EasyLink_Phy_Custom
 
-#define RADIO_PACKET_TYPE_ACK_PACKET             0
-#define RADIO_PACKET_TYPE_SENSOR_PACKET    		 3
-#define RADIO_PACKET_TYPE_ACCEL_PACKET           4
+#define  RADIO_PACKET_TYPE_ACK_PACKET     0
+#define  RADIO_PACKET_TYPE_SENSOR_PACKET  3
+#define  RADIO_PACKET_TYPE_ACCEL_PACKET   4
 
 #define SAMPLE_SIZE 13
 
 
 // masks of types of addresses
-#define BETA_ADDRESS 0x0
-#define ALPHA_ADDRESS 0X1
+#define BETA_ADDRESS    0x0
+#define ALPHA_ADDRESS   0X1
 #define GATEWAY_ADDRESS 0X3
 
 struct PacketHeader {
-    uint8_t sourceAddress;  // current hardware id
-    uint8_t packetType;
+	uint8_t sourceAddress;  // current hardware id
+	uint8_t packetType;
 };
 
 struct temperatureData {
@@ -60,7 +59,7 @@ struct sampleData {
 	struct temperatureData tempData;
 	struct accelerationData accelerometerData;
 	struct heartrateData heartRateData;
-    uint8_t error;
+	uint8_t error;
 };
 
 /* our custom packet with sensor info */
@@ -70,7 +69,7 @@ struct sensorPacket{
 };
 
 struct AckPacket {
-    struct PacketHeader header;
+	struct PacketHeader header;
 };
 
 #endif /* RADIOPROTOCOL_H_ */

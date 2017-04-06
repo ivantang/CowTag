@@ -8,7 +8,6 @@
 #ifndef RADIOSENDRECEIVE_H_
 #define RADIOSENDRECEIVE_H_
 
-
 #include <radioProtocol.h>
 #include <stdint.h>
 
@@ -21,8 +20,8 @@ enum alphaRadioOperationStatus {
 };
 
 union ConcentratorPacket {
-    struct PacketHeader header;
-    struct sensorPacket sensorPacket;
+	struct PacketHeader header;
+	struct sensorPacket sensorPacket;
 };
 
 /* Initializes the NodeRadioTask and creates all TI-RTOS objects */
@@ -38,7 +37,5 @@ enum alphaRadioOperationStatus alphaRadioReceiveData(void);
 
 /* sending function */
 enum alphaRadioOperationStatus alphaRadioSendData(struct sampleData data);
-
-
 
 #endif /* RADIOSENDRECEIVE_H_ */

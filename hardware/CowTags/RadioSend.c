@@ -70,7 +70,7 @@ extern PIN_Handle ledPinHandle;
 /***** Prototypes *****/
 static void nodeRadioTaskFunction(UArg arg0, UArg arg1);
 static void returnRadioOperationStatus(enum NodeRadioOperationStatus status);
-static void resendPacket(uint32_t newAckTimeout);
+static void resendPacket();
 static void rxDoneCallback(EasyLink_RxPacket * rxPacket, EasyLink_Status status);
 
 static void sendBetaPacket(struct sensorPacket betaPacket, uint8_t maxNumberOfRetries, uint32_t ackTimeoutMs);
@@ -175,7 +175,7 @@ static void nodeRadioTaskFunction(UArg arg0, UArg arg1)
 
 				System_printf("Next: %d, Ack: %d, Retries: %d\n", nextTimeout, currentRadioOperation.ackTimeoutMs, currentRadioOperation.retriesDone);
 				System_printf("Timed out: resending for the %d th time, with timeout = %d\n", currentRadioOperation.retriesDone, nextTimeout);
-				resendPacket(nextTimeout);
+				resendPacket();
 			}
 			else
 			{
@@ -265,11 +265,8 @@ static void sendBetaPacket(struct sensorPacket bp, uint8_t maxNumberOfRetries, u
 }
 
 
-static void resendPacket(uint32_t newAckTimeout)
+static void resendPacket()
 {
-	/* set increasing timeout */
-	currentRadioOperation.ackTimeoutMs = newAckTimeout;
-
 	/* Send packet  */
 	if (EasyLink_transmit(&currentRadioOperation.easyLinkTxPacket) != EasyLink_Status_Success)
 	{

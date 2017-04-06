@@ -194,11 +194,16 @@ static void alphaRadioTaskFunction(UArg arg0, UArg arg1)
 			/* If we haven't resent it the maximum number of times yet, then resend packet */
 			if (currentRadioOperation.retriesDone < currentRadioOperation.maxNumberOfRetries)
 			{
-				resendPacket();
+				/* Increase retries by one */
+				currentRadioOperation.retriesDone++;
 
-				if(verbose_alphaRadio){
-					System_printf("RadioSend: Timed out! resending for the %d th time\n", currentRadioOperation.retriesDone);
-					System_flush();}
+				/* generate increasing timeouts for greater resend success */
+				uint32_t nextTimeout = RADIO_SEND_ACK_TIMEOUT_TIME_MS * currentRadioOperation.retriesDone;
+				EasyLink_setCtrl(EasyLink_Ctrl_AsyncRx_TimeOut, EasyLink_ms_To_RadioTime(nextTimeout));
+
+				System_printf("Next: %d, Ack: %d, Retries: %d\n", nextTimeout, currentRadioOperation.ackTimeoutMs, currentRadioOperation.retriesDone);
+				System_printf("Timed out: resending for the %d th time, with timeout = %d\n", currentRadioOperation.retriesDone, nextTimeout);
+				resendPacket();
 			}
 			else
 			{
@@ -211,10 +216,6 @@ static void alphaRadioTaskFunction(UArg arg0, UArg arg1)
 			if(verbose_alphaRadio){
 				System_printf("RadioSend: Invalid packet received!\n");
 				System_flush();}
-
-			// do nothing
-			//Event_post(*radioOperationEventHandle, RADIO_EVENT_ACK_TIMEOUT);
-			//returnRadioOperationStatus(AlphaRadioStatus_ReceivedInvalidPacket);
 		}
 		/* If send fail */
 		else if (events & RADIO_EVENT_SEND_FAIL)
@@ -304,9 +305,6 @@ static void resendPacket()
 	if(EasyLink_receiveAsync(rxDoneCallbackReceive, 0) != EasyLink_Status_Success) {
 		System_printf("EasyLink_receiveAsync failed");
 	}
-
-	/* Increase retries by one */
-	currentRadioOperation.retriesDone++;
 }
 
 /*send an ACK packet to the src addr of the RX'd sensor packet*/

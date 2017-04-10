@@ -43,6 +43,18 @@ bool eeprom_testStart() {
 	return true;
 }
 
+bool eeprom_verify(struct sampleData *d1, struct sampleData *d2) {
+	return d1.cowID == d2.cowID
+		&& d1.packetType == d2.packetType
+		&& d1.tempData.timestamp = d2.tempData.timestamp
+		&& d1.tempData.temp_h = d2.tempData.temp_h
+		&& d1.tempData.temp_l = d2.tempData.temp_l
+		&& d1.heartRateData.rate_h = d2.heartRateData.rate_h
+		&& d1.heartRateData.rate_l = d2.heartRateData.rate_l
+		&& d1.heartRateData.temp_h = d2.heartRateData.temp_h
+		&& d1.heartRateData.temp_l = d2.heartRateData.temp_l;
+}
+
 /*** tests ***/
 
 void eeprom_testGetNext() {
@@ -78,9 +90,16 @@ void eeprom_testGetNext() {
 	// get from sample set, and loop until no samples left
 	struct sampleData sample2;
 	eeprom_getNext(&sample2);
-	++samplesGotten;
 
-	while (!eeprom_getNext(&sample2)) { ++samplesGotten; }
+	if (eeprom_verify(&sampledata, &sample2) {
+		++samplesGotten;
+	}
+
+	while (!eeprom_getNext(&sample2)) {
+		if (eeprom_verify(&sampledata, &sample2) {
+			++samplesGotten;
+		}
+	}
 
 	// validate
 	if (samplesGotten == testsize) {
@@ -162,15 +181,15 @@ void eeprom_testWriteReadNormal() {
 	eeprom_getNext(&sample2);
 
 	// verify unserialized packet
-	bool success = sampledata.cowID == sample2.cowID;
-	success = sampledata.packetType == sample2.packetType;
-	success = sampledata.tempData.timestamp = sample2.tempData.timestamp;
-	success = sampledata.tempData.temp_h = sample2.tempData.temp_h;
-	success = sampledata.tempData.temp_l = sample2.tempData.temp_l;
-	success = sampledata.heartRateData.rate_h = sample2.heartRateData.rate_h;
-	success = sampledata.heartRateData.rate_l = sample2.heartRateData.rate_l;
-	success = sampledata.heartRateData.temp_h = sample2.heartRateData.temp_h;
-	success = sampledata.heartRateData.temp_l = sample2.heartRateData.temp_l;
+	bool success = sampledata.cowID == sample2.cowID
+		&& sampledata.packetType == sample2.packetType
+		&& sampledata.tempData.timestamp = sample2.tempData.timestamp
+		&& sampledata.tempData.temp_h = sample2.tempData.temp_h
+		&& sampledata.tempData.temp_l = sample2.tempData.temp_l
+		&& sampledata.heartRateData.rate_h = sample2.heartRateData.rate_h
+		&& sampledata.heartRateData.rate_l = sample2.heartRateData.rate_l
+		&& sampledata.heartRateData.temp_h = sample2.heartRateData.temp_h
+		&& sampledata.heartRateData.temp_l = sample2.heartRateData.temp_l;
 
 	if (success) {
 		System_printf("eeprom sample successfully written/read\n");

@@ -55,8 +55,8 @@ int main(void) {
 	//if (verbose_main) {System_printf("Initializing EEPROM...\n");}
 	//eeprom_testStart();
 
-	//if (verbose_main) {System_printf("Initializing serialization thread...\n");}
-	//serialize_testStart();
+//	if (verbose_main) {System_printf("Initializing serialization thread...\n");}
+//	serializeTestStart();
 
 	if (verbose_main) {System_printf("Initializing radio antenna...\n");}
 	radioSendReceive_init();

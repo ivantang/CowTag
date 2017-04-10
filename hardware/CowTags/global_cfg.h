@@ -18,7 +18,7 @@
 // setup to build and run automatically before the main project builds,
 // therefore IF YOU CHANGE THE NAME OF THIS DEFINE YOU NEED TO CHANGE THE SEARCH
 // STRING IN ../../add_timestamp_to_config.c AS WELL
-#define TIMESTAMP_AT_BUILDTIME 1491506399
+#define TIMESTAMP_AT_BUILDTIME 1491860231
 // ********************
 // End auto-generated *
 // ********************
@@ -40,11 +40,11 @@
 
 // Specifies the timeout for send and receive in milliseconds
 // Original value: (500)
-#define RADIO_SEND_ACK_TIMEOUT_TIME_MS (500)
+#define RADIO_SEND_ACK_TIMEOUT_TIME_MS (250)
 
 // Specifies the timeout for send and receive in milliseconds
 // Original value: (500)
-#define RADIO_RECEIVE_ACK_TIMEOUT_TIME_MS (500)
+#define RADIO_RECEIVE_ACK_TIMEOUT_TIME_MS (250)
 
 // Original value: 3600000000
 #define HOUR_SLEEP_TICKS 3600000000
@@ -103,7 +103,7 @@ static const int verbose_arduinoCom = 0;
 static const int verbose_alphaRadio = 1;
 
 /* Tests suites */
-static const int verbose_serializeTest    = 0;
+static const int verbose_serializeTest    = 1;
 static const int verbose_betaRadioTest    = 1;
 static const int verbose_alphaRadioTest   = 1;
 static const int verbose_gatewayRadioTest = 0;
@@ -121,7 +121,7 @@ static const int verbose_sleep = 0;
 static const int usingEeprom = 0;
 
 /*** ignore sensors ***/
-static const int ignoreSensors = 0;
+static const int ignoreSensors = 1;
 
 #endif // GLOBAL_CFG_H
 

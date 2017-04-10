@@ -203,8 +203,10 @@ static void alphaRadioTaskFunction(UArg arg0, UArg arg1)
 		}
 		else if (events & RADIO_EVENT_INVALID_PACKET_RECEIVED) {
 			if(verbose_alphaRadio){
-				System_printf("RadioSend: Invalid packet received!\n");
+				System_printf("RadioSend: Invalid packet received from other Alpha, ignoring!\n");
 				System_flush();}
+
+			returnRadioOperationStatus(AlphaRadioStatus_ReceivedInvalidPacket);
 		}
 		/* If send fail */
 		else if (events & RADIO_EVENT_SEND_FAIL) {

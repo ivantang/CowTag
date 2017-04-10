@@ -27,6 +27,7 @@ Char task0Stack[TASKSTACKSIZE];
 
 /* test prototypes */
 bool serializeTestStart();
+void serializeTestRunner();
 void serializeTestSerializeNormal();
 void serializeTestSerializeAccelerometer();
 
@@ -36,9 +37,14 @@ bool serializeTestStart() {
 	Task_Params_init(&taskParams);
 	taskParams.stackSize = TASKSTACKSIZE;
 	taskParams.stack = &task0Stack;
-	Task_construct(&task0Struct, (Task_FuncPtr)serializeTestSerializeAccelerometer, &taskParams, NULL);
+	Task_construct(&task0Struct, (Task_FuncPtr)serializeTestRunner, &taskParams, NULL);
 
 	return true;
+}
+
+void serializeTestRunner() {
+	serializeTestSerializeNormal();
+	serializeTestSerializeAccelerometer();
 }
 
 // create fake Normal sample data, then read and write from eeprom. Confirm data is retrieved correctly
@@ -65,16 +71,16 @@ void serializeTestSerializeNormal() {
 	unserializePacket(&sample2, buffer);
 
 	// verify unserialized packet
-	bool success = (sampledata.cowID == sample2.cowID);
-	success = (sampledata.packetType == sample2.packetType);
-	success = (sampledata.timestamp == sample2.timestamp);
-	success = (sampledata.tempData.temp_h == sample2.tempData.temp_h);
-	success = (sampledata.tempData.temp_l == sample2.tempData.temp_l);
-	success = (sampledata.heartRateData.rate_h == sample2.heartRateData.rate_h);
-	success = (sampledata.heartRateData.rate_l == sample2.heartRateData.rate_l);
-	success = (sampledata.heartRateData.temp_h == sample2.heartRateData.temp_h);
-	success = (sampledata.heartRateData.temp_l == sample2.heartRateData.temp_l);
-	success = (sampledata.error == sample2.error);
+	bool success = (sampledata.cowID == sample2.cowID)
+		&& (sampledata.packetType == sample2.packetType)
+		&& (sampledata.timestamp == sample2.timestamp)
+		&& (sampledata.tempData.temp_h == sample2.tempData.temp_h)
+		&& (sampledata.tempData.temp_l == sample2.tempData.temp_l)
+		&& (sampledata.heartRateData.rate_h == sample2.heartRateData.rate_h)
+		&& (sampledata.heartRateData.rate_l == sample2.heartRateData.rate_l)
+		&& (sampledata.heartRateData.temp_h == sample2.heartRateData.temp_h)
+		&& (sampledata.heartRateData.temp_l == sample2.heartRateData.temp_l)
+		&& (sampledata.error == sample2.error);
 
 	if (success) {
 		if(verbose_serializeTest){System_printf("packet successfully unserialized\n");}
@@ -105,18 +111,18 @@ void serializeTestSerializeAccelerometer() {
 	unserializePacket(&sample2, buffer);
 
 	// verify unserialized packet
-	bool success = (sampledata.cowID == sample2.cowID);
-	success = (sampledata.packetType == sample2.packetType);
-	success = (sampledata.timestamp == sample2.timestamp);
-	success = (sampledata.accelerometerData.x == sample2.accelerometerData.x);
-	success = (sampledata.accelerometerData.y == sample2.accelerometerData.y);
-	success = (sampledata.accelerometerData.z == sample2.accelerometerData.z);
-	success = (sampledata.error == sample2.error);
+	bool success = (sampledata.cowID == sample2.cowID)
+		&& (sampledata.packetType == sample2.packetType)
+		&& (sampledata.timestamp == sample2.timestamp)
+		&& (sampledata.accelerometerData.x == sample2.accelerometerData.x)
+		&& (sampledata.accelerometerData.y == sample2.accelerometerData.y)
+		&& (sampledata.accelerometerData.z == sample2.accelerometerData.z)
+		&& (sampledata.error == sample2.error);
 
 	if (success) {
-		if(verbose_serializeTest){System_printf("packet successfully un/serialized\n");}
+		if(verbose_serializeTest){System_printf("packet successfully unserialized\n");}
 	} else {
-		if(verbose_serializeTest){System_printf("ERR: packet failed to un/serialize!\n");}
+		if(verbose_serializeTest){System_printf("ERR: packet failed to unserialize!\n");}
 	}
 }
 

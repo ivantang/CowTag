@@ -15,7 +15,7 @@
 // Begin auto-generated
 // IF YOU CHANGE THE NAME OF THIS DEFINE YOU NEED TO CHANGE THE SEARCH STRING IN
 // ../../add_timestamp_to_config.c AS WELL
-#define TIMESTAMP_AT_BUILDTIME 1491519967
+#define TIMESTAMP_AT_BUILDTIME 1491852326
 // End auto-generated
 
 // [0] = Beta
@@ -62,7 +62,7 @@
 
 /*** Print the contents of the packets to a file ***/
 /* verbose_alphaRadioTest also needs to be set to print packets to file */
-static const int verbose_beta_log = 1;
+static const int verbose_beta_log = 0;
 
 /* verbose_betaRadioTest also needs to be set to print packets to file */
 static const int verbose_alpha_log = 0;
@@ -110,10 +110,10 @@ static const int verbose_sleep = 0;
 static const int usingEeprom = 1;
 
 /*** ignore sensors ***/
-static const int ignoreSensors = 0;
+static const int ignoreSensors = 1;
 
 /*** grab 1 sample ***/
-static const int grabOnlyOne = 1;
+static const int grabOnlyOne = 0;
 
 #endif // GLOBAL_CFG_H
 

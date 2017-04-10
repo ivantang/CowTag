@@ -43,7 +43,7 @@ PIN_Config BoardGpioInitialTable[] = {
 PIN_State pinState;
 
 /**constants*/
-#define TASKSTACKSIZE		14000	//i2c
+#define TASKSTACKSIZE		2048	//i2c
 
 /**structures*/
 Task_Struct task0Struct;
@@ -62,16 +62,15 @@ void Sensors_test(void) {
 
 
 void getAcceleration(struct sampleData *sampleData) {
-	//if (verbose_sensors)System_printf("\n\nwhoamI: 0x%x \n", readI2CRegister(Board_LIS3DH_ADDR, 15)); //should read 0x33
-	//System_flush();
 
-	//System_printf("Getting acceleration..\n");
-	//System_flush();
+	System_printf("Getting acceleration..\n");
+	System_flush();
 
 	unsigned int	i;
+	unsigned samplesToGet = 100;
 	char accelerometer_state = 0x00;
 
-	struct sampleData accelerationData[30];
+	struct sampleData accelerationData[1];
 
 	switch(ACCELEROMETER_SAMPLE_RATE_HZ) {
 			case 1:
@@ -108,11 +107,17 @@ void getAcceleration(struct sampleData *sampleData) {
     //writeI2CRegister(Board_LIS3DH_ADDR, LIS3DH_REG_TEMPCFG, 0x80);    //enable adcs
     //writeI2C(Board_LIS3DH_ADDR, LIS3DH_REG_OUT_X_L | 0x80);    //enable auto increment
 
+	System_printf("Accelerometer set up..\n");
+	System_flush();
+
     //polling status register to check for new set of data
-    if(!grabOnlyOne){
-		for(i = 0 ; i < 30 ;){
+    //if(!grabOnlyOne){
+		for(i = 0 ; i < samplesToGet ;){
 			if( (readI2CRegister(Board_LIS3DH_ADDR,0x27) & 0x8) >> 3 == 1 ){
 				if( (readI2CRegister(Board_LIS3DH_ADDR,0x27) >> 7) == 1 ){
+					System_printf("Accelerometer data ready..\n");
+					System_flush();
+
 					accelerationData[i].accelerometerData.x_h = readI2CRegister(Board_LIS3DH_ADDR,0x28);
 					accelerationData[i].accelerometerData.x_l = readI2CRegister(Board_LIS3DH_ADDR,0x29);
 					accelerationData[i].accelerometerData.y_h = readI2CRegister(Board_LIS3DH_ADDR,0x2A);
@@ -127,41 +132,27 @@ void getAcceleration(struct sampleData *sampleData) {
 					sampleData->accelerometerData.z_h = accelerationData[i].accelerometerData.z_h;
 					sampleData->accelerometerData.z_l = accelerationData[i].accelerometerData.z_l;
 
-					System_flush();
+			    	System_printf("x:%i y:%i z:%i\n", 	sampleData->accelerometerData.x_h << 8 | sampleData->accelerometerData.x_l,
+														sampleData->accelerometerData.y_h << 8 | sampleData->accelerometerData.y_l,
+														sampleData->accelerometerData.z_h << 8 | sampleData->accelerometerData.z_l);
+			    	System_flush();
+
+					break;
+
 					i++;
 				}
 			}
 		}
-    }
+    //}
 
-    if(grabOnlyOne){
-    	if( (readI2CRegister(Board_LIS3DH_ADDR,0x27) & 0x8) >> 3 == 1 ){
-			if( (readI2CRegister(Board_LIS3DH_ADDR,0x27) >> 7) == 1 ){
-				accelerationData[i].accelerometerData.x_h = readI2CRegister(Board_LIS3DH_ADDR,0x28);
-				accelerationData[i].accelerometerData.x_l = readI2CRegister(Board_LIS3DH_ADDR,0x29);
-				accelerationData[i].accelerometerData.y_h = readI2CRegister(Board_LIS3DH_ADDR,0x2A);
-				accelerationData[i].accelerometerData.y_l = readI2CRegister(Board_LIS3DH_ADDR,0x2B);
-				accelerationData[i].accelerometerData.z_h = readI2CRegister(Board_LIS3DH_ADDR,0x2C);
-				accelerationData[i].accelerometerData.z_l = readI2CRegister(Board_LIS3DH_ADDR,0x2D);
-
-				sampleData->accelerometerData.x_h = accelerationData[i].accelerometerData.x_h;
-				sampleData->accelerometerData.x_l = accelerationData[i].accelerometerData.x_l;
-				sampleData->accelerometerData.y_h = accelerationData[i].accelerometerData.y_h;
-				sampleData->accelerometerData.y_l = accelerationData[i].accelerometerData.y_l;
-				sampleData->accelerometerData.z_h = accelerationData[i].accelerometerData.z_h;
-				sampleData->accelerometerData.z_l = accelerationData[i].accelerometerData.z_l;
-
-				System_flush();
-				i++;
-			}
-		}
-    }
+		System_printf("Acceleration read..\n");
+		System_flush();
 
     //write to file
-    //for(i = 0 ; i < 30 ;i++){
-    	/*System_printf("x:%3d y:%3d z:%3d\n", 	accelerationData[i].accelerometerData.x ,
-    										accelerationData[i].accelerometerData.y,
-											accelerationData[i].accelerometerData.z);*/
+    //for(i = 0 ; i < samplesToGet ;i++){
+    	System_printf("x:%i y:%i z:%i\n", 	sampleData->accelerometerData.x_h << 8 | sampleData->accelerometerData.x_l,
+											sampleData->accelerometerData.y_h << 8 | sampleData->accelerometerData.y_l,
+											sampleData->accelerometerData.z_h << 8 | sampleData->accelerometerData.z_l);
     	if(verbose_beta_log){
 			accelerationData[i].packetType = RADIO_PACKET_TYPE_ACCEL_PACKET;
 			file_printSampleData(accelerationData[i]);
@@ -192,6 +183,9 @@ void getTemp(struct sampleData *sampleData) {
 	/*if (verbose_sensors) {
 		System_printf("temp_obj %d\n", temp_obj);
 	}*/
+
+	System_printf("temp_obj %d\n", temp_obj);
+	System_flush();
 
 	if (verbose_beta_log){
 		sampleData->packetType = RADIO_PACKET_TYPE_TEMP_PACKET;
@@ -430,14 +424,25 @@ void getTimestamp(struct sampleData *sampleData) {
 }
 
 void makeSensorPacket(struct sampleData *sampleData) {
-
-	getAcceleration(sampleData);
+	System_printf("Activating sensors\n");
+	System_flush();
 
 	getTemp(sampleData);
+	System_printf("Temp done\n");
+	System_flush();
 
-	getHeartRate(sampleData);
+
+	getAcceleration(sampleData);
+	System_printf("Accel done\n");
+	System_flush();
+
+	//getHeartRate(sampleData);
+	//System_printf("HR done\n");
+	//System_flush();
 
 	getTimestamp(sampleData);
+	System_printf("Timestamp done\n");
+	System_flush();
 
 	System_printf(							"TemperatureCowData = %i ,"
 											"AmbientTemperatureData = %i ,"

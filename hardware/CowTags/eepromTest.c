@@ -51,8 +51,6 @@ void eepromTest_init() {
 	taskParams.stackSize = TASKSTACKSIZE;
 	taskParams.stack = &task0Stack;
 	Task_construct(&task0Struct, (Task_FuncPtr)eepromTestGetNext, &taskParams, NULL);
-
-	return true;
 }
 
 bool eeprom_verify(struct sampleData *d1, struct sampleData *d2) {

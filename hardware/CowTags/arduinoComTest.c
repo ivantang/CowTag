@@ -11,6 +11,17 @@
 #include <arduinoComTest.h>
 #include <arduinoCom.h>
 #include <serialize.h>
+/* Example/Board Header files */
+#include <Board.h>
+
+/* TI-RTOS Header files */
+#include <ti/drivers/PIN.h>
+#include <ti/drivers/I2C.h> //i2c
+#include <ti/drivers/UART.h> //i2c
+#include <IIC.h>
+
+#include <stdint.h>
+#include <assert.h>
 
 /* XDCtools Header files */
 #include <xdc/std.h>
@@ -48,7 +59,7 @@ void arduinoComTest_init(void){
 void arduinoComTest(void){
 	while(1){
 	int delay = 10000;
-	CPUdelay(delay*5000);
+	CPUdelay(delay*1000);
 	if(verbose_arduinoComTest){System_printf("Starting arduinoComTest\n");}
 
 	uint8_t buf[SAMPLE_SIZE];
@@ -76,16 +87,20 @@ void arduinoComTest(void){
 		System_flush();
 	}
 
-	writeI2CArduino(0x6, buf);
 
+	writeI2CArduino(0x6, buf);
+	/*
 	CPUdelay(delay*5000);
 
 	sampledata.cowID = 1;
 	sampledata.packetType = RADIO_PACKET_TYPE_ACCEL_PACKET;
 	sampledata.timestamp = 0x12345678;
-	sampledata.accelerometerData.x=0x12;
-	sampledata.accelerometerData.y=0x34;
-	sampledata.accelerometerData.z=0x56;
+	sampledata.accelerometerData.x_h=0x2;
+	sampledata.accelerometerData.x_l=0x2;
+	sampledata.accelerometerData.y_h=0x2;
+	sampledata.accelerometerData.y_l=0x2;
+	sampledata.accelerometerData.z_h=0x2;
+	sampledata.accelerometerData.z_l=0x2;
 	sampledata.error = 0x0;
 	if(verbose_arduinoComTest){printSampleData(sampledata);}
 
@@ -99,8 +114,8 @@ void arduinoComTest(void){
 		System_flush();
 	}
 
-	writeI2CArduino(0x6, buf);
-
+	//writeI2CArduino(0x6, buf);
+	*/
 	if(verbose_arduinoComTest){System_printf("testArduino finished\n");}
 	System_flush();
 	}
@@ -128,8 +143,8 @@ void printSampleData(struct sampleData sampledata){
 	}
 	else{
 	System_printf(							"accelerometerData= x=%i, y=%i, z=%i\n",
-											sampledata.accelerometerData.x,
-											sampledata.accelerometerData.y,
-											sampledata.accelerometerData.z);
+											sampledata.accelerometerData.x_h << 8 + sampledata.accelerometerData.x_l,
+											sampledata.accelerometerData.y_h << 8 + sampledata.accelerometerData.y_l,
+											sampledata.accelerometerData.z_h << 8 + sampledata.accelerometerData.z_l);
 	}
 }

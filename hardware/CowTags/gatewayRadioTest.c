@@ -68,7 +68,7 @@ static struct sensorPacket latestActivePacket;
 static void gatewayRadioTestTaskFunction(UArg arg0, UArg arg1);
 static void packetReceivedCallback(union ConcentratorPacket* packet, int8_t rssi);
 static void printSampleData(struct sampleData sampledata);
-static void file_printSampleData(struct sampleData sampledata);
+static void filePrintSampleData(struct sampleData sampledata);
 
 /***** Function definitions *****/
 void gatewayRadioTest_init(void) {
@@ -107,13 +107,6 @@ static void gatewayRadioTestTaskFunction(UArg arg0, UArg arg1)
 
 			// show results
 			printSampleData(latestActivePacket.sampledata);
-
-			if(verbose_gatewayRadioTest) {
-				if (print_packet_to_file_gateway) {
-					file_printSampleData(latestActivePacket.sampledata);
-				}
-				System_flush();
-			}
 
 			if(verbose_gatewayRadioTest){System_printf("serializing packet...\n");System_flush();}
 			serializePacket(&latestActivePacket.sampledata, buf);
@@ -156,14 +149,14 @@ void printSampleData(struct sampleData sampledata){
 	}
 	else{
 	System_printf(							"accelerometerData= x=%i, y=%i, z=%i\n",
-											sampledata.accelerometerData.x,
-											sampledata.accelerometerData.y,
-											sampledata.accelerometerData.z);
+											sampledata.accelerometerData.x_h << 8 + sampledata.accelerometerData.x_l,
+											sampledata.accelerometerData.y_h << 8 + sampledata.accelerometerData.y_l,
+											sampledata.accelerometerData.z_h << 8 + sampledata.accelerometerData.z_l);
 	}
 }
 
 // write samples to a file instead of STDOUT
-void file_printSampleData(struct sampleData sampledata) {
+void filePrintSampleData(struct sampleData sampledata) {
 	static bool file_is_initialized = false;
 	static FILE *fp;
 
@@ -192,9 +185,9 @@ void file_printSampleData(struct sampleData sampledata) {
 	}
 	else{
 		fprintf(fp, "accelerometerData= x=%i, y=%i, z=%i\n",
-				sampledata.accelerometerData.x,
-				sampledata.accelerometerData.y,
-				sampledata.accelerometerData.z);
+				sampledata.accelerometerData.x_h << 8 + sampledata.accelerometerData.x_l,
+				sampledata.accelerometerData.y_h << 8 + sampledata.accelerometerData.y_l,
+				sampledata.accelerometerData.z_h << 8 + sampledata.accelerometerData.z_l);
 	}
 }
 

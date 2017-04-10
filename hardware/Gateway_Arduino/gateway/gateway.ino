@@ -239,15 +239,16 @@ void setup() {
   digitalWrite(4, HIGH);
   
   initSerial();
-  initEthernet();
+ //initEthernet();
 
   Wire.begin(6);
   Wire.onReceive(receiveEvent);
-
+Serial.println(F("done stup."));
 }
 
 // ARDUINO entry point #2: runs over and over again forever
 void loop() {
+  Serial.println(F("looping"));
   wait();
 }
 
@@ -294,6 +295,7 @@ void receiveEvent(int howMany) {
   //Serial.print("\n\r");
   Serial.println(data);
 
+/*
   if (!postPage(serverName, serverPort, pageName, data)) {
     Serial.println(F("Fail "));
   }
@@ -301,4 +303,5 @@ void receiveEvent(int howMany) {
     Serial.println(F("Pass "));
   }
   Serial.println("Done");
+  */
 }

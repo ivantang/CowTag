@@ -118,9 +118,12 @@ void serializeTestSerializeAccelerometer() {
 	bool success = (sampledata.cowID == sample2.cowID)
 		&& (sampledata.packetType == sample2.packetType)
 		&& (sampledata.timestamp == sample2.timestamp)
-		&& (sampledata.accelerometerData.x == sample2.accelerometerData.x)
-		&& (sampledata.accelerometerData.y == sample2.accelerometerData.y)
-		&& (sampledata.accelerometerData.z == sample2.accelerometerData.z)
+		&& (sampledata.accelerometerData.x_h == sample2.accelerometerData.x_h)
+		&& (sampledata.accelerometerData.x_l == sample2.accelerometerData.x_l)
+		&& (sampledata.accelerometerData.y_h == sample2.accelerometerData.y_h)
+		&& (sampledata.accelerometerData.y_l == sample2.accelerometerData.y_l)
+		&& (sampledata.accelerometerData.z_h == sample2.accelerometerData.z_h)
+		&& (sampledata.accelerometerData.z_l == sample2.accelerometerData.z_l)
 		&& (sampledata.error == sample2.error);
 
 	if (success) {

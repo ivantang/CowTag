@@ -56,15 +56,15 @@ void eepromTest_init() {
 }
 
 bool eeprom_verify(struct sampleData *d1, struct sampleData *d2) {
-	return d1.cowID == d2.cowID
-		&& d1.packetType == d2.packetType
-		&& d1.tempData.timestamp = d2.tempData.timestamp
-		&& d1.tempData.temp_h = d2.tempData.temp_h
-		&& d1.tempData.temp_l = d2.tempData.temp_l
-		&& d1.heartRateData.rate_h = d2.heartRateData.rate_h
-		&& d1.heartRateData.rate_l = d2.heartRateData.rate_l
-		&& d1.heartRateData.temp_h = d2.heartRateData.temp_h
-		&& d1.heartRateData.temp_l = d2.heartRateData.temp_l;
+	return d1->cowID == d2->cowID
+		&& d1->packetType == d2->packetType
+		&& d1->timestamp == d2->timestamp
+		&& d1->tempData.temp_h == d2->tempData.temp_h
+		&& d1->tempData.temp_l == d2->tempData.temp_l
+		&& d1->heartRateData.rate_h == d2->heartRateData.rate_h
+		&& d1->heartRateData.rate_l == d2->heartRateData.rate_l
+		&& d1->heartRateData.temp_h == d2->heartRateData.temp_h
+		&& d1->heartRateData.temp_l == d2->heartRateData.temp_l;
 }
 
 void eepromTestGetNext() {
@@ -132,12 +132,12 @@ void eepromTestGetNextWithWrap() {
 	struct sampleData sample2;
 	eeprom_getNext(&sample2);
 
-	if (eeprom_verify(&sampledata, &sample2) {
+	if (eeprom_verify(&sampledata, &sample2)) {
 		++samplesGotten;
 	}
 
 	while (!eeprom_getNext(&sample2)) {
-		if (eeprom_verify(&sampledata, &sample2) {
+		if (eeprom_verify(&sampledata, &sample2)) {
 			++samplesGotten;
 		}
 	}

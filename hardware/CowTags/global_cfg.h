@@ -15,7 +15,7 @@
 // Begin auto-generated
 // IF YOU CHANGE THE NAME OF THIS DEFINE YOU NEED TO CHANGE THE SEARCH STRING IN
 // ../../add_timestamp_to_config.c AS WELL
-#define TIMESTAMP_AT_BUILDTIME 1490319163
+#define TIMESTAMP_AT_BUILDTIME 1491846677
 // End auto-generated
 
 // [0] = Beta
@@ -76,7 +76,7 @@ static const int print_packet_to_file_gateway = 0;
 static const int verbose_main = 1;
 
 /* sensor blocks */
-static const int verbose_sensors = 1;
+static const int verbose_sensors = 0;
 static const int verbose_i2c = 0;
 
 /* Serialization of sensor packets */

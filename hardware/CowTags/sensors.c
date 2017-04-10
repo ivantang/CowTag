@@ -68,7 +68,7 @@ void getAcceleration(struct sampleData *sampleData) {
 	unsigned int	i;
 	char accelerometer_state = 0x00;
 
-	struct sampleData accelerationData[30];
+	struct sampleData accelerationData[5];
 
 	switch(ACCELEROMETER_SAMPLE_RATE_HZ) {
 			case 1:
@@ -106,7 +106,7 @@ void getAcceleration(struct sampleData *sampleData) {
     //writeI2C(Board_LIS3DH_ADDR, LIS3DH_REG_OUT_X_L | 0x80);    //enable auto increment
 
     //polling status register to check for new set of data
-    for(i = 0 ; i < 30 ;){
+    for(i = 0 ; i < 1 ;){
     	if( (readI2CRegister(Board_LIS3DH_ADDR,0x27) & 0x8) >> 3 == 1 ){
     		if( (readI2CRegister(Board_LIS3DH_ADDR,0x27) >> 7) == 1 ){
     			accelerationData[i].accelerometerData.x = readI2CRegister(Board_LIS3DH_ADDR,0x28) | (readI2CRegister(Board_LIS3DH_ADDR,0x29) << 8);
@@ -127,7 +127,8 @@ void getAcceleration(struct sampleData *sampleData) {
     }
 
     //write to file
-    for(i = 0 ; i < 30 ;i++){
+
+    for(i = 0 ; i < 1 ;i++){
     	System_printf("x:%3d y:%3d z:%3d\n", 	accelerationData[i].accelerometerData.x ,
     										accelerationData[i].accelerometerData.y,
 											accelerationData[i].accelerometerData.z);
@@ -153,8 +154,12 @@ void getTemp(struct sampleData *sampleData) {
 	sampleData->heartRateData.temp_l = temp_amb & 0xFF;
 	sampleData->heartRateData.temp_h = temp_amb >> 8;
 
-	if (verbose_sensors) {
-		System_printf("temp_obj %d\n", temp_obj);
+	sampleData->packetType = RADIO_PACKET_TYPE_SENSOR_PACKET;
+	file_printSampleData(*sampleData);
+
+	if (1) {
+		System_printf("Object temperature %d   ", temp_obj);
+		System_printf("Ambient temperature %d\n", temp_amb);
 	}
 
 	return;
@@ -261,13 +266,10 @@ void getHeartRateContinuous(struct sampleData *sampleData) {
 void getHeartRate(struct sampleData* sampleData) {
 	int i = 0;
 	int j = 0;
-	uint16_t numValues = 50;
-	uint16_t HRData[50];
+	uint16_t numValues = 1;
+	uint16_t HRData[1];
 	//uint16_t RedData[250];
 	//int Derivative[75];
-
-	System_printf("Getting heart rate..\n");
-	System_flush();
 
 	//check if device is connected
 	if(readI2CRegister(Board_MAX30100_ADDR,0xFF) != 0x11){
@@ -389,6 +391,8 @@ void getHeartRate(struct sampleData* sampleData) {
 
 		//if(i!=0) Derivative[i] = (int)(HRData[i] - HRData[i-1]);
 
+
+
 		i++;
 	}
 
@@ -398,6 +402,10 @@ void getHeartRate(struct sampleData* sampleData) {
 		}
 
 		System_flush();
+	}
+
+	for (i = 0 ; i < numValues ; i++) {
+		System_printf("IR Intensity %d\n",HRData[i]);
 	}
 
 	return;
@@ -410,15 +418,16 @@ void getTimestamp(struct sampleData *sampleData) {
 
 void makeSensorPacket(struct sampleData *sampleData) {
 
-//	getAcceleration(sampleData);
+	getAcceleration(sampleData);
 
-//	getTemp(sampleData);
+	getTemp(sampleData);
 
 	getHeartRate(sampleData);
 
-	//getTimestamp(sampleData);
+	getTimestamp(sampleData);
 
-	/*System_printf(							"TemperatureCowData = %i ,"
+	/*
+	System_printf(							"TemperatureCowData = %i ,"
 											"AmbientTemperatureData = %i ,"
 											"InfraredData = %i\n"
 											"AccelerometerData= x=%i, y=%i, z=%i\n"
@@ -437,7 +446,7 @@ void makeSensorPacket(struct sampleData *sampleData) {
 void testSensors() {
 	struct sampleData sampleData;
 
-	makeSensorPacket(&sampleData);
+	while(1) makeSensorPacket(&sampleData);
 
 	System_printf("Tests done\n");
 	System_flush();

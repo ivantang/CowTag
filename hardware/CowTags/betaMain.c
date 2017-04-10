@@ -44,7 +44,7 @@ int main(void) {
 	Board_initGeneral(); // init board
 
 	//if (verbose_main) {System_printf("Initializing event manager...\n");}
-	//eventManager_init();
+	eventManager_init();
 
 	//if (verbose_main) {System_printf("Initializing sensors...\n");}
 	//Sensors_test(); // init i2C

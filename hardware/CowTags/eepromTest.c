@@ -29,6 +29,7 @@ Char task0Stack[TASKSTACKSIZE];
 struct sampleData sampledata;
 
 /***** Prototypes *****/
+bool eeprom_verify(struct sampleData *d1, struct sampleData *d2);
 void eepromTestWriteReadNormal();
 void eepromTestWriteReadAccelerometer();
 void eepromTestValidateMemory();
@@ -49,9 +50,21 @@ void eepromTest_init() {
 	Task_Params_init(&taskParams);
 	taskParams.stackSize = TASKSTACKSIZE;
 	taskParams.stack = &task0Stack;
-	Task_construct(&task0Struct, (Task_FuncPtr)eepromTestValidateMemory, &taskParams, NULL);
+	Task_construct(&task0Struct, (Task_FuncPtr)eepromTestGetNext, &taskParams, NULL);
 
-	if(verbose_eepromTest){System_printf("Finished eepromTest\n");System_flush();}
+	return true;
+}
+
+bool eeprom_verify(struct sampleData *d1, struct sampleData *d2) {
+	return d1.cowID == d2.cowID
+		&& d1.packetType == d2.packetType
+		&& d1.tempData.timestamp = d2.tempData.timestamp
+		&& d1.tempData.temp_h = d2.tempData.temp_h
+		&& d1.tempData.temp_l = d2.tempData.temp_l
+		&& d1.heartRateData.rate_h = d2.heartRateData.rate_h
+		&& d1.heartRateData.rate_l = d2.heartRateData.rate_l
+		&& d1.heartRateData.temp_h = d2.heartRateData.temp_h
+		&& d1.heartRateData.temp_l = d2.heartRateData.temp_l;
 }
 
 void eepromTestGetNext() {
@@ -118,9 +131,16 @@ void eepromTestGetNextWithWrap() {
 	// get from sample set, and loop until no samples left
 	struct sampleData sample2;
 	eeprom_getNext(&sample2);
-	++samplesGotten;
 
-	while (!eeprom_getNext(&sample2)) { ++samplesGotten; }
+	if (eeprom_verify(&sampledata, &sample2) {
+		++samplesGotten;
+	}
+
+	while (!eeprom_getNext(&sample2)) {
+		if (eeprom_verify(&sampledata, &sample2) {
+			++samplesGotten;
+		}
+	}
 
 	// validate
 	if (samplesGotten == MAX_EEPROM_ADDRESS / SAMPLE_SIZE) {

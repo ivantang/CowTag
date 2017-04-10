@@ -95,13 +95,17 @@ void serializeTestSerializeAccelerometer() {
 
 	// test packet
 	struct sampleData sampledata;
-	sampledata.cowID               = 1;
-	sampledata.packetType          = RADIO_PACKET_TYPE_ACCEL_PACKET;
-	sampledata.timestamp           = 0x12345678;
-	sampledata.accelerometerData.x = 0x78;
-	sampledata.accelerometerData.y = 0x89;
-	sampledata.accelerometerData.z = 0x90;
-	sampledata.error               = 0x0;
+	sampledata.cowID = 1;
+	sampledata.packetType = RADIO_PACKET_TYPE_ACCEL_PACKET;
+	sampledata.timestamp = 0x12345678;
+	sampledata.accelerometerData.x_h = 0x78;
+	sampledata.accelerometerData.x_l = 0x78;
+	sampledata.accelerometerData.y_h = 0x89;
+	sampledata.accelerometerData.y_l = 0x89;
+	sampledata.accelerometerData.z_h = 0x90;
+	sampledata.accelerometerData.z_l = 0x90;
+
+	sampledata.error = 0x0;
 
 
 	uint8_t buffer[SAMPLE_SIZE];

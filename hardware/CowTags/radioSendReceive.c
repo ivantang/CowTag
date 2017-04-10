@@ -207,6 +207,7 @@ static void alphaRadioTaskFunction(UArg arg0, UArg arg1)
 				System_flush();}
 
 			returnRadioOperationStatus(AlphaRadioStatus_ReceivedInvalidPacket);
+
 		}
 		/* If send fail */
 		else if (events & RADIO_EVENT_SEND_FAIL) {

@@ -14,5 +14,6 @@
 
 /***** Prototypes *****/
 void betaRadioTest_init(void);
+void file_printSampleData(struct sampleData sampledata);
 
 #endif /* TASKS_BETATASK_H_ */

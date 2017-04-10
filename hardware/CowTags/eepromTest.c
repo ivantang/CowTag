@@ -182,13 +182,16 @@ void eepromTestWriteReadAccelerometer() {
 
 	// test packet
 	struct sampleData sample;
-	sample.cowID               = 1;
-	sample.packetType          = RADIO_PACKET_TYPE_ACCEL_PACKET;
-	sample.timestamp           = 0x12345678;
-	sample.accelerometerData.x = 0x78;
-	sample.accelerometerData.y = 0x89;
-	sample.accelerometerData.z = 0x90;
-	sample.error               = 0x0;
+	sample.cowID = 1;
+	sample.packetType = RADIO_PACKET_TYPE_ACCEL_PACKET;
+	sample.timestamp = 0x12345678;
+	sample.accelerometerData.x_h = 0x12;
+	sample.accelerometerData.x_h = 0x34;
+	sample.accelerometerData.y_h = 0x56;
+	sample.accelerometerData.y_l = 0x78;
+	sample.accelerometerData.z_h = 0x90;
+	sample.accelerometerData.z_l = 0x12;
+	sample.error = 0x0;
 
 	eeprom_reset();
 	eeprom_write(&sample);
@@ -198,17 +201,20 @@ void eepromTestWriteReadAccelerometer() {
 	eeprom_getNext(&sample2);
 
 	System_printf("ID: %d\n", sample2.cowID);
-	System_printf("X: %x\n", sample2.accelerometerData.x);
-	System_printf("Y: %x\n", sample2.accelerometerData.y);
-	System_printf("Z: %x\n", sample2.accelerometerData.z);
+	System_printf("X: %x\n", sample2.accelerometerData.x_h << 8 + sample2.accelerometerData.x_l);
+	System_printf("Y: %x\n", sample2.accelerometerData.y_h << 8 + sample2.accelerometerData.y_l);
+	System_printf("Z: %x\n", sample2.accelerometerData.z_h << 8 + sample2.accelerometerData.z_l);
 
 	// verify unserialized packet
 	bool success = (sampledata.cowID == sample2.cowID);
 	success = (sample.packetType == sample2.packetType);
 	success = (sample.timestamp == sample2.timestamp);
-	success = (sample.accelerometerData.x == sample2.accelerometerData.x);
-	success = (sample.accelerometerData.y == sample2.accelerometerData.y);
-	success = (sample.accelerometerData.z == sample2.accelerometerData.z);
+	success = (sampledata.accelerometerData.x_h == sample2.accelerometerData.x_h);
+	success = (sampledata.accelerometerData.x_l == sample2.accelerometerData.x_l);
+	success = (sampledata.accelerometerData.y_h == sample2.accelerometerData.y_h);
+	success = (sampledata.accelerometerData.y_l == sample2.accelerometerData.y_l);
+	success = (sampledata.accelerometerData.z_h == sample2.accelerometerData.z_h);
+	success = (sampledata.accelerometerData.z_l == sample2.accelerometerData.z_l);
 	success = (sample.error == sample2.error);
 
 	if (success) {

@@ -67,8 +67,8 @@ void loop()
         Serial.print("H:");
         Serial.println(pox.getHeartRate());
 
-        Serial.print("O:");
-        Serial.println(pox.getSpO2());
+        //Serial.print("O:");
+        //Serial.println(pox.getSpO2());
 
         tsLastReport = millis();
     }

@@ -289,7 +289,7 @@ uint8_t readI2CRegister(uint8_t board_address, uint8_t address){
 	int i = 0;
 	for(i = 0; i < retryI2CCount ; i++){
 		if(I2C_transfer(handle, &i2cTransaction) != NULL) break;
-		if(verbose_i2c && i == retryI2CCount-1){
+		if(/*verbose_i2c &&*/ i == retryI2CCount-1){
 			System_printf("I2C Transfer timed out\n");
 			System_flush();
 		}

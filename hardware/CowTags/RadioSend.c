@@ -34,7 +34,7 @@
 #include "global_cfg.h"
 
 /***** Defines *****/
-#define NODERADIO_TASK_STACK_SIZE 1024
+#define NODERADIO_TASK_STACK_SIZE 512
 #define NODERADIO_TASK_PRIORITY   3
 
 
@@ -118,8 +118,11 @@ static void betaRadioTaskFunction(UArg arg0, UArg arg1)
 	/* Setup header */
 	sensorPacket.header.sourceAddress = betaAddress;
 
+	System_printf("Entering into radiosend main loop\n");
+	System_flush();
 	/* Enter main task loop */
-	while (1) {
+	while (1)
+	{
 		/* Wait for an event */
 		uint32_t events = Event_pend(*eventHandle, 0, RADIO_EVENT_ALL, BIOS_WAIT_FOREVER);
 

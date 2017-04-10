@@ -41,14 +41,14 @@ PIN_Config BoardGpioInitialTable[] = {
 PIN_State pinState;
 
 /**constants*/
-#define TASKSTACKSIZE 1024 //i2c
+#define TASKSTACKSIZE		2048	//i2c
 
 /**structures*/
 Task_Struct task0Struct;
 Char task0Stack[TASKSTACKSIZE];
 
 /*function definition */
-void Sensors_init(void) {
+void Sensors_test(void) {
 	//PIN_init(BoardGpioInitialTable);
 	Task_Params taskParams;
 
@@ -60,72 +60,114 @@ void Sensors_init(void) {
 
 
 void getAcceleration(struct sampleData *sampleData) {
-	unsigned int i;
-
-	// 7 specifies that all x, y, and z axes are enabled
-	// See pg35: http://www.st.com/content/ccc/resource/technical/document/datasheet/3c/ae/50/85/d6/b1/46/fe/CD00274221.pdf/files/CD00274221.pdf/jcr:content/translations/en.CD00274221.pdf
-	char accelerometer_state = 0x07;
-
-	switch(ACCELEROMETER_SAMPLE_RATE_HZ) {
-		case 1:
-			// 1 specifies 1Hz, the 7 enables all axes
-			accelerometer_state = 0x17;
-			break;
-		case 10:
-			// 2 specifies 10Hz, the 7 enables all axes
-			accelerometer_state = 0x27;
-			break;
-		case 25:
-			// etc
-			accelerometer_state = 0x37;
-			break;
-		case 50:
-			accelerometer_state = 0x47;
-			break;
-		case 100:
-			accelerometer_state = 0x57;
-			break;
-		case 200:
-			accelerometer_state = 0x67;
-			break;
-		case 400:
-			accelerometer_state = 0x77;
-			break;
-		default:
-			// fail if we get anything else.
-			assert(0);
-	}
-
-	writeI2CRegister(Board_LIS3DH_ADDR, LIS3DH_REG_CTRL1, 0x77);    //all axes , normal mode
-	writeI2CRegister(Board_LIS3DH_ADDR, LIS3DH_REG_CTRL4, 0x08);    //high res and BDU and self test off
-	writeI2CRegister(Board_LIS3DH_ADDR, LIS3DH_REG_TEMPCFG, 0x80);  //enable adcs
-
-	//polling status register to check for new set of data
-	for (i = 0 ; i < 30 ; i++) {
-		if ( (readI2CRegister(Board_LIS3DH_ADDR, accelerometer_state) & 0x8) >> 3 == 1 ) {
-			if ( (readI2CRegister(Board_LIS3DH_ADDR, accelerometer_state) >> 7) == 1 ) {
-				sampleData->accelerometerData.x = readI2CRegister(Board_LIS3DH_ADDR,0x28) | (readI2CRegister(Board_LIS3DH_ADDR,0x29) << 8);
-				sampleData->accelerometerData.y = readI2CRegister(Board_LIS3DH_ADDR,0x2A) | (readI2CRegister(Board_LIS3DH_ADDR,0x2B) << 8) ;
-				sampleData->accelerometerData.z = readI2CRegister(Board_LIS3DH_ADDR,0x2C) | (readI2CRegister(Board_LIS3DH_ADDR,0x2D) << 8) ;
-
-				if (verbose_sensors) System_printf("x:%d y:%d z:%d\n",
-                                           sampleData->accelerometerData.x,
-                                           sampleData->accelerometerData.y,
-                                           sampleData->accelerometerData.z);
-				System_flush();
-				break;
-			}
-		}
-	}
-
+	System_printf("Getting acceleration..\n");
 	System_flush();
 
-	return;
+	unsigned int	i;
+	unsigned samplesToGet = 100;
+	char accelerometer_state = 0x00;
+
+	struct sampleData accelerationData[1];
+
+	switch(ACCELEROMETER_SAMPLE_RATE_HZ) {
+			case 1:
+				// 1 specifies 1Hz, the 7 enables all axes
+				accelerometer_state = 0x17;
+				break;
+			case 10:
+				// 2 specifies 10Hz, the 7 enables all axes
+				accelerometer_state = 0x27;
+				break;
+			case 25:
+				// etc
+				accelerometer_state = 0x37;
+				break;
+			case 50:
+				accelerometer_state = 0x47;
+				break;
+			case 100:
+				accelerometer_state = 0x57;
+				break;
+			case 200:
+				accelerometer_state = 0x67;
+				break;
+			case 400:
+				accelerometer_state = 0x77;
+				break;
+			default:
+				// fail if we get anything else.
+				assert(0);
+		}
+    writeI2CRegister(Board_LIS3DH_ADDR, LIS3DH_REG_CTRL1, accelerometer_state);    //all axes , HR/normal mode, 10Hz
+    writeI2CRegister(Board_LIS3DH_ADDR, LIS3DH_REG_CTRL4, 0x08);	//high res and BDU and self test off +/-2g
+    writeI2CRegister(Board_LIS3DH_ADDR, LIS3DH_REG_CTRL3, 0x10);    //DRDY on INT1
+    //writeI2CRegister(Board_LIS3DH_ADDR, LIS3DH_REG_TEMPCFG, 0x80);    //enable adcs
+    //writeI2C(Board_LIS3DH_ADDR, LIS3DH_REG_OUT_X_L | 0x80);    //enable auto increment
+
+	System_printf("Accelerometer set up..\n");
+	System_flush();
+
+    //polling status register to check for new set of data
+    //if(!grabOnlyOne){
+		for(i = 0 ; i < samplesToGet ;){
+			if( (readI2CRegister(Board_LIS3DH_ADDR,0x27) & 0x8) >> 3 == 1 ){
+				if( (readI2CRegister(Board_LIS3DH_ADDR,0x27) >> 7) == 1 ){
+					System_printf("Accelerometer data ready..\n");
+					System_flush();
+
+					accelerationData[i].accelerometerData.x_h = readI2CRegister(Board_LIS3DH_ADDR,0x28);
+					accelerationData[i].accelerometerData.x_l = readI2CRegister(Board_LIS3DH_ADDR,0x29);
+					accelerationData[i].accelerometerData.y_h = readI2CRegister(Board_LIS3DH_ADDR,0x2A);
+					accelerationData[i].accelerometerData.y_l = readI2CRegister(Board_LIS3DH_ADDR,0x2B);
+					accelerationData[i].accelerometerData.z_h = readI2CRegister(Board_LIS3DH_ADDR,0x2C);
+					accelerationData[i].accelerometerData.z_l = readI2CRegister(Board_LIS3DH_ADDR,0x2D);
+
+					sampleData->accelerometerData.x_h = accelerationData[i].accelerometerData.x_h;
+					sampleData->accelerometerData.x_l = accelerationData[i].accelerometerData.x_l;
+					sampleData->accelerometerData.y_h = accelerationData[i].accelerometerData.y_h;
+					sampleData->accelerometerData.y_l = accelerationData[i].accelerometerData.y_l;
+					sampleData->accelerometerData.z_h = accelerationData[i].accelerometerData.z_h;
+					sampleData->accelerometerData.z_l = accelerationData[i].accelerometerData.z_l;
+
+			    	System_printf("x:%i y:%i z:%i\n", 	sampleData->accelerometerData.x_h << 8 | sampleData->accelerometerData.x_l,
+														sampleData->accelerometerData.y_h << 8 | sampleData->accelerometerData.y_l,
+														sampleData->accelerometerData.z_h << 8 | sampleData->accelerometerData.z_l);
+			    	System_flush();
+
+					break;
+
+					i++;
+				}
+			}
+		}
+    //}
+
+		System_printf("Acceleration read..\n");
+		System_flush();
+
+    //write to file
+    //for(i = 0 ; i < samplesToGet ;i++){
+    	System_printf("x:%i y:%i z:%i\n", 	sampleData->accelerometerData.x_h << 8 | sampleData->accelerometerData.x_l,
+											sampleData->accelerometerData.y_h << 8 | sampleData->accelerometerData.y_l,
+											sampleData->accelerometerData.z_h << 8 | sampleData->accelerometerData.z_l);
+    	if(verbose_beta_log){
+			accelerationData[i].packetType = RADIO_PACKET_TYPE_ACCEL_PACKET;
+			file_printSampleData(accelerationData[i]);
+    	}
+    //}
+
+
+    System_flush();
+
+    return;
 }
 
 void getTemp(struct sampleData *sampleData) {
 	uint16_t temp_obj;
 	uint16_t temp_amb;
+
+	System_printf("Getting ambient and object temperature..\n");
+	System_flush();
 
 	temp_obj =  readI2CWord100kHz(Board_MIKROE1362_ADDR,0x07)*0.02 - 273.15;
 	sampleData->tempData.temp_l = temp_obj & 0xFF;
@@ -135,8 +177,16 @@ void getTemp(struct sampleData *sampleData) {
 	sampleData->heartRateData.temp_l = temp_amb & 0xFF;
 	sampleData->heartRateData.temp_h = temp_amb >> 8;
 
-	if (verbose_sensors) {
+	/*if (verbose_sensors) {
 		System_printf("temp_obj %d\n", temp_obj);
+	}*/
+
+	System_printf("temp_obj %d\n", temp_obj);
+	System_flush();
+
+	if (verbose_beta_log){
+		sampleData->packetType = RADIO_PACKET_TYPE_TEMP_PACKET;
+		file_printSampleData(*sampleData);
 	}
 
 	return;
@@ -160,18 +210,34 @@ void getTempNoPtr() {
 	return;
 }
 
-void getHeartRate(struct sampleData *sampleData) {
+
+void getHeartRate(struct sampleData* sampleData) {
 	int i = 0;
-	uint16_t numValues = 10;
-	uint16_t HRData[10];
-	uint32_t start_timestamp;
-	uint32_t end_timestamp;
-	uint32_t start_clock;
-	uint32_t end_clock;
+	uint16_t numValues = 200;
+	//uint16_t RedData[250];
+	//int Derivative[75];
+	struct sampleData HRData[200];
+
+	System_printf("Getting heart rate..\n");
+	System_flush();
+
+	//check if device is connected
+	if(readI2CRegister(Board_MAX30100_ADDR,0xFF) != 0x11){
+		System_printf("Hardware is not the MAX30100 : 0x%x\n",readI2CRegister(Board_MAX30100_ADDR,0xFF));
+		System_flush();
+	}
+
+	writeI2CRegister(Board_MAX30100_ADDR, MAX30100_REG_MODE_CONFIGURATION, 0x02);	//enable HR only
+
+//	uint8_t previous = readI2CRegister(Board_MAX30100_ADDR, MAX30100_REG_SPO2_CONFIGURATION);
+//	writeI2CRegister(Board_MAX30100_ADDR,
+//					 MAX30100_REG_SPO2_CONFIGURATION,
+//					 previous & 0xA0 | 0x47);	//SPO2 cofig reg
 
 	// previous holds the current state of the heartrate configuration
 	uint8_t previous = readI2CRegister(Board_MAX30100_ADDR,
-                                     MAX30100_REG_SPO2_CONFIGURATION);
+	                                   MAX30100_REG_SPO2_CONFIGURATION);
+
 	// Now we take that previous configuration and "and" it with 0xA0 to keep only
 	// the information that we want to keep from the previous setting. Then "or"
 	// it with 0x43 to set our own global settings
@@ -220,109 +286,178 @@ void getHeartRate(struct sampleData *sampleData) {
 			assert(0);
 	}
 
-
-	Types_FreqHz frequency;
-
-	//enable HR only
-	writeI2CRegister(Board_MAX30100_ADDR, MAX30100_REG_MODE_CONFIGURATION, 0x02);
-
-	//set LED 50mA
 	writeI2CRegister(Board_MAX30100_ADDR,
-                   MAX30100_REG_LED_CONFIGURATION,
-                   MAX30100_LED_CURR_50MA);
+					 MAX30100_REG_SPO2_CONFIGURATION,
+					 heartrate_config);	//SPO2 cofig reg
 
-	// Sets up the heartrate configuration, including sample rate.
-	// Also sets LED Pulse width to 1600 micro seconds (bits set 0000 0011)
-	// Also High resolution is enabled (0100 0000)
 	writeI2CRegister(Board_MAX30100_ADDR,
-                   MAX30100_REG_SPO2_CONFIGURATION,
-                   heartrate_config);
+					 MAX30100_REG_LED_CONFIGURATION,
+					 0x0f);	//set LED 50mA
 
+	previous = readI2CRegister(Board_MAX30100_ADDR, MAX30100_REG_INTERRUPT_CONFIGURATION);
+	writeI2CRegister(Board_MAX30100_ADDR,
+				 	 MAX30100_REG_INTERRUPT_CONFIGURATION,
+					 previous & 0x0A | 0xA0);	//turn on interrupts
 
-	writeI2CRegister(Board_MAX30100_ADDR, 0x01, 0xE0); //turn on interrupts
+	uint32_t tempval;
 
-	start_clock = Clock_getTicks();
-	end_clock = Clock_getTicks();
-	while (i < numValues) {
-		while ((readI2CRegister(Board_MAX30100_ADDR, 0x00) & 0x20) != 0x20) {
+//	check if registers have correct values
+//	System_printf("%x\n", readI2CRegister(Board_MAX30100_ADDR, MAX30100_REG_SPO2_CONFIGURATION));
+//	System_printf("%x\n", readI2CRegister(Board_MAX30100_ADDR, MAX30100_REG_INTERRUPT_CONFIGURATION));
+//	System_printf("%x\n", readI2CRegister(Board_MAX30100_ADDR, MAX30100_REG_LED_CONFIGURATION));
+//	System_printf("%x\n", readI2CRegister(Board_MAX30100_ADDR, MAX30100_REG_MODE_CONFIGURATION));
+//	System_flush();
+
+	if(!grabOnlyOne){
+		while(i < numValues){
+			//clear FIFO PTR
+			writeI2CRegister(Board_MAX30100_ADDR, MAX30100_REG_FIFO_WRITE_POINTER, 0x00);
+			writeI2CRegister(Board_MAX30100_ADDR, MAX30100_REG_FIFO_READ_POINTER, 0x00);
+
 			//check if hr data is ready
+			//tempval = readI2CRegister(Board_MAX30100_ADDR, MAX30100_REG_INTERRUPT_STATUS);
+
+			while(!tempval){
+				tempval = readI2CRegister(Board_MAX30100_ADDR, MAX30100_REG_INTERRUPT_STATUS);
+				tempval &= MAX30100_HRDATA_READY;
+				//System_printf(".");
+				//System_flush();
+				if(tempval &= MAX30100_DATA_FULL){
+					System_printf("IM FULL\n");
+					System_flush();
+				}
+			}
+
+
+			//fifo data is 16 bits so 4 reads is needed
+			//first 16 bits is IR data, in our case, HR data
+			HRData[i].heartRateData.rate_h = readI2CRegister(Board_MAX30100_ADDR,MAX30100_REG_FIFO_DATA);
+			HRData[i].heartRateData.rate_l = readI2CRegister(Board_MAX30100_ADDR, MAX30100_REG_FIFO_DATA);
+			readI2CRegister(Board_MAX30100_ADDR,MAX30100_REG_FIFO_DATA)<<8 + readI2CRegister(Board_MAX30100_ADDR, MAX30100_REG_FIFO_DATA);
+			//filter out 0 measurements
+			while(HRData[i].heartRateData.rate_h << 8 + HRData[i].heartRateData.rate_l == 0){
+				HRData[i].heartRateData.rate_h = readI2CRegister(Board_MAX30100_ADDR,MAX30100_REG_FIFO_DATA);
+				HRData[i].heartRateData.rate_l = readI2CRegister(Board_MAX30100_ADDR, MAX30100_REG_FIFO_DATA);
+				readI2CRegister(Board_MAX30100_ADDR,MAX30100_REG_FIFO_DATA)<<8 + readI2CRegister(Board_MAX30100_ADDR, MAX30100_REG_FIFO_DATA);
+			}
+
+			/*if(HRData[i] < 40000 || HRData[i] > 60000){
+				if(i != 0)
+				HRData[i] = HRData[i-1];
+			}*/
+
+			//next 16 bits is useless data red led data
+			//RedData[i] = readI2CRegister(Board_MAX30100_ADDR,MAX30100_REG_FIFO_DATA)<<8 + readI2CRegister(Board_MAX30100_ADDR,MAX30100_REG_FIFO_DATA);
+
+			//if(i!=0) Derivative[i] = (int)(HRData[i] - HRData[i-1]);
+
+			i++;
 		}
-		//fifo data is 16 bits so 4 reads is needed
-		//first 16 bits is IR data, in our case, HR data
-		HRData[i] = readI2CRegister(Board_MAX30100_ADDR,MAX30100_REG_FIFO_DATA)<<8 +
-                readI2CRegister(Board_MAX30100_ADDR,MAX30100_REG_FIFO_DATA);
-		while (HRData[i] == 0) {
-			HRData[i] = readI2CRegister(Board_MAX30100_ADDR,MAX30100_REG_FIFO_DATA)<<8 +
-                  readI2CRegister(Board_MAX30100_ADDR,MAX30100_REG_FIFO_DATA);
-		}
-
-		Timestamp_getFreq(&frequency);
-
-		if (i == 0) {
-			start_timestamp = TrueTimestamp();
-		}
-
-		Task_sleep(10000 / Clock_tickPeriod);  //adding this to extend measurement to 10 seconds
-
-		end_timestamp = TrueTimestamp();
-		end_clock = Clock_getTicks();
-
-		i++;
 	}
 
-	sampleData->heartRateData.rate_l = HRData[0] & 0xFF;
-	sampleData->heartRateData.rate_h = HRData[0] >> 8;
+	if(grabOnlyOne){
+		//clear FIFO PTR
+		writeI2CRegister(Board_MAX30100_ADDR, MAX30100_REG_FIFO_WRITE_POINTER, 0x00);
+		writeI2CRegister(Board_MAX30100_ADDR, MAX30100_REG_FIFO_READ_POINTER, 0x00);
+
+		//check if hr data is ready
+		//tempval = readI2CRegister(Board_MAX30100_ADDR, MAX30100_REG_INTERRUPT_STATUS);
+
+		while(!tempval){
+			tempval = readI2CRegister(Board_MAX30100_ADDR, MAX30100_REG_INTERRUPT_STATUS);
+			tempval &= MAX30100_HRDATA_READY;
+			//System_printf(".");
+			//System_flush();
+			if(tempval &= MAX30100_DATA_FULL){
+				System_printf("MAX30100 FIFO is full\n");
+				System_flush();
+			}
+		}
+
+		//fifo data is 16 bits so 4 reads is needed
+		//first 16 bits is IR data, in our case, HR data
+		HRData[i].heartRateData.rate_h = readI2CRegister(Board_MAX30100_ADDR,MAX30100_REG_FIFO_DATA);
+		HRData[i].heartRateData.rate_l = readI2CRegister(Board_MAX30100_ADDR, MAX30100_REG_FIFO_DATA);
+		readI2CRegister(Board_MAX30100_ADDR,MAX30100_REG_FIFO_DATA)<<8 + readI2CRegister(Board_MAX30100_ADDR, MAX30100_REG_FIFO_DATA);
+		//filter out 0 measurements
+		while(HRData[i].heartRateData.rate_h << 8 + HRData[i].heartRateData.rate_l == 0){
+			HRData[i].heartRateData.rate_h = readI2CRegister(Board_MAX30100_ADDR,MAX30100_REG_FIFO_DATA);
+			HRData[i].heartRateData.rate_l = readI2CRegister(Board_MAX30100_ADDR, MAX30100_REG_FIFO_DATA);
+			readI2CRegister(Board_MAX30100_ADDR,MAX30100_REG_FIFO_DATA)<<8 + readI2CRegister(Board_MAX30100_ADDR, MAX30100_REG_FIFO_DATA);
+		}
+
+		i++;
+
+}
+
+	sampleData->heartRateData.rate_h = HRData[i].heartRateData.rate_h;
+	sampleData->heartRateData.rate_l = HRData[i].heartRateData.rate_l;
 
 	if (verbose_sensors) {
 		for (i = 0 ; i < numValues ; i++) {
-			System_printf("%d\n",HRData[i]);
+			/*System_printf("%u\n",(HRData[i].heartRateData.rate_h << 8 | HRData[i].heartRateData.rate_l));
+*/
+			System_flush();
+
+
+			if (verbose_beta_log){
+				HRData[i].packetType = RADIO_PACKET_TYPE_SENSOR_PACKET;
+				file_printSampleData(HRData[i]);
+			}
 		}
 
-		System_printf("Timestamp diff: %d\n" , end_timestamp-start_timestamp);
-		System_printf("Frequency %d\n", frequency.hi << 8 | frequency.lo);
-		System_printf("Time elapsed: %d\n" , (end_timestamp-start_timestamp) / (frequency.hi << 8 | frequency.lo));
 
-		System_printf("Clock diff: %d\n" , end_clock-start_clock);
-		System_printf("Time elapsed: %d\n" , (end_clock-start_clock)/100000);
-
-		System_flush();
 	}
 
 	return;
 }
+
 
 void getTimestamp(struct sampleData *sampleData) {
 	sampleData->timestamp = TrueTimestamp();
 }
 
 void makeSensorPacket(struct sampleData *sampleData) {
-	getAcceleration(sampleData);
-	getTemp(sampleData);
+	System_printf("Activating sensors\n");
+	System_flush();
 
-	//getHeartRate(sampleData);
+	getTemp(sampleData);
+	System_printf("Temp done\n");
+	System_flush();
+
+	getAcceleration(sampleData);
+	System_printf("Accel done\n");
+	System_flush();
 
 	getTimestamp(sampleData);
-
-	System_printf("TemperatureCowData = %i ,"
-                "AmbientTemperatureData = %i ,"
-                "InfraredData = %i\n"
-                "AccelerometerData= x=%i, y=%i, z=%i\n"
-                "Timestamp = %i\n",
-                sampleData->tempData.temp_h << 8 | sampleData->tempData.temp_l,
-                sampleData->heartRateData.temp_h << 8 | sampleData->heartRateData.temp_l,
-                sampleData->heartRateData.rate_h << 8 | sampleData->heartRateData.rate_l,
-                sampleData->accelerometerData.x,
-                sampleData->accelerometerData.y,
-                sampleData->accelerometerData.z,
-                sampleData->timestamp);
-
+	System_printf("Timestamp done\n");
 	System_flush();
+
+	System_printf(							"TemperatureCowData = %i ,"
+											"AmbientTemperatureData = %i ,"
+											"InfraredData = %i\n"
+											"AccelerometerData= x=%i, y=%i, z=%i\n"
+											"Timestamp = %i\n",
+											sampleData->tempData.temp_h << 8 | sampleData->tempData.temp_l,
+											sampleData->heartRateData.temp_h << 8 | sampleData->heartRateData.temp_l,
+											sampleData->heartRateData.rate_h << 8 | sampleData->heartRateData.rate_l,
+											sampleData->accelerometerData.x_h << 8 | sampleData->accelerometerData.x_l,
+											sampleData->accelerometerData.y_h << 8 | sampleData->accelerometerData.y_l,
+											sampleData->accelerometerData.z_h << 8 | sampleData->accelerometerData.z_l,
+											sampleData->timestamp);
+
 }
 
 void testSensors() {
 	struct sampleData sampleData;
 
-	while (1) {
+	while(1){
 		makeSensorPacket(&sampleData);
 	}
+
+	System_printf("Tests done\n");
+	System_flush();
+
+	System_printf("Tests really done\n");
+	System_flush();
 }

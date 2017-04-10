@@ -23,8 +23,7 @@ C_SRCS += \
 ../eepromTest.c \
 ../radioSendReceive.c \
 ../sensors.c \
-../serialize.c \
-../uArtEcho.c 
+../serialize.c 
 
 OBJS += \
 ./CC1310_LAUNCHXL.obj \
@@ -40,8 +39,7 @@ OBJS += \
 ./eepromTest.obj \
 ./radioSendReceive.obj \
 ./sensors.obj \
-./serialize.obj \
-./uArtEcho.obj 
+./serialize.obj 
 
 C_DEPS += \
 ./CC1310_LAUNCHXL.d \
@@ -57,8 +55,7 @@ C_DEPS += \
 ./eepromTest.d \
 ./radioSendReceive.d \
 ./sensors.d \
-./serialize.d \
-./uArtEcho.d 
+./serialize.d 
 
 GEN_MISC_DIRS += \
 ./configPkg/ 
@@ -94,8 +91,7 @@ C_DEPS__QUOTED += \
 "eepromTest.d" \
 "radioSendReceive.d" \
 "sensors.d" \
-"serialize.d" \
-"uArtEcho.d" 
+"serialize.d" 
 
 OBJS__QUOTED += \
 "CC1310_LAUNCHXL.obj" \
@@ -111,8 +107,7 @@ OBJS__QUOTED += \
 "eepromTest.obj" \
 "radioSendReceive.obj" \
 "sensors.obj" \
-"serialize.obj" \
-"uArtEcho.obj" 
+"serialize.obj" 
 
 C_SRCS__QUOTED += \
 "../CC1310_LAUNCHXL.c" \
@@ -128,7 +123,6 @@ C_SRCS__QUOTED += \
 "../eepromTest.c" \
 "../radioSendReceive.c" \
 "../sensors.c" \
-"../serialize.c" \
-"../uArtEcho.c" 
+"../serialize.c" 
 
 

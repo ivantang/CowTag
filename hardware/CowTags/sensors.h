@@ -12,6 +12,7 @@
 #include <ti/drivers/I2C.h> //i2c
 #include <ti/drivers/UART.h> //i2c
 #include <radioProtocol.h>
+#include <betaRadioTest.h>
 /*initialize node task and create TI-RTOS objects*/
 void Sensors_init(void);
 
@@ -78,10 +79,12 @@ void Sensors_init(void);
 /*MAX30100 HEART RATE ADDRESSES*/
 #define Board_MAX30100_ADDR 0x57
 //FIFO CONTROL and DATA REGISTERS
-#define MAX30100_REG_FIFO_WRITE_POINTER    0x02
-#define MAX30100_REG_FIFO_OVERFLOW_COUNTER 0x03
-#define MAX30100_REG_FIFO_READ_POINTER     0x04
-#define MAX30100_REG_FIFO_DATA             0x05  // Burst read does not autoincrement addr
+#define MAX30100_REG_INTERRUPT_STATUS			0x00
+#define MAX30100_REG_INTERRUPT_CONFIGURATION	0x01
+#define MAX30100_REG_FIFO_WRITE_POINTER         0x02
+#define MAX30100_REG_FIFO_OVERFLOW_COUNTER      0x03
+#define MAX30100_REG_FIFO_READ_POINTER          0x04
+#define MAX30100_REG_FIFO_DATA                  0x05  // Burst read does not autoincrement addr
 
 // Mode Configuration register
 #define MAX30100_REG_MODE_CONFIGURATION 0x06
@@ -91,11 +94,14 @@ void Sensors_init(void);
 #define MAX30100_REG_SPO2_CONFIGURATION 0x07
 #define MAX30100_REG_LED_CONFIGURATION  0x09
 
-#define MAX30100_MODE_SPO2_HR         0x03   //default   LEDPUlseWidth
-#define MAX30100_SAMPRATE_100HZ       0x01   //default   Samplerate
-#define MAX30100_SPC_PW_1600US_16BITS 0x03   //default   LEDPulseWidth
-#define MAX30100_LED_CURR_50MA        0x0f   //default   LEDcurrent
-#define MAX30100_SPC_SPO2_HI_RES_EN   (1   <<   6)
+#define	MAX30100_MODE_SPO2_HR			0x03	//default LEDPUlseWidth
+#define MAX30100_SAMPRATE_100HZ			0x01	//default Samplerate
+#define	MAX30100_SPC_PW_1600US_16BITS	0x03	//default LEDPulseWidth
+#define	MAX30100_LED_CURR_50MA			0x0f	//default LEDcurrent
+#define MAX30100_SPC_SPO2_HI_RES_EN     (1 << 6)
+#define MAX30100_HRDATA_READY			0x20
+#define MAX30100_DATA_FULL				0x80
+
 
 void getAcceleration(struct sampleData*);
 void getTemp(struct sampleData*);
@@ -103,5 +109,6 @@ void getHeartRate(struct sampleData*);
 void getTimestamp(struct sampleData*);
 void makeSensorPacket(struct sampleData*);
 void testSensors();
+//void Sensors_test();
 
 #endif /* SENSORS_H_ */

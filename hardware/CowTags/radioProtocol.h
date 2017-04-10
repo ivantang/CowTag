@@ -16,9 +16,11 @@
 
 #define RADIO_EASYLINK_MODULATION EasyLink_Phy_Custom
 
-#define  RADIO_PACKET_TYPE_ACK_PACKET     0
-#define  RADIO_PACKET_TYPE_SENSOR_PACKET  3
-#define  RADIO_PACKET_TYPE_ACCEL_PACKET   4
+#define RADIO_PACKET_TYPE_ACK_PACKET             0
+#define RADIO_PACKET_TYPE_SENSOR_PACKET    		 3
+#define RADIO_PACKET_TYPE_ACCEL_PACKET           4
+//delete RADIO_PACKET_TYPE_TEMP_PACKET afterwards, just using this for the farm demo :)
+#define RADIO_PACKET_TYPE_TEMP_PACKET           5
 
 #define SAMPLE_SIZE 13
 
@@ -39,9 +41,12 @@ struct temperatureData {
 };
 
 struct accelerationData {
-	uint8_t x;
-	uint8_t y;
-	uint8_t z;
+	uint8_t x_h;
+	uint8_t x_l;
+	uint8_t y_h;
+	uint8_t y_l;
+	uint8_t z_h;
+	uint8_t z_l;
 };
 
 struct heartrateData {

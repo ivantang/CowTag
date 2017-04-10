@@ -56,15 +56,33 @@ void eepromTest_init() {
 }
 
 bool eeprom_verify(struct sampleData *d1, struct sampleData *d2) {
-	return d1->cowID == d2->cowID
-		&& d1->packetType == d2->packetType
-		&& d1->timestamp == d2->timestamp
-		&& d1->tempData.temp_h == d2->tempData.temp_h
-		&& d1->tempData.temp_l == d2->tempData.temp_l
-		&& d1->heartRateData.rate_h == d2->heartRateData.rate_h
-		&& d1->heartRateData.rate_l == d2->heartRateData.rate_l
-		&& d1->heartRateData.temp_h == d2->heartRateData.temp_h
-		&& d1->heartRateData.temp_l == d2->heartRateData.temp_l;
+	bool results = false;
+	if (d1->packetType == d2->packetType) {
+		if (d1->packetType == RADIO_PACKET_TYPE_ACCEL_PACKET) {
+			results =  d1->cowID == d2->cowID
+				&& d1->packetType == d2->packetType
+				&& d1->timestamp == d2->timestamp
+				&& d1->accelerometerData.x_h == d2->accelerometerData.x_h
+				&& d1->accelerometerData.x_l == d2->accelerometerData.x_l
+				&& d1->accelerometerData.y_h == d2->accelerometerData.y_h
+				&& d1->accelerometerData.y_l == d2->accelerometerData.y_l
+				&& d1->accelerometerData.z_h == d2->accelerometerData.z_h
+				&& d1->accelerometerData.z_l == d2->accelerometerData.z_l;
+
+		} else {
+			results =  d1->cowID == d2->cowID
+				&& d1->packetType == d2->packetType
+				&& d1->timestamp == d2->timestamp
+				&& d1->tempData.temp_h == d2->tempData.temp_h
+				&& d1->tempData.temp_l == d2->tempData.temp_l
+				&& d1->heartRateData.rate_h == d2->heartRateData.rate_h
+				&& d1->heartRateData.rate_l == d2->heartRateData.rate_l
+				&& d1->heartRateData.temp_h == d2->heartRateData.temp_h
+				&& d1->heartRateData.temp_l == d2->heartRateData.temp_l;
+		}
+	}
+
+	return results;
 }
 
 void eepromTestGetNext() {
@@ -73,6 +91,18 @@ void eepromTestGetNext() {
 	unsigned testsize = 3;
 
 	eeprom_reset();
+	// test packet
+	struct sampleData sampledata;
+	sampledata.cowID = 1;
+	sampledata.packetType = RADIO_PACKET_TYPE_ACCEL_PACKET;
+	sampledata.timestamp = 0x12345678;
+	sampledata.accelerometerData.x_h = 0x12;
+	sampledata.accelerometerData.x_h = 0x34;
+	sampledata.accelerometerData.y_h = 0x56;
+	sampledata.accelerometerData.y_l = 0x78;
+	sampledata.accelerometerData.z_h = 0x90;
+	sampledata.accelerometerData.z_l = 0x12;
+	sampledata.error = 0x0;
 
 	// write thrice
 	unsigned iter = 0;
@@ -87,9 +117,16 @@ void eepromTestGetNext() {
 	// get from sample set, and loop until no samples left
 	struct sampleData sample2;
 	eeprom_getNext(&sample2);
-	++samplesGotten;
 
-	while (!eeprom_getNext(&sample2)) { ++samplesGotten; }
+	if (eeprom_verify(&sampledata, &sample2)) {
+		++samplesGotten;
+	}
+
+	while (!eeprom_getNext(&sample2)) {
+		if (eeprom_verify(&sampledata, &sample2)) {
+			++samplesGotten;
+		}
+	}
 
 	// validate
 	if (samplesGotten == testsize) {

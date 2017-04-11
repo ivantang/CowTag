@@ -15,7 +15,7 @@
 // Begin auto-generated
 // IF YOU CHANGE THE NAME OF THIS DEFINE YOU NEED TO CHANGE THE SEARCH STRING IN
 // ../../add_timestamp_to_config.c AS WELL
-#define TIMESTAMP_AT_BUILDTIME 1491882212
+#define TIMESTAMP_AT_BUILDTIME 1491882426
 // End auto-generated
 
 // [0] = Beta

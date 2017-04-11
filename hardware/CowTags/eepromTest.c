@@ -29,6 +29,7 @@ Char task0Stack[TASKSTACKSIZE];
 struct sampleData sampledata;
 
 /***** Prototypes *****/
+bool eeprom_verify(struct sampleData *d1, struct sampleData *d2);
 void eepromTestWriteReadNormal();
 void eepromTestWriteReadAccelerometer();
 void eepromTestValidateMemory();
@@ -49,9 +50,37 @@ void eepromTest_init() {
 	Task_Params_init(&taskParams);
 	taskParams.stackSize = TASKSTACKSIZE;
 	taskParams.stack = &task0Stack;
-	Task_construct(&task0Struct, (Task_FuncPtr)eepromTestValidateMemory, &taskParams, NULL);
+	Task_construct(&task0Struct, (Task_FuncPtr)eepromTestGetNext, &taskParams, NULL);
+}
 
-	if(verbose_eepromTest){System_printf("Finished eepromTest\n");System_flush();}
+bool eeprom_verify(struct sampleData *d1, struct sampleData *d2) {
+	bool results = false;
+	if (d1->packetType == d2->packetType) {
+		if (d1->packetType == RADIO_PACKET_TYPE_ACCEL_PACKET) {
+			results =  d1->cowID == d2->cowID
+				&& d1->packetType == d2->packetType
+				&& d1->timestamp == d2->timestamp
+				&& d1->accelerometerData.x_h == d2->accelerometerData.x_h
+				&& d1->accelerometerData.x_l == d2->accelerometerData.x_l
+				&& d1->accelerometerData.y_h == d2->accelerometerData.y_h
+				&& d1->accelerometerData.y_l == d2->accelerometerData.y_l
+				&& d1->accelerometerData.z_h == d2->accelerometerData.z_h
+				&& d1->accelerometerData.z_l == d2->accelerometerData.z_l;
+
+		} else {
+			results =  d1->cowID == d2->cowID
+				&& d1->packetType == d2->packetType
+				&& d1->timestamp == d2->timestamp
+				&& d1->tempData.temp_h == d2->tempData.temp_h
+				&& d1->tempData.temp_l == d2->tempData.temp_l
+				&& d1->heartRateData.rate_h == d2->heartRateData.rate_h
+				&& d1->heartRateData.rate_l == d2->heartRateData.rate_l
+				&& d1->heartRateData.temp_h == d2->heartRateData.temp_h
+				&& d1->heartRateData.temp_l == d2->heartRateData.temp_l;
+		}
+	}
+
+	return results;
 }
 
 void eepromTestGetNext() {
@@ -60,6 +89,18 @@ void eepromTestGetNext() {
 	unsigned testsize = 3;
 
 	eeprom_reset();
+	// test packet
+	struct sampleData sampledata;
+	sampledata.cowID = 1;
+	sampledata.packetType = RADIO_PACKET_TYPE_SENSOR_PACKET;
+	sampledata.timestamp = 0x12345678;
+	sampledata.tempData.temp_h = 0x78;
+	sampledata.tempData.temp_l = 0x65;
+	sampledata.heartRateData.rate_h = 0x90;
+	sampledata.heartRateData.rate_l = 0x87;
+	sampledata.heartRateData.temp_h = 0x45;
+	sampledata.heartRateData.temp_l = 0x32;
+	sampledata.error = 0x0;
 
 	// write thrice
 	unsigned iter = 0;
@@ -74,9 +115,16 @@ void eepromTestGetNext() {
 	// get from sample set, and loop until no samples left
 	struct sampleData sample2;
 	eeprom_getNext(&sample2);
-	++samplesGotten;
 
-	while (!eeprom_getNext(&sample2)) { ++samplesGotten; }
+	if (eeprom_verify(&sampledata, &sample2)) {
+		++samplesGotten;
+	}
+
+	while (!eeprom_getNext(&sample2)) {
+		if (eeprom_verify(&sampledata, &sample2)) {
+			++samplesGotten;
+		}
+	}
 
 	// validate
 	if (samplesGotten == testsize) {
@@ -118,9 +166,16 @@ void eepromTestGetNextWithWrap() {
 	// get from sample set, and loop until no samples left
 	struct sampleData sample2;
 	eeprom_getNext(&sample2);
-	++samplesGotten;
 
-	while (!eeprom_getNext(&sample2)) { ++samplesGotten; }
+	if (eeprom_verify(&sampledata, &sample2)) {
+		++samplesGotten;
+	}
+
+	while (!eeprom_getNext(&sample2)) {
+		if (eeprom_verify(&sampledata, &sample2)) {
+			++samplesGotten;
+		}
+	}
 
 	// validate
 	if (samplesGotten == MAX_EEPROM_ADDRESS / SAMPLE_SIZE) {

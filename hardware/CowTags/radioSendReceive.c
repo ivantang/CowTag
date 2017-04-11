@@ -206,7 +206,7 @@ static void alphaRadioTaskFunction(UArg arg0, UArg arg1)
 				System_printf("RadioSend: Invalid packet received from other Alpha, ignoring!\n");
 				System_flush();}
 
-				returnRadioOperationStatus(AlphaRadioStatus_ReceivedInvalidPacket);
+			returnRadioOperationStatus(AlphaRadioStatus_ReceivedInvalidPacket);
 
 		}
 		/* If send fail */

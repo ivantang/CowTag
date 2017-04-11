@@ -117,11 +117,7 @@ static void betaRadioTestTaskFunction(UArg arg0, UArg arg1)
 		// send packet or save to eeprom
 		if(verbose_betaRadioTest){System_printf("BetaTest: sending packet...\n");System_flush();}
 
-		while(Timestamp_get32()%2 != 0);
-
 		results = betaRadioSendData(sampledata);
-
-
 		if (results != NodeRadioStatus_Success) {
 
 			if (usingEeprom) {
@@ -150,8 +146,11 @@ static void betaRadioTestTaskFunction(UArg arg0, UArg arg1)
 
 				// check for another stored sample
 				bool hasNext = eeprom_getNext(&oldSample);
+				System_printf("GET NEXT: %d\n", hasNext);
 				if (hasNext) {
 					Task_sleep(sleepASecond());
+					System_printf("RESSEDING\n");
+					printSampleData(oldSample);
 					results = betaRadioSendData(oldSample);
 
 					if (results != NodeRadioStatus_Success) {
@@ -162,7 +161,9 @@ static void betaRadioTestTaskFunction(UArg arg0, UArg arg1)
 					} else {
 						++oldSamplesSent;
 					}
-				} //end if(hasnext)
+				} else {
+					isSending = false;
+				}
 			} while (isSending == true);
 
 			if(verbose_betaRadioTest){System_printf("%d saved samples sent\n", oldSamplesSent);}
@@ -188,14 +189,14 @@ void printSampleData(struct sampleData sampledata){
 		sampledata.timestamp,
 		sampledata.error);
 	if(sampledata.packetType == RADIO_PACKET_TYPE_SENSOR_PACKET){
-		System_printf(							"TemperatureCowData = %i.%i, "
-			"AmbientTemperatureData = %i.%i, "
-			"InfraredData = %i.%i\n",
-			sampledata.tempData.temp_h,
+		System_printf(							"TemperatureCowData = %i, "
+			"AmbientTemperatureData = %i, "
+			"InfraredData = %i\n",
+			sampledata.tempData.temp_h << 8 |
 			sampledata.tempData.temp_l,
-			sampledata.heartRateData.temp_h,
+			sampledata.heartRateData.temp_h << 8 |
 			sampledata.heartRateData.temp_l,
-			sampledata.heartRateData.rate_h,
+			sampledata.heartRateData.rate_h <<8 |
 			sampledata.heartRateData.rate_l);
 	}
 	else{

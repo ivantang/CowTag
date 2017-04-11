@@ -33,7 +33,7 @@
 #include <IIC.h>
 
 /***** Defines *****/
-#define BOARD_24LC256 0x50	//slave address for first eeprom (a1a2a3 = 000)
+#define BOARD_24LC256 0x53	//slave address for first eeprom (a1a2a3 = 000)
 
 /***** Variable Declarations *****/
 uint16_t eeprom_currentAddress = MIN_EEPROM_ADDRESS;
@@ -136,24 +136,30 @@ bool eeprom_getNext(struct sampleData *data) {
 
 		// convert bytes to sensorPacket struct
 		unserializePacket(data, buf);
+		return true;
 
 		// no wrapping: read samples from lastAddress to currentAddress
 	} else {
-		if (eeprom_lastAddress + SAMPLE_SIZE <= eeprom_currentAddress) {
+		if (eeprom_currentAddress == eeprom_lastAddress) {
+			if(verbose_eeprom){System_printf("eepromGetNext has no next!\n");System_flush();}
+			return false;
+
+		} else if (eeprom_lastAddress + SAMPLE_SIZE <= eeprom_currentAddress) {
 			eeprom_readAddress(eeprom_lastAddress >> 8, eeprom_lastAddress & 0xff, SAMPLE_SIZE, buf);
 			eeprom_lastAddress += SAMPLE_SIZE;
 
 			// convert bytes to sensorPacket struct
 			unserializePacket(data, buf);
+			return true;
 
 		} else {
 			eeprom_currentAddress = eeprom_lastAddress = MIN_EEPROM_ADDRESS;
 			if(verbose_eeprom){System_printf("Finished eepromGetNext\n");System_flush();}
-			return true;  // DONE
+			return false;
 		}
 	}
 	if(verbose_eeprom){System_printf("Finished eepromGetNext\n");System_flush();}
-	return false;  // NOT DONE
+	return false;
 }
 
 void eeprom_reset() {

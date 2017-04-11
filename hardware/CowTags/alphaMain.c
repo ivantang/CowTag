@@ -53,10 +53,10 @@ int main(void) {
 	//Sensors_init(); // init i2C
 
 	//if (verbose_main) {System_printf("Initializing EEPROM...\n");}
-	//eeprom_testStart();
+//	eepromTestStart();
 
-	//if (verbose_main) {System_printf("Initializing serialization thread...\n");}
-	//serialize_testStart();
+//	if (verbose_main) {System_printf("Initializing serialization thread...\n");}
+//	serializeTestStart();
 
 	if (verbose_main) {System_printf("Initializing radio antenna...\n");}
 	radioSendReceive_init();

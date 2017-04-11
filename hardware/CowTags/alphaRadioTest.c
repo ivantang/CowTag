@@ -112,7 +112,9 @@ static void alphaRadioTestTaskFunction(UArg arg0, UArg arg1){
 
 	while (1) {
 		received = 0;
-		Task_sleep(2 * sleepASecond());
+
+		Task_sleep(sleepASecond());
+
 		// -------------------- SENDING -------------------------
 		sampledata.cowID = 2;
 		sampledata.packetType = RADIO_PACKET_TYPE_SENSOR_PACKET;
@@ -148,13 +150,9 @@ static void alphaRadioTestTaskFunction(UArg arg0, UArg arg1){
 		// rather, we wish to send and receive at different times.
 		// Although it is necessary for the radioSendReceive thread to be able to do both!
 
-		Task_sleep(2 * sleepASecond());
-
 		AlphaRadioTask_registerPacketReceivedCallback(packetReceivedCallback); // register callback
-		while(Timestamp_get32()%2 != 0);
 		results = alphaRadioReceiveData();	// start listening, obtain radioAccessSem
-		if (results == AlphaRadioStatus_ReceivedValidPacket||
-				received == 1) {
+		if (results == AlphaRadioStatus_ReceivedValidPacket) { // || received == 1) {
 			if(verbose_alphaRadioTest){
 				System_printf("RECEIVE: received a packet.\n");
 				printSampleData(latestActivePacket.sampledata);
@@ -163,7 +161,6 @@ static void alphaRadioTestTaskFunction(UArg arg0, UArg arg1){
 			if(verbose_alphaRadioTest){
 				System_printf("RECEIVE: did not receive packet.\n");System_flush();}
 		}
-
 	}
 }
 
@@ -171,7 +168,6 @@ static void alphaRadioTestTaskFunction(UArg arg0, UArg arg1){
 void packetReceivedCallback(union ConcentratorPacket* packet, int8_t rssi) {
 	latestActivePacket.header = packet->header;
 	latestActivePacket.sampledata = packet->sensorPacket.sampledata;
-	//printSampleData(latestActivePacket.sampledata);
 	received = 1;
 }
 

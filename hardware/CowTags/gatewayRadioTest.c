@@ -128,30 +128,30 @@ static void gatewayRadioTestTaskFunction(UArg arg0, UArg arg1)
 
 // display incoming samples in STDOUT
 void printSampleData(struct sampleData sampledata){
-	System_printf("gatewayRadio: received packet with CowID = %i, "
-											"PacketType: %i, "
-											"Timestamp: %i, "
-											"Error: %i, ",
-											sampledata.cowID,
-											sampledata.packetType,
-											sampledata.timestamp,
-											sampledata.error);
+	System_printf("BetaTest: sent packet with CowID = %i, "
+		"PacketType: %i, "
+		"Timestamp: %i, "
+		"Error: %i, ",
+		sampledata.cowID,
+		sampledata.packetType,
+		sampledata.timestamp,
+		sampledata.error);
 	if(sampledata.packetType == RADIO_PACKET_TYPE_SENSOR_PACKET){
-	System_printf(							"TemperatureCowData = %i.%i, "
-											"AmbientTemperatureData = %i.%i, "
-											"InfraredData = %i.%i\n",
-											sampledata.tempData.temp_h,
-											sampledata.tempData.temp_l,
-											sampledata.heartRateData.temp_h,
-											sampledata.heartRateData.temp_l,
-											sampledata.heartRateData.rate_h,
-											sampledata.heartRateData.rate_l);
+		System_printf(							"TemperatureCowData = %i, "
+			"AmbientTemperatureData = %i, "
+			"InfraredData = %i\n",
+			sampledata.tempData.temp_h << 8 |
+			sampledata.tempData.temp_l,
+			sampledata.heartRateData.temp_h << 8 |
+			sampledata.heartRateData.temp_l,
+			sampledata.heartRateData.rate_h <<8 |
+			sampledata.heartRateData.rate_l);
 	}
 	else{
-	System_printf(							"accelerometerData= x=%i, y=%i, z=%i\n",
-											sampledata.accelerometerData.x_h << 8 + sampledata.accelerometerData.x_l,
-											sampledata.accelerometerData.y_h << 8 + sampledata.accelerometerData.y_l,
-											sampledata.accelerometerData.z_h << 8 + sampledata.accelerometerData.z_l);
+		System_printf(							"accelerometerData= x=%i, y=%i, z=%i\n",
+			sampledata.accelerometerData.x_h << 8 + sampledata.accelerometerData.x_l,
+			sampledata.accelerometerData.y_h << 8 + sampledata.accelerometerData.y_l,
+			sampledata.accelerometerData.z_h << 8 + sampledata.accelerometerData.z_l);
 	}
 }
 

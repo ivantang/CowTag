@@ -52,13 +52,13 @@ int main(void) {
 	//if (verbose_main) {System_printf("Initializing EEPROM...\n");}
 	//eepromTest_init();
 
-	//if (verbose_main) {System_printf("Initializing serialization thread...\n");}
-	//serializeTestStart();
+//	if (verbose_main) {System_printf("Initializing serialization thread...\n");}
+//	serializeTestStart();
 
-	//if(verbose_main){System_printf("Initializing radio antenna...\n");}
+	if(verbose_main){System_printf("Initializing radio antenna...\n");}
 	radioSend_init();
 
-	//if(verbose_main){System_printf("Initializing Beta tasks...\n");}
+	if(verbose_main){System_printf("Initializing Beta tasks...\n");}
 	betaRadioTest_init();
 
 	System_flush();

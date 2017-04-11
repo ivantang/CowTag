@@ -57,7 +57,7 @@
 #include <pinTable.h>
 
 /***** Defines *****/
-#define BETARADIOTEST_TASK_STACK_SIZE 1024
+#define BETARADIOTEST_TASK_STACK_SIZE 8192
 #define BETARADIOTEST_TASK_PRIORITY   3
 
 /***** Variable Declarations *****/
@@ -196,7 +196,6 @@ void printSampleData(struct sampleData sampledata){
 			sampledata.tempData.temp_l,
 			sampledata.heartRateData.temp_h << 8 |
 			sampledata.heartRateData.temp_l,
-			sampledata.heartRateData.rate_h <<8 |
 			sampledata.heartRateData.rate_l);
 	}
 	else{

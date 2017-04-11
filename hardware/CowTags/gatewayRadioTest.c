@@ -175,7 +175,7 @@ void filePrintSampleData(struct sampleData sampledata) {
 	if(sampledata.packetType == RADIO_PACKET_TYPE_SENSOR_PACKET){
 		fprintf(fp, "TemperatureCowData = %i.%i, "
 				"AmbientTemperatureData = %i.%i, "
-				"InfraredData = %i.%i\n",
+				"HeartRate = %i.%i\n",
 				sampledata.tempData.temp_h,
 				sampledata.tempData.temp_l,
 				sampledata.heartRateData.temp_h,

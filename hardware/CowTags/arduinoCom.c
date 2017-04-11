@@ -17,10 +17,13 @@
 /* Example/Board Header files */
 #include <Board.h>
 
-/* Drivers */
+/* TI-RTOS Header files */
+#include <ti/drivers/PIN.h>
 #include <ti/drivers/I2C.h> //i2c
+#include <ti/drivers/UART.h> //i2c
+#include <IIC.h>
 
-/* miscellaneous */
+#include <stdint.h>
 #include <assert.h>
 
 /***** Defines *****/
@@ -46,7 +49,6 @@ void writeI2CArduino(uint8_t slaveAddr, uint8_t bytes[]) {
 	// init clock speed and synch
 	I2C_Params_init(&t_params);
 
-	if(verbose_arduinoCom){System_printf("Initialized I2C Params\n");}
     t_params.transferMode = I2C_MODE_BLOCKING;
     t_params.bitRate = I2C_100kHz;
 
@@ -65,20 +67,23 @@ void writeI2CArduino(uint8_t slaveAddr, uint8_t bytes[]) {
     t_i2cTransaction.readCount = 0;
     t_i2cTransaction.slaveAddress = slaveAddr;
 
-	t_handle = I2C_open(Board_I2C, &t_params);
+    t_handle = I2C_open(Board_I2C, &t_params);
 	if (t_handle == NULL) {
 		System_abort("Error Initializing I2C for Transmitting\n");
 	}
-
-	// while error, keep trying
-	if(verbose_arduinoCom){System_printf("Starting transfer\n");}
-	if(I2C_transfer(t_handle, &t_i2cTransaction) == NULL){
-		System_printf("Error transferring data to I2C to Arduino\n");
+	else {
+		if(verbose_i2c) System_printf("I2C Initialized for Transmitting!\n");
 	}
 
+	i = 0;
+	for(i = 0; i < retryI2CCount ; i++){
+		if(I2C_transfer(t_handle, &t_i2cTransaction) != NULL) break;
+		if(verbose_i2c && i == retryI2CCount-1){
+			System_printf("I2C Transfer timed out\n");
+			System_flush();
+		}
+	}
 
 	if(verbose_arduinoCom){System_printf("Closing I2C\n");}
 	I2C_close(t_handle);
-
-	if(verbose_arduinoCom){System_printf("ArduinoCom finished\n");}
 }

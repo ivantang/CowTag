@@ -24,6 +24,7 @@
 #define GATEWAY_MAX_NODES 7
 #define RADIO_PACKET_TYPE_SENSOR_PACKET 3
 #define RADIO_PACKET_TYPE_ACCEL_PACKET 4
+#define VERBOSE 0
 
 EthernetClient client;
 byte mac[] = {  0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xEF };  // MAC address for the ethernet controller.
@@ -156,23 +157,23 @@ void initSerial() {
   while (!Serial) {
     ;  // wait for serial port to initialize
   }
-  Serial.println("Serial ready");
+  if(VERBOSE){Serial.println("Serial ready");}
 }
 
 // Initialize Ethernet library
 void initEthernet() {
   byte mac[] = {0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED};
     if (!Ethernet.begin(mac)) {
-      Serial.println("Failed to configure Ethernet");
+       if(VERBOSE){Serial.println("Failed to configure Ethernet");}
       return;
     }
-  Serial.println("Ethernet ready");
+   if(VERBOSE){Serial.println("Ethernet ready");}
   delay(1000);
 }
 
 // Pause for 5 seconds
 void wait() {
-  Serial.println("Wait 5 seconds");
+   if(VERBOSE){Serial.println("Wait 5 seconds");}
   delay(5000);
 }
 
@@ -181,11 +182,11 @@ byte postPage(char* domainBuffer, int thisPort, char* page, char* thisData)
   int inChar;
   char outBuf[64];
 
-  Serial.print(F("connecting..."));
+   if(VERBOSE){Serial.print(F("connecting..."));}
 
   if (client.connect(domainBuffer, thisPort) == 1)
   {
-    Serial.println(F("connected"));
+     if(VERBOSE){Serial.println(F("connected"));}
 
     // send the header
     sprintf(outBuf, "POST %s HTTP/1.1", page);
@@ -201,7 +202,7 @@ byte postPage(char* domainBuffer, int thisPort, char* page, char* thisData)
   }
   else
   {
-    Serial.println(F("failed"));
+     if(VERBOSE){Serial.println(F("failed"));}
     return 0;
   }
 
@@ -220,14 +221,14 @@ byte postPage(char* domainBuffer, int thisPort, char* page, char* thisData)
     connectLoop++;
     if (connectLoop > 10000)
     {
-      Serial.println();
-      Serial.println(F("Timeout"));
+       if(VERBOSE){Serial.println();}
+       if(VERBOSE){Serial.println(F("Timeout"));}
       client.stop();
     }
   }
 
-  Serial.println();
-  Serial.println(F("disconnecting."));
+   if(VERBOSE){Serial.println();}
+   if(VERBOSE){Serial.println(F("disconnecting."));}
   client.stop();
   return 1;
 }
@@ -239,11 +240,11 @@ void setup() {
   digitalWrite(4, HIGH);
   
   initSerial();
-  initEthernet();
+ //initEthernet();
 
   Wire.begin(6);
   Wire.onReceive(receiveEvent);
-
+  if(VERBOSE){Serial.println(F("done stup."));}
 }
 
 // ARDUINO entry point #2: runs over and over again forever
@@ -252,16 +253,14 @@ void loop() {
 }
 
 void receiveEvent(int howMany) {
-  Serial.println("Receiving");
   int i = 0;
-  
   SampleData sampleData;
-   char data[MAX_CONTENT_SIZE];
+  char data[MAX_CONTENT_SIZE];
 
   //Get Data via I2C
   while (1 <= Wire.available()) { // loop through all
     unsigned char c = Wire.read(); // receive byte as a int
-    //Serial.println(c);         // print the character
+     if(VERBOSE){Serial.println(c);}      // print the character
     buffer[i] = c;
     i++;
   }
@@ -294,6 +293,7 @@ void receiveEvent(int howMany) {
   //Serial.print("\n\r");
   Serial.println(data);
 
+/*
   if (!postPage(serverName, serverPort, pageName, data)) {
     Serial.println(F("Fail "));
   }
@@ -301,4 +301,5 @@ void receiveEvent(int howMany) {
     Serial.println(F("Pass "));
   }
   Serial.println("Done");
+  */
 }

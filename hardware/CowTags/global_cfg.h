@@ -91,7 +91,7 @@ static const int verbose_serialize = 0;
 static const int verbose_eeprom = 0;
 
 /* Arduino Communications */
-static const int verbose_arduinoCom = 0;
+static const int verbose_arduinoCom = 1;
 
 /* Alpha send and receive radio */
 static const int verbose_alphaRadio = 0;
@@ -100,8 +100,8 @@ static const int verbose_alphaRadio = 0;
 static const int verbose_serializeTest    = 1;
 static const int verbose_betaRadioTest    = 1;
 static const int verbose_alphaRadioTest   = 1;
-static const int verbose_gatewayRadioTest = 0;
-static const int verbose_arduinoComTest   = 0;
+static const int verbose_gatewayRadioTest = 1;
+static const int verbose_arduinoComTest   = 1;
 static const int verbose_eepromTest       = 1;
 
 // Timestamp
@@ -115,10 +115,13 @@ static const int verbose_sleep = 0;
 static const int usingEeprom = 1;
 
 /*** ignore sensors ***/
-static const int ignoreSensors = 0;
+static const int ignoreSensors = 1;
 
 /*** grab 1 sample ***/
 static const int grabOnlyOne = 0;
+
+static const int retryI2CCount = 10;
+
 
 #endif // GLOBAL_CFG_H
 

@@ -9,8 +9,6 @@
 #define IIC_H_
 
 
-#define retryI2CCount	10
-
 /***** Includes *****/
 #include <stdint.h>
 

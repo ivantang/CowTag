@@ -527,7 +527,7 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry excluding="uArtEcho.c|radioSendReceive.c|eepromTest.c|sensors.c|RadioSend.c|IIC.c|eeprom.c|alphaMain.c|alphaRadioTest.c|betaRadioTest.c|betaMain.c|src" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+						<entry excluding="uArtEcho.c|radioSendReceive.c|eepromTest.c|sensors.c|RadioSend.c|eeprom.c|alphaMain.c|alphaRadioTest.c|betaRadioTest.c|betaMain.c|src" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>

@@ -49,17 +49,17 @@ int main(void) {
 	//if (verbose_main) {System_printf("Initializing sensors...\n");}
 	//Sensors_test(); // init i2C
 
-	if (verbose_main) {System_printf("Initializing EEPROM...\n");}
-	eepromTest_init();
+	//if (verbose_main) {System_printf("Initializing EEPROM...\n");}
+	//eepromTest_init();
 
 //	if (verbose_main) {System_printf("Initializing serialization thread...\n");}
 //	serializeTestStart();
 
-	//if(verbose_main){System_printf("Initializing radio antenna...\n");}
-//	radioSend_init();
+	if(verbose_main){System_printf("Initializing radio antenna...\n");}
+	radioSend_init();
 
-	//if(verbose_main){System_printf("Initializing Beta tasks...\n");}
-//	betaRadioTest_init();
+	if(verbose_main){System_printf("Initializing Beta tasks...\n");}
+	betaRadioTest_init();
 
 	System_flush();
 

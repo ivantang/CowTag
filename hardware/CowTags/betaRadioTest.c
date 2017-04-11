@@ -117,11 +117,7 @@ static void betaRadioTestTaskFunction(UArg arg0, UArg arg1)
 		// send packet or save to eeprom
 		if(verbose_betaRadioTest){System_printf("BetaTest: sending packet...\n");System_flush();}
 
-		while(Timestamp_get32()%2 != 0);
-
 		results = betaRadioSendData(sampledata);
-
-
 		if (results != NodeRadioStatus_Success) {
 
 			if (usingEeprom) {
@@ -150,8 +146,11 @@ static void betaRadioTestTaskFunction(UArg arg0, UArg arg1)
 
 				// check for another stored sample
 				bool hasNext = eeprom_getNext(&oldSample);
+				System_printf("GET NEXT: %d\n", hasNext);
 				if (hasNext) {
 					Task_sleep(sleepASecond());
+					System_printf("RESSEDING\n");
+					printSampleData(oldSample);
 					results = betaRadioSendData(oldSample);
 
 					if (results != NodeRadioStatus_Success) {
@@ -162,7 +161,9 @@ static void betaRadioTestTaskFunction(UArg arg0, UArg arg1)
 					} else {
 						++oldSamplesSent;
 					}
-				} //end if(hasnext)
+				} else {
+					isSending = false;
+				}
 			} while (isSending == true);
 
 			if(verbose_betaRadioTest){System_printf("%d saved samples sent\n", oldSamplesSent);}

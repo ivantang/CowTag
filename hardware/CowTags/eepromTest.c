@@ -92,14 +92,14 @@ void eepromTestGetNext() {
 	// test packet
 	struct sampleData sampledata;
 	sampledata.cowID = 1;
-	sampledata.packetType = RADIO_PACKET_TYPE_ACCEL_PACKET;
+	sampledata.packetType = RADIO_PACKET_TYPE_SENSOR_PACKET;
 	sampledata.timestamp = 0x12345678;
-	sampledata.accelerometerData.x_h = 0x12;
-	sampledata.accelerometerData.x_h = 0x34;
-	sampledata.accelerometerData.y_h = 0x56;
-	sampledata.accelerometerData.y_l = 0x78;
-	sampledata.accelerometerData.z_h = 0x90;
-	sampledata.accelerometerData.z_l = 0x12;
+	sampledata.tempData.temp_h = 0x78;
+	sampledata.tempData.temp_l = 0x65;
+	sampledata.heartRateData.rate_h = 0x90;
+	sampledata.heartRateData.rate_l = 0x87;
+	sampledata.heartRateData.temp_h = 0x45;
+	sampledata.heartRateData.temp_l = 0x32;
 	sampledata.error = 0x0;
 
 	// write thrice

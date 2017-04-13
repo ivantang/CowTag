@@ -200,9 +200,9 @@ void printSampleData(struct sampleData sampledata){
 	}
 	else{
 		System_printf(							"accelerometerData= x=%i, y=%i, z=%i\n",
-			sampledata.accelerometerData.x_h << 8 + sampledata.accelerometerData.x_l,
-			sampledata.accelerometerData.y_h << 8 + sampledata.accelerometerData.y_l,
-			sampledata.accelerometerData.z_h << 8 + sampledata.accelerometerData.z_l);
+			sampledata.accelerometerData.x_h << 8 | sampledata.accelerometerData.x_l,
+			sampledata.accelerometerData.y_h << 8 | sampledata.accelerometerData.y_l,
+			sampledata.accelerometerData.z_h << 8 | sampledata.accelerometerData.z_l);
 	}
 }
 

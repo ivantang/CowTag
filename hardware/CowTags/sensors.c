@@ -98,47 +98,37 @@ void getAcceleration(struct sampleData *sampleData) {
     writeI2CRegister(Board_LIS3DH_ADDR, LIS3DH_REG_CTRL1, accelerometer_state);    //all axes , HR/normal mode, 10Hz
     writeI2CRegister(Board_LIS3DH_ADDR, LIS3DH_REG_CTRL4, 0x08);	//high res and BDU and self test off +/-2g
     writeI2CRegister(Board_LIS3DH_ADDR, LIS3DH_REG_CTRL3, 0x10);    //DRDY on INT1
-    //writeI2CRegister(Board_LIS3DH_ADDR, LIS3DH_REG_TEMPCFG, 0x80);    //enable adcs
-    //writeI2C(Board_LIS3DH_ADDR, LIS3DH_REG_OUT_X_L | 0x80);    //enable auto increment
 
     //polling status register to check for new set of data
-    //if(!grabOnlyOne){
-		for(i = 0 ; i < samplesToGet ;){
-			if( (readI2CRegister(Board_LIS3DH_ADDR,0x27) & 0x8) >> 3 == 1 ){
-				if( (readI2CRegister(Board_LIS3DH_ADDR,0x27) >> 7) == 1 ){
-					accelerationData[i].accelerometerData.x_h = readI2CRegister(Board_LIS3DH_ADDR,0x28);
-					accelerationData[i].accelerometerData.x_l = readI2CRegister(Board_LIS3DH_ADDR,0x29);
-					accelerationData[i].accelerometerData.y_h = readI2CRegister(Board_LIS3DH_ADDR,0x2A);
-					accelerationData[i].accelerometerData.y_l = readI2CRegister(Board_LIS3DH_ADDR,0x2B);
-					accelerationData[i].accelerometerData.z_h = readI2CRegister(Board_LIS3DH_ADDR,0x2C);
-					accelerationData[i].accelerometerData.z_l = readI2CRegister(Board_LIS3DH_ADDR,0x2D);
+	for(i = 0 ; i < samplesToGet ;){
+		if( (readI2CRegister(Board_LIS3DH_ADDR,0x27) & 0x8) >> 3 == 1 ){
+			if( (readI2CRegister(Board_LIS3DH_ADDR,0x27) >> 7) == 1 ){
+				accelerationData[i].accelerometerData.x_h = readI2CRegister(Board_LIS3DH_ADDR,0x28);
+				accelerationData[i].accelerometerData.x_l = readI2CRegister(Board_LIS3DH_ADDR,0x29);
+				accelerationData[i].accelerometerData.y_h = readI2CRegister(Board_LIS3DH_ADDR,0x2A);
+				accelerationData[i].accelerometerData.y_l = readI2CRegister(Board_LIS3DH_ADDR,0x2B);
+				accelerationData[i].accelerometerData.z_h = readI2CRegister(Board_LIS3DH_ADDR,0x2C);
+				accelerationData[i].accelerometerData.z_l = readI2CRegister(Board_LIS3DH_ADDR,0x2D);
 
-					sampleData->accelerometerData.x_h = accelerationData[i].accelerometerData.x_h;
-					sampleData->accelerometerData.x_l = accelerationData[i].accelerometerData.x_l;
-					sampleData->accelerometerData.y_h = accelerationData[i].accelerometerData.y_h;
-					sampleData->accelerometerData.y_l = accelerationData[i].accelerometerData.y_l;
-					sampleData->accelerometerData.z_h = accelerationData[i].accelerometerData.z_h;
-					sampleData->accelerometerData.z_l = accelerationData[i].accelerometerData.z_l;
+				sampleData->accelerometerData.x_h = accelerationData[i].accelerometerData.x_h;
+				sampleData->accelerometerData.x_l = accelerationData[i].accelerometerData.x_l;
+				sampleData->accelerometerData.y_h = accelerationData[i].accelerometerData.y_h;
+				sampleData->accelerometerData.y_l = accelerationData[i].accelerometerData.y_l;
+				sampleData->accelerometerData.z_h = accelerationData[i].accelerometerData.z_h;
+				sampleData->accelerometerData.z_l = accelerationData[i].accelerometerData.z_l;
 
-			    	System_flush();
+				System_flush();
 
-					break;
-				}
+				break;
 			}
 		}
-    //}
+	}
 
-    //write to file
-    //for(i = 0 ; i < samplesToGet ;i++){
-//    	System_printf("x:%i y:%i z:%i\n", 	sampleData->accelerometerData.x_h << 8 | sampleData->accelerometerData.x_l,
-//											sampleData->accelerometerData.y_h << 8 | sampleData->accelerometerData.y_l,
-//											sampleData->accelerometerData.z_h << 8 | sampleData->accelerometerData.z_l);
-    	if(verbose_beta_log){
-			accelerationData[i].packetType = RADIO_PACKET_TYPE_ACCEL_PACKET;
-			file_printSampleData(accelerationData[i]);
-    	}
-    //}
-
+	//prints output to file
+	if(verbose_beta_log){
+		accelerationData[i].packetType = RADIO_PACKET_TYPE_ACCEL_PACKET;
+		file_printSampleData(accelerationData[i]);
+	}
 
     System_flush();
 
@@ -157,9 +147,9 @@ void getTemp(struct sampleData *sampleData) {
 	sampleData->heartRateData.temp_l = temp_amb & 0xFF;
 	sampleData->heartRateData.temp_h = temp_amb >> 8;
 
-	/*if (verbose_sensors) {
+	if (verbose_sensors) {
 		System_printf("temp_obj %d\n", temp_obj);
-	}*/
+	}
 
 	if (verbose_beta_log){
 		sampleData->packetType = RADIO_PACKET_TYPE_TEMP_PACKET;
@@ -169,30 +159,10 @@ void getTemp(struct sampleData *sampleData) {
 	return;
 }
 
-void getTempNoPtr() {
-	uint16_t temp_obj;
-	uint16_t temp_amb;
-
-
-	temp_obj =  readI2CWord100kHz(Board_MIKROE1362_ADDR,0x07)*0.02 - 273.15;
-
-	temp_amb =  readI2CWord100kHz(Board_MIKROE1362_ADDR,0x06)*0.02 - 273.15;
-
-	if (verbose_sensors) {
-		System_printf("temp_obj %d\n", temp_obj);
-		System_printf("temp_obj %d\n", temp_amb);
-		System_flush();
-	}
-
-	return;
-}
-
 
 void getHeartRate(struct sampleData* sampleData) {
 	int i = 0;
 	uint16_t numValues = 500;
-	//uint16_t RedData[250];
-	//int Derivative[75];
 	uint8_t rate_l[500];
 	uint8_t rate_h[500];
 
@@ -203,11 +173,6 @@ void getHeartRate(struct sampleData* sampleData) {
 	}
 
 	writeI2CRegister(Board_MAX30100_ADDR, MAX30100_REG_MODE_CONFIGURATION, 0x02);	//enable HR only
-
-//	uint8_t previous = readI2CRegister(Board_MAX30100_ADDR, MAX30100_REG_SPO2_CONFIGURATION);
-//	writeI2CRegister(Board_MAX30100_ADDR,
-//					 MAX30100_REG_SPO2_CONFIGURATION,
-//					 previous & 0xA0 | 0x47);	//SPO2 cofig reg
 
 	// previous holds the current state of the heartrate configuration
 	uint8_t previous = readI2CRegister(Board_MAX30100_ADDR,
@@ -286,8 +251,6 @@ void getHeartRate(struct sampleData* sampleData) {
 	if(!grabOnlyOne){
 		while(i < numValues){
 			//clear FIFO PTR
-			//writeI2CRegister(Board_MAX30100_ADDR, MAX30100_REG_FIFO_WRITE_POINTER, 0x00);
-			//writeI2CRegister(Board_MAX30100_ADDR, MAX30100_REG_FIFO_READ_POINTER, 0x00);
 
 			//check if hr data is ready
 			while(!tempval){
@@ -310,7 +273,7 @@ void getHeartRate(struct sampleData* sampleData) {
 			/*while( (rate_h[i] << 8 + rate_l[i] == 0)){
 				rate_h[i] = readI2CRegister(Board_MAX30100_ADDR,MAX30100_REG_FIFO_DATA);
 				rate_l[i] = readI2CRegister(Board_MAX30100_ADDR, MAX30100_REG_FIFO_DATA);
-				//readI2CRegister(Board_MAX30100_ADDR,MAX30100_REG_FIFO_DATA)<<8 + readI2CRegister(Board_MAX30100_ADDR, MAX30100_REG_FIFO_DATA);
+				readI2CRegister(Board_MAX30100_ADDR,MAX30100_REG_FIFO_DATA)<<8 + readI2CRegister(Board_MAX30100_ADDR, MAX30100_REG_FIFO_DATA);
 			}*/
 
 			break;
@@ -327,11 +290,19 @@ void getHeartRate(struct sampleData* sampleData) {
 			peak = 0;
 		} else {
 			if(rate_h[i] << 8 + rate_l[i] != 0) peak = rate_h[i] << 8 + rate_l[i];
-			//System_printf("HR %i\n", rate_h[i] << 8 + rate_l[i]);
 		}
 	}
 
 	sampleData->heartRateData.rate_l = actualHeartRate;
+
+	if (verbose_beta_log){
+		for (i = 0; i < numValues; i++) {
+			sampleData->heartRateData.rate_l = rate_l[i];
+			sampleData->heartRateData.rate_h = rate_l[i];
+			sampleData->packetType = RADIO_PACKET_TYPE_TEMP_PACKET;
+			file_printSampleData(*sampleData);
+		}
+	}
 
 	return;
 }
@@ -364,6 +335,8 @@ void makeSensorPacket(struct sampleData *sampleData) {
 
 }
 
+//continuously runs makeSensorPacket
+//if verbose_beta_log is 1 then data is written to file
 void testSensors() {
 	struct sampleData sampleData;
 

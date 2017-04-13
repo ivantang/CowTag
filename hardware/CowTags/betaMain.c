@@ -47,19 +47,19 @@ int main(void) {
 	eventManager_init();
 
 	//if (verbose_main) {System_printf("Initializing sensors...\n");}
-	//Sensors_test(); // init i2C
+	//Sensors_test(); // this initializes the sensor test thread (only need Board_initGeneral)
 
 	//if (verbose_main) {System_printf("Initializing EEPROM...\n");}
-	//eepromTest_init();
+	//eepromTest_init(); // this initializes the eeprom test thread (only need Board_initGeneral)
 
 //	if (verbose_main) {System_printf("Initializing serialization thread...\n");}
-//	serializeTestStart();
+//	serializeTestStart(); //this initializes the packet serialize test thread (only need Board_initGeneral)
 
 	if(verbose_main){System_printf("Initializing radio antenna...\n");}
 	radioSend_init();
 
 	if(verbose_main){System_printf("Initializing Beta tasks...\n");}
-	betaRadioTest_init();
+	betaRadioTest_init(); //this initializes beta radio thread (requires radioSend and Board_initGeneral and eventManager)
 
 	System_flush();
 

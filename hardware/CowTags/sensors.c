@@ -41,7 +41,7 @@ PIN_Config BoardGpioInitialTable[] = {
 PIN_State pinState;
 
 /**constants*/
-#define TASKSTACKSIZE		2048	//i2c
+#define TASKSTACKSIZE		0
 
 /**structures*/
 Task_Struct task0Struct;
@@ -190,10 +190,11 @@ void getTempNoPtr() {
 
 void getHeartRate(struct sampleData* sampleData) {
 	int i = 0;
-	uint16_t numValues = 15;
+	uint16_t numValues = 500;
 	//uint16_t RedData[250];
 	//int Derivative[75];
-	struct heartrateData HRData[15];
+	uint8_t rate_l[500];
+	uint8_t rate_h[500];
 
 	//check if device is connected
 	if(readI2CRegister(Board_MAX30100_ADDR,0xFF) != 0x11){
@@ -285,46 +286,52 @@ void getHeartRate(struct sampleData* sampleData) {
 	if(!grabOnlyOne){
 		while(i < numValues){
 			//clear FIFO PTR
-			writeI2CRegister(Board_MAX30100_ADDR, MAX30100_REG_FIFO_WRITE_POINTER, 0x00);
-			writeI2CRegister(Board_MAX30100_ADDR, MAX30100_REG_FIFO_READ_POINTER, 0x00);
+			//writeI2CRegister(Board_MAX30100_ADDR, MAX30100_REG_FIFO_WRITE_POINTER, 0x00);
+			//writeI2CRegister(Board_MAX30100_ADDR, MAX30100_REG_FIFO_READ_POINTER, 0x00);
 
 			//check if hr data is ready
 			while(!tempval){
 				tempval = readI2CRegister(Board_MAX30100_ADDR, MAX30100_REG_INTERRUPT_STATUS);
 				tempval &= MAX30100_HRDATA_READY;
-				//System_printf(".");
-				//System_flush();
-				if(tempval &= MAX30100_DATA_FULL){
-					System_printf("IM FULL\n");
-					System_flush();
-				}
 			}
 
 			//fifo data is 16 bits so 4 reads is needed
 			//first 16 bits is IR data, in our case, HR data
-			HRData[i].rate_h = readI2CRegister(Board_MAX30100_ADDR,MAX30100_REG_FIFO_DATA);
-			HRData[i].rate_l = readI2CRegister(Board_MAX30100_ADDR, MAX30100_REG_FIFO_DATA);
-			readI2CRegister(Board_MAX30100_ADDR,MAX30100_REG_FIFO_DATA)<<8 + readI2CRegister(Board_MAX30100_ADDR, MAX30100_REG_FIFO_DATA);
-			//filter out 0 measurements
-			while( (HRData[i].rate_h << 8 + HRData[i].rate_l < 1) || (HRData[i].rate_h << 8 + HRData[i].rate_l > 48829)){
-				HRData[i].rate_h = readI2CRegister(Board_MAX30100_ADDR,MAX30100_REG_FIFO_DATA);
-				HRData[i].rate_l = readI2CRegister(Board_MAX30100_ADDR, MAX30100_REG_FIFO_DATA);
-				//readI2CRegister(Board_MAX30100_ADDR,MAX30100_REG_FIFO_DATA)<<8 + readI2CRegister(Board_MAX30100_ADDR, MAX30100_REG_FIFO_DATA);
+			rate_h[i] = readI2CRegister(Board_MAX30100_ADDR,MAX30100_REG_FIFO_DATA);
+			rate_l[i] = readI2CRegister(Board_MAX30100_ADDR, MAX30100_REG_FIFO_DATA);
+
+			while(!tempval){
+				tempval = readI2CRegister(Board_MAX30100_ADDR, MAX30100_REG_INTERRUPT_STATUS);
+				tempval &= 0x10;
 			}
 
-			sampleData->heartRateData.rate_h = HRData[i].rate_h;
-			sampleData->heartRateData.rate_l = HRData[i].rate_l;
+			readI2CRegister(Board_MAX30100_ADDR,MAX30100_REG_FIFO_DATA)<<8 + readI2CRegister(Board_MAX30100_ADDR, MAX30100_REG_FIFO_DATA);
+			//filter out 0 measurements
+			/*while( (rate_h[i] << 8 + rate_l[i] == 0)){
+				rate_h[i] = readI2CRegister(Board_MAX30100_ADDR,MAX30100_REG_FIFO_DATA);
+				rate_l[i] = readI2CRegister(Board_MAX30100_ADDR, MAX30100_REG_FIFO_DATA);
+				//readI2CRegister(Board_MAX30100_ADDR,MAX30100_REG_FIFO_DATA)<<8 + readI2CRegister(Board_MAX30100_ADDR, MAX30100_REG_FIFO_DATA);
+			}*/
 
 			break;
 		}
 	}
 
+	//heart rate algorithm
+	uint16_t peak = 0;
+	unsigned actualHeartRate = 0;
 
-	if (verbose_beta_log){
-		//HRData[i].packetType = RADIO_PACKET_TYPE_SENSOR_PACKET;
-		//file_printSampleData(HRData[i]);
+	for (i = 0; i < numValues; i++) {
+		if( (rate_h[i] << 8 + rate_l[i]) < peak){
+			actualHeartRate++;
+			peak = 0;
+		} else {
+			if(rate_h[i] << 8 + rate_l[i] != 0) peak = rate_h[i] << 8 + rate_l[i];
+			//System_printf("HR %i\n", rate_h[i] << 8 + rate_l[i]);
+		}
 	}
 
+	sampleData->heartRateData.rate_l = actualHeartRate;
 
 	return;
 }
@@ -335,21 +342,21 @@ void getTimestamp(struct sampleData *sampleData) {
 }
 
 void makeSensorPacket(struct sampleData *sampleData) {
-	getHeartRate(sampleData);
-
 	getTemp(sampleData);
 
 	getAcceleration(sampleData);
 
+	getHeartRate(sampleData);
+
 	if(verbose_sensors)
 	System_printf(							"TemperatureCowData = %i ,"
 											"AmbientTemperatureData = %i ,"
-											"InfraredData = %i\n"
+											"Heartrate = %i\n"
 											"AccelerometerData= x=%i, y=%i, z=%i\n"
 											"Timestamp = %i\n",
 											sampleData->tempData.temp_h << 8 | sampleData->tempData.temp_l,
 											sampleData->heartRateData.temp_h << 8 | sampleData->heartRateData.temp_l,
-											sampleData->heartRateData.rate_h << 8 | sampleData->heartRateData.rate_l,
+											sampleData->heartRateData.rate_l,
 											sampleData->accelerometerData.x_h << 8 | sampleData->accelerometerData.x_l,
 											sampleData->accelerometerData.y_h << 8 | sampleData->accelerometerData.y_l,
 											sampleData->accelerometerData.z_h << 8 | sampleData->accelerometerData.z_l,

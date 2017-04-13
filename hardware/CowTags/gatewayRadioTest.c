@@ -145,7 +145,6 @@ void printSampleData(struct sampleData sampledata){
 			sampledata.tempData.temp_l,
 			sampledata.heartRateData.temp_h << 8 |
 			sampledata.heartRateData.temp_l,
-			sampledata.heartRateData.rate_h <<8 |
 			sampledata.heartRateData.rate_l);
 	}
 	else{
@@ -176,7 +175,7 @@ void filePrintSampleData(struct sampleData sampledata) {
 	if(sampledata.packetType == RADIO_PACKET_TYPE_SENSOR_PACKET){
 		fprintf(fp, "TemperatureCowData = %i.%i, "
 				"AmbientTemperatureData = %i.%i, "
-				"InfraredData = %i.%i\n",
+				"HeartRate = %i\n",
 				sampledata.tempData.temp_h,
 				sampledata.tempData.temp_l,
 				sampledata.heartRateData.temp_h,

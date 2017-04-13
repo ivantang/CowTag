@@ -158,8 +158,6 @@ bool eeprom_getNext(struct sampleData *data) {
 			return false;
 		}
 	}
-	if(verbose_eeprom){System_printf("Finished eepromGetNext\n");System_flush();}
-	return false;
 }
 
 void eeprom_reset() {

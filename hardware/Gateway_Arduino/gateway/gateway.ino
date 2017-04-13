@@ -43,9 +43,9 @@ struct TemperatureData {
 };
 
 struct AccelerationData {
-  unsigned char x;
-  unsigned char y;
-  unsigned char z;
+  unsigned long x;
+  unsigned long y;
+  unsigned long z;
 };
 
 struct HeartrateData {
@@ -140,7 +140,7 @@ void serializeSampleData(const struct SampleData* sampleData, char *data)
               sampleData->heartRateData.ambtemp_l,
               sampleData->errorCode);
   }else if(sampleData->packetType == RADIO_PACKET_TYPE_ACCEL_PACKET){
-    sprintf(data, "{\"cowID\": %i, \"packetType\": %i, \"timestamp\": %lu, \"xaxis\": %i, \"yaxis\": %i, \"zaxis\": %i, \"errcode\": %i}\n",
+    sprintf(data, "{\"cowID\": %i, \"packetType\": %i, \"timestamp\": %lu, \"xaxis\": %lu, \"yaxis\": %lu, \"zaxis\": %lu, \"errcode\": %i}\n",
               sampleData->cowID,
               sampleData->packetType,
               sampleData->timestamp,
@@ -240,7 +240,7 @@ void setup() {
   digitalWrite(4, HIGH);
   
   initSerial();
- //initEthernet();
+  initEthernet();
 
   Wire.begin(6);
   Wire.onReceive(receiveEvent);
@@ -279,10 +279,10 @@ void receiveEvent(int howMany) {
     sampleData.heartRateData.ambtemp_l = buffer[11];
     sampleData.errorCode = buffer[12];
   }else if(sampleData.packetType == RADIO_PACKET_TYPE_ACCEL_PACKET){
-    sampleData.accelerometerData.x = buffer[6];
-    sampleData.accelerometerData.y = buffer[7];
-    sampleData.accelerometerData.z = buffer[8];
-    sampleData.errorCode = buffer[9];
+    sampleData.accelerometerData.x = ((unsigned int)buffer[6]<<8 | (unsigned int)buffer[7]);
+    sampleData.accelerometerData.y = ((unsigned int)buffer[8]<<8 | (unsigned int)buffer[9]);
+    sampleData.accelerometerData.z = ((unsigned int)buffer[10]<<8 | (unsigned int)buffer[11]);
+    sampleData.errorCode = buffer[12];
   }
 
   //printSampleData(&sampleData);
@@ -293,7 +293,7 @@ void receiveEvent(int howMany) {
   //Serial.print("\n\r");
   Serial.println(data);
 
-/*
+
   if (!postPage(serverName, serverPort, pageName, data)) {
     Serial.println(F("Fail "));
   }
@@ -301,5 +301,4 @@ void receiveEvent(int howMany) {
     Serial.println(F("Pass "));
   }
   Serial.println("Done");
-  */
 }

@@ -123,8 +123,6 @@ void getAcceleration(struct sampleData *sampleData) {
 			    	System_flush();
 
 					break;
-
-					i++;
 				}
 			}
 		}
@@ -318,8 +316,6 @@ void getHeartRate(struct sampleData* sampleData) {
 			sampleData->heartRateData.rate_l = HRData[i].rate_l;
 
 			break;
-
-			i++;
 		}
 	}
 
@@ -344,8 +340,6 @@ void makeSensorPacket(struct sampleData *sampleData) {
 	getTemp(sampleData);
 
 	getAcceleration(sampleData);
-
-	printSampleData(sampleData);
 
 	if(verbose_sensors)
 	System_printf(							"TemperatureCowData = %i ,"

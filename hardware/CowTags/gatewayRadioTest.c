@@ -108,9 +108,10 @@ static void gatewayRadioTestTaskFunction(UArg arg0, UArg arg1)
 			// show results
 			printSampleData(latestActivePacket.sampledata);
 
-			if(verbose_gatewayRadioTest){System_printf("serializing packet...\n");System_flush();}
+			//if(verbose_gatewayRadioTest){System_printf("serializing packet...\n");System_flush();}
 			serializePacket(&latestActivePacket.sampledata, buf);
 
+			/*
 			if(verbose_gatewayRadioTest){
 				for(i = 0 ; i<SAMPLE_SIZE; i++){
 					System_printf("%i ", buf[i]);
@@ -118,10 +119,10 @@ static void gatewayRadioTestTaskFunction(UArg arg0, UArg arg1)
 				System_printf("\n");
 				System_flush();
 			}
-
-			if(verbose_gatewayRadioTest){System_printf("sending packet to ethernet shield...\n");System_flush();}
+			*/
+			//if(verbose_gatewayRadioTest){System_printf("sending packet to ethernet shield...\n");System_flush();}
 			writeI2CArduino(0x6, buf);
-			if(verbose_gatewayRadioTest){System_printf("packet sent to ethernet shield...\n");System_flush();}
+			//if(verbose_gatewayRadioTest){System_printf("packet sent to ethernet shield...\n");System_flush();}
 		}
 	}
 }
@@ -148,10 +149,10 @@ void printSampleData(struct sampleData sampledata){
 			sampledata.heartRateData.rate_l);
 	}
 	else{
-		System_printf(							"accelerometerData= x=%i, y=%i, z=%i\n",
-			sampledata.accelerometerData.x_h << 8 + sampledata.accelerometerData.x_l,
-			sampledata.accelerometerData.y_h << 8 + sampledata.accelerometerData.y_l,
-			sampledata.accelerometerData.z_h << 8 + sampledata.accelerometerData.z_l);
+		System_printf(							"accelerometerData= x=%d, y=%d, z=%d\n",
+			sampledata.accelerometerData.x_h << 8 | sampledata.accelerometerData.x_l,
+			sampledata.accelerometerData.y_h << 8 | sampledata.accelerometerData.y_l,
+			sampledata.accelerometerData.z_h << 8 | sampledata.accelerometerData.z_l);
 	}
 }
 

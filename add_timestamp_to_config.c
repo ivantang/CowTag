@@ -14,7 +14,7 @@ int getCurrentTime() {
 int Search_in_File(FILE *fp, char *str) {
   char current_line[512];
   int byte_count=0;
-  char c;
+  int i;
 #ifdef __WIN32
   int current_line_number=0;
 #endif
@@ -30,7 +30,7 @@ int Search_in_File(FILE *fp, char *str) {
       break;
     }
     // Count the number of bytes in the line if the line does not match
-    for (int i = 0; i < sizeof(current_line); i++) {
+    for (i = 0; i < sizeof(current_line); i++) {
       // If the current character is a newline, that is the end of the line, so
       // the current index+1 is the number of characters on that line
       if (current_line[i] == '\n') {
